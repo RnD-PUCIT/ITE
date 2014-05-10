@@ -69,7 +69,7 @@ public class AppFrame extends JFrame {
 						
 						@Override
 						public void run() {
-							String[]s={"-f","G:\\git\\Movsim\\movsim-master\\sim\\buildingBlocks\\cloverleaf"};
+							String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cloverleaf"};
 							try {
 								App.main(s);
 							} catch (URISyntaxException | IOException e) {
@@ -93,7 +93,7 @@ public class AppFrame extends JFrame {
 		pack();
 		RoadNetwork rn=new RoadNetwork();
 		try {
-			OpenDriveReader.loadRoadNetwork(rn,"G:\\git\\Movsim\\movsim-master\\sim\\buildingBlocks\\cleaf.xodr");
+			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cloverleaf");
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
