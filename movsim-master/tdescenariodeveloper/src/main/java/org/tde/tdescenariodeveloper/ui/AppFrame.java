@@ -97,8 +97,8 @@ public class AppFrame extends JFrame {
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
-		DrawingArea drawingArea = new DrawingArea(rn);
 		rdPrPnl= new RoadPropertiesPanel();
+		DrawingArea drawingArea = new DrawingArea(rn,rdPrPnl);
 		rdPrPnl.setBorder(new TitledBorder(new EmptyBorder(10, 10, 10, 10), "Road Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(drawingArea, BorderLayout.CENTER);
 		getContentPane().add(rdPrPnl, BorderLayout.EAST);

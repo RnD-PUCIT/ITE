@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.movsim.simulator.roadnetwork.RoadSegment;
+
 public class RoadPropertiesPanel extends JPanel {
 	/**
 	 * 
@@ -99,6 +101,11 @@ public class RoadPropertiesPanel extends JPanel {
 		gbc_textField_3.gridy = 4;
 		add(textField_3, gbc_textField_3);
 		textField_3.setColumns(10);
+	}
+	public void updateFields(RoadSegment selectedRoad) {
+		textField.setText(selectedRoad.getUserId());
+		textField_1.setText(selectedRoad.getRoadName());
+		textField_2.setText(selectedRoad.getRoadLength()+"");
 	}
 	
 }

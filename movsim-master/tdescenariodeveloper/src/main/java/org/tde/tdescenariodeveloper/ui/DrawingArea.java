@@ -38,7 +38,7 @@ public class DrawingArea extends Canvas {
     double scale=1.0;
     int xOffset=0,yOffset=0;
     protected AffineTransform transform = new AffineTransform();
-    
+    RoadPropertiesPanel roadPnl;
     float lineWidth=0.5f;
     float lineLength=4.5f;
     float gapLength=3.0f;
@@ -60,9 +60,11 @@ public class DrawingArea extends Canvas {
     final DrawingAreaKeyListener keyListener;
 	private boolean drawAxis=true;
 	private boolean drawBounds=false;
+	private RoadSegment selectedRoad=null;
     
     
-	public DrawingArea(RoadNetwork rn) {
+	public DrawingArea(RoadNetwork rn, RoadPropertiesPanel rdPrPnl) {
+		this.roadPnl=rdPrPnl;
 		setSize(new Dimension(bufferWidth,bufferHeight));
 		this.rn=rn;
 		keyListener=new DrawingAreaKeyListener(this, rn);
@@ -72,7 +74,16 @@ public class DrawingArea extends Canvas {
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(mouseListener);
 	}
-	
+    public void updateSelected(Graphics2D g){
+    	if(selectedRoad==null)return;
+    	roadPnl.updateFields(selectedRoad);
+    	Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
+    	g.setStroke(dashed);
+    	//g.setColor(new Color(Integer.MAX_VALUE-selectedRoad.roadMapping().roadColor()));
+    	g.setColor(Color.WHITE.darker());
+    	g.draw(selectedRoad.roadMapping().getBounds());
+    	
+    }
 	protected void setTransform() {
         transform.setToIdentity();
         transform.scale(scale, scale);
@@ -129,6 +140,7 @@ public class DrawingArea extends Canvas {
         clearBackground(backgroundGraphics);
         backgroundGraphics.setTransform(transform);
         drawBackground(backgroundGraphics);
+        updateSelected(backgroundGraphics);
         g.drawImage(backgroundBuffer, 0, 0, null);
     }
     protected void clearBackground(Graphics2D g) {
@@ -470,5 +482,11 @@ public class DrawingArea extends Canvas {
             }
         }
     }
+	public RoadSegment getSelectedRoad() {
+		return selectedRoad;
+	}
+	public void setSelectedRoad(RoadSegment selectedRoad) {
+		this.selectedRoad = selectedRoad;
+	}
     
 }

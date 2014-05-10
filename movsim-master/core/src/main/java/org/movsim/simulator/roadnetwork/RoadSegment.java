@@ -1321,4 +1321,16 @@ public class RoadSegment extends DefaultWeightedEdge implements Iterable<Vehicle
                 + ", laneCount=" + laneCount + ", nodeIds=" + nodeIds + "]";
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getRoadName() {
+        return roadName;
+    }
+
+    public double getRoadLength() {
+        return roadLength;
+    }
+
 }

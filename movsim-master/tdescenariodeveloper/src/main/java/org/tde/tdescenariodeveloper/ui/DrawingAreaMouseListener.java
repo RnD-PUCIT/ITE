@@ -17,6 +17,7 @@ import java.awt.geom.Point2D;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.movsim.viewer.graphics.TrafficCanvas;
 
 public class DrawingAreaMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -29,8 +30,6 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     private int xOffsetSave;
     private int yOffsetSave;
     RoadMapping rm;
-    RoadSegment selected=null;
-    AffineTransform at=null;
 
     /**
      * @param trafficCanvas
@@ -51,9 +50,8 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     public void mouseClicked(MouseEvent e) {
     	Point point=e.getPoint();
         Point2D.Double transformedPoint=new Point2D.Double();
-        at=trafficCanvas.transform;
         try {
-			at.inverseTransform(new Point2D.Float(point.x, point.y), transformedPoint);
+			trafficCanvas.transform.inverseTransform(new Point2D.Float(point.x, point.y), transformedPoint);
 		} catch (NoninvertibleTransformException e1) {
 			e1.printStackTrace();
 		}
@@ -61,8 +59,8 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         for(int i=roadNetwork.size()-1;i>=0;i--){
         	RoadSegment rs=roadNetwork.getRoadSegments().get(i);
     		if(controller.contains(transformedPoint.getX(), transformedPoint.getY(), rs.roadMapping())){
-    			selected=rs;
-    			updateSelected();
+    			trafficCanvas.setSelectedRoad(rs);
+    			trafficCanvas.paint(trafficCanvas.getGraphics());
     			break;
     		}
     	}
@@ -83,15 +81,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         inDrag = true;
     }
 
-    public void updateSelected(){
-    	trafficCanvas.paint(trafficCanvas.getGraphics());
-    	Stroke dashed = new BasicStroke(1.5f*(float)trafficCanvas.scale, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4*(float)trafficCanvas.scale}, 0);
-    	Graphics2D g2d=((Graphics2D)trafficCanvas.getGraphics());
-    	g2d.setStroke(dashed);
-    	g2d.setColor(new Color(Integer.MAX_VALUE-selected.roadMapping().roadColor()));
-    	g2d.draw(at.createTransformedShape(selected.roadMapping().getBounds()));
-    	
-    }
+
 	/*
      * (non-Javadoc)
      * 
@@ -99,7 +89,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-    	if(selected!=null)updateSelected();
+    	trafficCanvas.paint(trafficCanvas.getGraphics());
         inDrag = false;
     }
 
@@ -142,7 +132,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         } else {
             controller.commandZoomOut();
         }
-        updateSelected();
+        trafficCanvas.paint(trafficCanvas.getGraphics());
     }
 
 
