@@ -59,7 +59,7 @@ public class DrawingArea extends Canvas {
     final DrawingAreaMouseListener mouseListener;
     final DrawingAreaKeyListener keyListener;
 	private boolean drawAxis=true;
-	private boolean drawBounds=true;
+	private boolean drawBounds=false;
     
     
 	public DrawingArea(RoadNetwork rn) {

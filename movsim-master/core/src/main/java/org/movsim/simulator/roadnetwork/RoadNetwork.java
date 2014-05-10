@@ -409,4 +409,8 @@ public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
         return instantaneousConsumption;
     }
 
+    public ArrayList<RoadSegment> getRoadSegments() {
+        return roadSegments;
+    }
+
 }

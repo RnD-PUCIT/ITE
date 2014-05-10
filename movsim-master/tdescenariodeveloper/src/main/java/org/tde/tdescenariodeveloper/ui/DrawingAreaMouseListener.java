@@ -1,22 +1,22 @@
 package org.tde.tdescenariodeveloper.ui;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
-import javax.swing.JOptionPane;
 
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-import org.movsim.simulator.trafficlights.TrafficLightLocation;
-import org.movsim.viewer.graphics.TrafficCanvas;
 
 public class DrawingAreaMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
@@ -29,6 +29,8 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     private int xOffsetSave;
     private int yOffsetSave;
     RoadMapping rm;
+    RoadSegment selected=null;
+    AffineTransform at=null;
 
     /**
      * @param trafficCanvas
@@ -47,27 +49,23 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
      */
     @Override
     public void mouseClicked(MouseEvent e) {
-        for (final RoadSegment roadSegment : roadNetwork) {
-            if (roadSegment.trafficLightLocations() != null) {
-                final RoadMapping roadMapping = roadSegment.roadMapping();
-                for (final TrafficLightLocation trafficLightLocation : roadSegment.trafficLightLocations()) {
-                    final Rectangle2D trafficLightRect = TrafficCanvas.trafficLightRect(roadMapping, trafficLightLocation);
-                    final Point point = e.getPoint();
-                    final Point2D transformedPoint = new Point2D.Float();
-                    try {
-                        // convert from mouse coordinates to canvas coordinates
-                        trafficCanvas.transform.inverseTransform(new Point2D.Float(point.x, point.y), transformedPoint);
-                    } catch (final NoninvertibleTransformException e1) {
-                        e1.printStackTrace();
-                        return;
-                    }
-                    if (trafficLightRect.contains(transformedPoint)) {
-                        trafficLightLocation.getTrafficLight().triggerNextPhase();
-                        trafficCanvas.paint(trafficCanvas.getGraphics());
-                    }
-                }
-            }
-        }
+    	Point point=e.getPoint();
+        Point2D.Double transformedPoint=new Point2D.Double();
+        at=trafficCanvas.transform;
+        try {
+			at.inverseTransform(new Point2D.Float(point.x, point.y), transformedPoint);
+		} catch (NoninvertibleTransformException e1) {
+			e1.printStackTrace();
+		}
+        
+        for(int i=roadNetwork.size()-1;i>=0;i--){
+        	RoadSegment rs=roadNetwork.getRoadSegments().get(i);
+    		if(controller.contains(transformedPoint.getX(), transformedPoint.getY(), rs.roadMapping())){
+    			selected=rs;
+    			updateSelected();
+    			break;
+    		}
+    	}
     }
 
     /*
@@ -82,24 +80,18 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         startDragY = point.y;
         xOffsetSave =  trafficCanvas.xOffset;
         yOffsetSave =  trafficCanvas.yOffset;
-        Point2D.Double transformedPoint=new Point2D.Double();
-        try {
-			trafficCanvas.transform.inverseTransform(new Point2D.Float(point.x, point.y), transformedPoint);
-		} catch (NoninvertibleTransformException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-        for(RoadSegment rs:roadNetwork){
-    		if(controller.contains(transformedPoint.getX(), transformedPoint.getY(), rs.roadMapping())){
-    			//JOptionPane.showMessageDialog(null,rs.toString());
-    		}
-    	}
-        
-        JOptionPane.showMessageDialog(null,transformedPoint.getX()+", "+transformedPoint.getY());
         inDrag = true;
     }
 
-
+    public void updateSelected(){
+    	trafficCanvas.paint(trafficCanvas.getGraphics());
+    	Stroke dashed = new BasicStroke(1.5f*(float)trafficCanvas.scale, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{4*(float)trafficCanvas.scale}, 0);
+    	Graphics2D g2d=((Graphics2D)trafficCanvas.getGraphics());
+    	g2d.setStroke(dashed);
+    	g2d.setColor(new Color(Integer.MAX_VALUE-selected.roadMapping().roadColor()));
+    	g2d.draw(at.createTransformedShape(selected.roadMapping().getBounds()));
+    	
+    }
 	/*
      * (non-Javadoc)
      * 
@@ -107,6 +99,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
      */
     @Override
     public void mouseReleased(MouseEvent e) {
+    	if(selected!=null)updateSelected();
         inDrag = false;
     }
 
@@ -149,6 +142,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         } else {
             controller.commandZoomOut();
         }
+        updateSelected();
     }
 
 

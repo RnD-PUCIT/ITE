@@ -105,12 +105,13 @@ public class OpenDriveHandlerJaxb {
         p = roadSegment.roadMapping().map(roadLength, -width);
         edge.moveTo(p.x, p.y);
         double s = 0.0 + pathStep;
-        while (s < roadLength) {
+        while (s <= roadLength) {
             p = roadSegment.roadMapping().map(s, width);
             refLine.lineTo(p.x, p.y);
             s += pathStep;
         }
-        while (s > 0) {
+        s -= pathStep;
+        while (s >= 0) {
             p = roadSegment.roadMapping().map(s, -width);
             edge.lineTo(p.x, p.y);
             s -= pathStep;
