@@ -93,7 +93,7 @@ public class AppFrame extends JFrame {
 		pack();
 		RoadNetwork rn=new RoadNetwork();
 		try {
-			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cloverleaf");
+			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cleaf.xodr");
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
