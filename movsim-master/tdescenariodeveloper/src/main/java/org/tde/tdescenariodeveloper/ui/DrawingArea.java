@@ -14,10 +14,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import org.movsim.autogen.TrafficLightStatus;
 import org.movsim.roadmappings.RoadMapping;

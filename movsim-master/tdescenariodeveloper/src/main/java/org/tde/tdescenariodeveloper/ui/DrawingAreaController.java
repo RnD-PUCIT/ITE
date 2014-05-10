@@ -1,12 +1,10 @@
 package org.tde.tdescenariodeveloper.ui;
 
-import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.util.Iterator;
 
 import org.movsim.roadmappings.RoadMapping;

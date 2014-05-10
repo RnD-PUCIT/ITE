@@ -9,6 +9,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class RoadPropertiesPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1683090113017092656L;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;

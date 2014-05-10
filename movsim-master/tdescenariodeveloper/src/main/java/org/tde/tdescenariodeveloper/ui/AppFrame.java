@@ -69,7 +69,7 @@ public class AppFrame extends JFrame {
 						
 						@Override
 						public void run() {
-							String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cloverleaf"};
+							String[]s={"-f","G:\\git\\Movsim\\movsim-master\\sim\\buildingBlocks\\cloverleaf"};
 							try {
 								App.main(s);
 							} catch (URISyntaxException | IOException e) {
