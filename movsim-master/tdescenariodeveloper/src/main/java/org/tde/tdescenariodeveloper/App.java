@@ -9,7 +9,6 @@ public class App
 {
     public static void main( String[] args )
     {
-    	System.out.println("Shmeel");
     	GraphicsHelper.setWindowsUI();
     	AppFrame fr=new AppFrame();
     	fr.setVisible(true);
