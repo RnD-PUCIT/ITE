@@ -1,0 +1,9 @@
+/target
+/bin
+/sim/figs/*
+/sim/*.csv
+/sim/*.internal_xml
+*.log
+*.log.*
+/.classpath
+/.project
