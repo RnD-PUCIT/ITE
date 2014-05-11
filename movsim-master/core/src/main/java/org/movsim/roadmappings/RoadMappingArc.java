@@ -96,6 +96,18 @@ public class RoadMappingArc extends RoadMappingCircle {
         centerY = y0 + radius * Math.sin(startAngle - 0.5 * Math.PI) * (clockwise ? -1 : 1);
     }
 
+    @Override
+    public void setX0(double x0) {
+        super.setX0(x0);
+        centerX = x0 - radius * Math.cos(startAngle - 0.5 * Math.PI) * (clockwise ? -1 : 1);
+    }
+
+    @Override
+    public void setY0(double y0) {
+        super.setY0(y0);
+        centerY = y0 + radius * Math.sin(startAngle - 0.5 * Math.PI) * (clockwise ? -1 : 1);
+    }
+
     RoadMappingArc(int laneCount, double x0, double y0, double radius, boolean clockwise) {
         super(laneCount, x0, y0, radius, clockwise);
     }

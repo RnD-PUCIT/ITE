@@ -26,7 +26,10 @@
 
 package org.movsim.roadmappings;
 
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import org.movsim.simulator.roadnetwork.Lanes;
@@ -48,7 +51,7 @@ public abstract class RoadMapping {
     public abstract RoadMapping.PosTheta map(double roadPos, double lateralOffset);
 
     /** boundry of the road (Added by Shmeel) */
-    private GeneralPath bounds;
+    private Shape bounds;
     /**
      * Polygon with integer coordinates.
      */
@@ -191,6 +194,28 @@ public abstract class RoadMapping {
         this.laneWidth = laneWidth;
         roadWidth = laneWidth * laneCount;
         roadColor = defaultRoadColor;
+    }
+    
+    /**
+     * 
+     * @param x
+     *            x-coordinate of the point
+     * @param y
+     *            y-coordinate of the point
+     * @return true if point is in boundary of the road false otherwise
+     */
+    public boolean contains(double x, double y) {
+        return getBounds().contains(x, y);
+    }
+
+    /**
+     * 
+     * @param p
+     *            point
+     * @return true if point is in boundary of the road false otherwise
+     */
+    public boolean contains(Point2D p) {
+        return getBounds().contains(p.getX(), p.getY());
     }
 
     /**
@@ -512,11 +537,32 @@ public abstract class RoadMapping {
         return mapFloat(posTheta, vehicle.physicalQuantities().getLength(), vehicle.physicalQuantities().getWidth());
     }
 
-    public GeneralPath getBounds() {
+    public Shape getBounds() {
         return bounds;
     }
 
     public void setBounds(GeneralPath bounds) {
         this.bounds = bounds;
+    }
+
+    public double getX0() {
+        return x0;
+    }
+
+    public void setX0(double x0) {
+        this.x0 = x0;
+    }
+
+    public double getY0() {
+        return y0;
+    }
+
+    public void setY0(double y0) {
+        this.y0 = y0;
+    }
+
+    public void adjustBounds(double d, double e) {
+        AffineTransform at = AffineTransform.getTranslateInstance(d, e);
+        bounds = at.createTransformedShape(bounds);
     }
 }

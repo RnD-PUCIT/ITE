@@ -1,23 +1,28 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.xml.bind.JAXBException;
 
 import org.movsim.input.network.OpenDriveReader;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.viewer.App;
 import org.xml.sax.SAXException;
+
 import javax.swing.border.TitledBorder;
 import javax.swing.border.EmptyBorder;
 
@@ -25,6 +30,7 @@ public class AppFrame extends JFrame {
 	/**
 	 * 
 	 */
+	JPanel drawingPnl;
 	private static final long serialVersionUID = 14320973455L;
 	RoadPropertiesPanel rdPrPnl;
 	public RoadPropertiesPanel getRdPrPnl(){
@@ -98,9 +104,12 @@ public class AppFrame extends JFrame {
 			e1.printStackTrace();
 		}
 		rdPrPnl= new RoadPropertiesPanel();
+		drawingPnl=new JPanel();
 		DrawingArea drawingArea = new DrawingArea(rn,rdPrPnl);
+		drawingPnl.add(drawingArea);
+		drawingPnl.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), "Drawing Area", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP, new Font("arial",Font.BOLD,14), Color.RED));
 		rdPrPnl.setBorder(new TitledBorder(new EmptyBorder(10, 10, 10, 10), "Road Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		getContentPane().add(drawingArea, BorderLayout.CENTER);
+		getContentPane().add(drawingPnl, BorderLayout.CENTER);
 		getContentPane().add(rdPrPnl, BorderLayout.EAST);
 	}
 

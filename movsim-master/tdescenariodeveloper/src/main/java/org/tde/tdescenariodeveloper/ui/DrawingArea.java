@@ -73,6 +73,8 @@ public class DrawingArea extends Canvas {
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(mouseListener);
+		setBackground(Color.GREEN.darker());
+		
 	}
     public void updateSelected(Graphics2D g){
     	if(selectedRoad==null)return;

@@ -24,7 +24,4 @@ public class DrawingAreaController {
         trafficCanvas.setScale(trafficCanvas.getScale() / zoomFactor);
         trafficCanvas.paint(trafficCanvas.getGraphics());
     }
-    public boolean contains(double x,double y,RoadMapping roadMapping){
-    	return roadMapping.getBounds().contains(x, y);
-    }
 }

@@ -61,6 +61,18 @@ public class RoadMappingCircle extends RoadMapping {
         centerY = y0;
     }
 
+    @Override
+    public void setX0(double d) {
+        centerX = clockwise ? d + radius : d - radius;
+        super.setX0(d);
+    }
+
+    @Override
+    public void setY0(double d) {
+        centerY = d;
+        super.setY0(d);
+    }
+
     /**
      * Returns the x coordinate of the center of the circle.
      * 
