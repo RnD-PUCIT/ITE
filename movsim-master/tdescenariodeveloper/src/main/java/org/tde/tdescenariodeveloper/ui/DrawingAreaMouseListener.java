@@ -57,7 +57,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         for(int i=roadNetwork.size()-1;i>=0;i--){
         	RoadSegment rs=roadNetwork.getRoadSegments().get(i);
     		if(rs.roadMapping().contains(transformedPoint.getX(), transformedPoint.getY())){
-    			trafficCanvas.setSelectedRoad(rs);
+    			trafficCanvas.getRoadPnl().setSelectedRoad(rs);
     			trafficCanvas.paint(trafficCanvas.getGraphics());
     			break;
     		}
@@ -78,9 +78,9 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         yOffsetSave =  trafficCanvas.yOffset;
         
         try {
-        	if(trafficCanvas.getSelectedRoad()!=null){
-        		X0=trafficCanvas.getSelectedRoad().roadMapping().getX0();
-        		Y0=trafficCanvas.getSelectedRoad().roadMapping().getY0();
+        	if(trafficCanvas.getRoadPnl().getSelectedRoad()!=null){
+        		X0=trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().getX0();
+        		Y0=trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().getY0();
         		trafficCanvas.transform.inverseTransform(new Point2D.Float(startDragX, startDragY), startTransformed);
         	}
 		} catch (NoninvertibleTransformException e1) {
@@ -98,12 +98,12 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
      */
     @Override
     public void mouseReleased(MouseEvent e) {
-    	if(inDrag && trafficCanvas.getSelectedRoad()!=null && trafficCanvas.getSelectedRoad().roadMapping().contains(startTransformed)){
+    	if(inDrag && trafficCanvas.getRoadPnl().getSelectedRoad()!=null && trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
         	try {
         		trafficCanvas.transform.inverseTransform(new Point2D.Float(e.getPoint().x, e.getPoint().y), endTransformed);
-        		trafficCanvas.getSelectedRoad().roadMapping().setX0(X0+endTransformed.getX()-startTransformed.getX());
-        		trafficCanvas.getSelectedRoad().roadMapping().setY0(Y0+endTransformed.getY()-startTransformed.getY());
-        		trafficCanvas.getSelectedRoad().roadMapping().adjustBounds(endTransformed.getX()-startTransformed.getX(),endTransformed.getY()-startTransformed.getY());
+        		trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setX0(X0+endTransformed.getX()-startTransformed.getX());
+        		trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setY0(Y0+endTransformed.getY()-startTransformed.getY());
+        		trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().adjustBounds(endTransformed.getX()-startTransformed.getX(),endTransformed.getY()-startTransformed.getY());
         	} catch (NoninvertibleTransformException e1) {
         		JOptionPane.showMessageDialog(null, e1.getMessage());
         	}
@@ -131,11 +131,11 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     public void mouseDragged(MouseEvent e) {
         final Point p = e.getPoint();
         if (inDrag) {//start transform should be updated every time
-        	 if(trafficCanvas.getSelectedRoad()!=null && trafficCanvas.getSelectedRoad().roadMapping().contains(startTransformed)){
+        	 if(trafficCanvas.getRoadPnl().getSelectedRoad()!=null && trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
              	try {
              		trafficCanvas.transform.inverseTransform(new Point2D.Float(p.x, p.y), endTransformed);
-             		trafficCanvas.getSelectedRoad().roadMapping().setX0(X0+endTransformed.getX()-startTransformed.getX());
-            		trafficCanvas.getSelectedRoad().roadMapping().setY0(Y0+endTransformed.getY()-startTransformed.getY());
+             		trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setX0(X0+endTransformed.getX()-startTransformed.getX());
+             		trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setY0(Y0+endTransformed.getY()-startTransformed.getY());
              	} catch (NoninvertibleTransformException e1) {
              		JOptionPane.showMessageDialog(null, e1.getMessage());
              	}

@@ -103,6 +103,8 @@ public class RoadSegment extends DefaultWeightedEdge implements Iterable<Vehicle
     /** total length of road up to start of segment. */
     private final double cumulativeRoadLength = -1.0;
     private final int laneCount;
+    /** Open drive reference (Added by Shmeel) */
+    private org.movsim.network.autogen.opendrive.OpenDRIVE.Road odrRoad;
     private final LaneSegment laneSegments[];
     private LoopDetectors loopDetectors;
     private FlowConservingBottlenecks flowConservingBottlenecks;
@@ -1331,6 +1333,14 @@ public class RoadSegment extends DefaultWeightedEdge implements Iterable<Vehicle
 
     public double getRoadLength() {
         return roadLength;
+    }
+
+    public org.movsim.network.autogen.opendrive.OpenDRIVE.Road getOdrRoad() {
+        return odrRoad;
+    }
+
+    public void setOdrRoad(org.movsim.network.autogen.opendrive.OpenDRIVE.Road road) {
+        this.odrRoad = road;
     }
 
 }

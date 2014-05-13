@@ -82,6 +82,7 @@ public class OpenDriveHandlerJaxb {
                     RoadSegment roadSegmentRight = createRoadSegment(laneSectionType, roadMapping, road);
                     if (roadSegmentRight != null) {
                         setBounds(roadSegmentRight);
+                        roadSegmentRight.setOdrRoad(road);
                         roadNetwork.add(roadSegmentRight);
                     }
                 }

@@ -60,7 +60,6 @@ public class DrawingArea extends Canvas {
     final DrawingAreaKeyListener keyListener;
 	private boolean drawAxis=true;
 	private boolean drawBounds=false;
-	private RoadSegment selectedRoad=null;
     
     
 	public DrawingArea(RoadNetwork rn, RoadPropertiesPanel rdPrPnl) {
@@ -76,14 +75,12 @@ public class DrawingArea extends Canvas {
 		setBackground(Color.GREEN.darker());
 		
 	}
-    public void updateSelected(Graphics2D g){
-    	if(selectedRoad==null)return;
-    	roadPnl.updateFields(selectedRoad);
+    public void drawSelected(Graphics2D g){
+    	if(roadPnl.getSelectedRoad()==null)return;
     	Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
     	g.setStroke(dashed);
-    	//g.setColor(new Color(Integer.MAX_VALUE-selectedRoad.roadMapping().roadColor()));
     	g.setColor(Color.WHITE.darker());
-    	g.draw(selectedRoad.roadMapping().getBounds());
+    	g.draw(roadPnl.getSelectedRoad().roadMapping().getBounds());
     	
     }
 	protected void setTransform() {
@@ -142,7 +139,7 @@ public class DrawingArea extends Canvas {
         clearBackground(backgroundGraphics);
         backgroundGraphics.setTransform(transform);
         drawBackground(backgroundGraphics);
-        updateSelected(backgroundGraphics);
+        drawSelected(backgroundGraphics);
         g.drawImage(backgroundBuffer, 0, 0, null);
     }
     protected void clearBackground(Graphics2D g) {
@@ -484,11 +481,7 @@ public class DrawingArea extends Canvas {
             }
         }
     }
-	public RoadSegment getSelectedRoad() {
-		return selectedRoad;
+	public RoadPropertiesPanel getRoadPnl() {
+		return roadPnl;
 	}
-	public void setSelectedRoad(RoadSegment selectedRoad) {
-		this.selectedRoad = selectedRoad;
-	}
-    
 }

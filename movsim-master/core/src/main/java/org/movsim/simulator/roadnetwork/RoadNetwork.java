@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
  * Iterable collection of the road segments in the road network.
  */
 public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
-
+    /** true if any property of any road is changed. */
+    boolean modified = true;
     /** The Constant LOG. */
     private static final Logger LOG = LoggerFactory.getLogger(RoadNetwork.class);
 
@@ -411,6 +412,14 @@ public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
 
     public ArrayList<RoadSegment> getRoadSegments() {
         return roadSegments;
+    }
+
+    public boolean isModified() {
+        return modified;
+    }
+
+    public void setModified(boolean modified) {
+        this.modified = modified;
     }
 
 }

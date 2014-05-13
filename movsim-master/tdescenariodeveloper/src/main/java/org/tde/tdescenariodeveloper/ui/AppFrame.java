@@ -103,7 +103,7 @@ public class AppFrame extends JFrame {
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
-		rdPrPnl= new RoadPropertiesPanel();
+		rdPrPnl= new RoadPropertiesPanel(rn);
 		drawingPnl=new JPanel();
 		DrawingArea drawingArea = new DrawingArea(rn,rdPrPnl);
 		drawingPnl.add(drawingArea);

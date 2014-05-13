@@ -1,6 +1,5 @@
 package org.tde.tdescenariodeveloper.ui;
 
-import org.movsim.roadmappings.RoadMapping;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 
 
