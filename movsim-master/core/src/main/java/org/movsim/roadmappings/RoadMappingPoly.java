@@ -26,6 +26,9 @@
 
 package org.movsim.roadmappings;
 
+import java.awt.Shape;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -43,6 +46,30 @@ public class RoadMappingPoly extends RoadMapping implements Iterable<RoadMapping
         return roadMappings.iterator();
     }
 
+    @Override
+    public Shape getBounds() {
+        GeneralPath s = new GeneralPath();
+        for (RoadMapping rm : roadMappings) {
+            s.append(rm.getBounds(), false);
+        }
+        return s;
+    }
+
+    @Override
+    public boolean contains(Point2D p) {
+        return this.contains(p.getX(), p.getY());
+    }
+
+    @Override
+    public boolean contains(double x, double y) {
+        boolean f = false;
+        for (RoadMapping rm : roadMappings) {
+            if (rm.contains(x, y)) {
+                return true;
+            }
+        }
+        return f;
+    }
     /**
      * Constructor.
      * 
@@ -170,5 +197,9 @@ public class RoadMappingPoly extends RoadMapping implements Iterable<RoadMapping
         final RoadMappingBezier roadMapping = new RoadMappingBezier(laneCount, s, x0, y0, theta, length, a, b, c, d);
         roadLength += length;
         roadMappings.add(roadMapping);
+    }
+
+    public ArrayList<RoadMapping> getRoadMappings() {
+        return roadMappings;
     }
 }

@@ -29,6 +29,7 @@ package org.movsim.simulator.roadnetwork;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE;
 import org.movsim.simulator.SimulationTimeStep;
 import org.movsim.simulator.roadnetwork.routing.Route;
 import org.slf4j.Logger;
@@ -45,7 +46,8 @@ public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
 
     private final ArrayList<RoadSegment> roadSegments = new ArrayList<>();
     private String name;
-
+    /** OpenDrive network reference (Added by Shmeel) */
+    private OpenDRIVE odrNetwork;
     private boolean isWithCrashExit;
     private boolean hasVariableMessageSign;
 
@@ -420,6 +422,14 @@ public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
 
     public void setModified(boolean modified) {
         this.modified = modified;
+    }
+
+    public OpenDRIVE getOdrNetwork() {
+        return odrNetwork;
+    }
+
+    public void setOdrNetwork(OpenDRIVE odrNetwork) {
+        this.odrNetwork = odrNetwork;
     }
 
 }

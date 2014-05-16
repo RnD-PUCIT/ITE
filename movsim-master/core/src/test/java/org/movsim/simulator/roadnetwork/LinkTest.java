@@ -51,6 +51,7 @@ public class LinkTest {
         public RoadMappingConcrete.PosTheta map(double roadPos, double delta) {
             return posTheta;
         }
+
     }
 
     /**

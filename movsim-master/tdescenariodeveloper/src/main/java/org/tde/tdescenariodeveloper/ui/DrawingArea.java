@@ -9,14 +9,17 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import org.movsim.autogen.TrafficLightStatus;
 import org.movsim.roadmappings.RoadMapping;
+import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.AbstractTrafficSource;
 import org.movsim.simulator.roadnetwork.Lanes;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
@@ -60,6 +63,7 @@ public class DrawingArea extends Canvas {
     final DrawingAreaKeyListener keyListener;
 	private boolean drawAxis=true;
 	private boolean drawBounds=false;
+	private boolean wholeRoadSelectable=true;
     
     
 	public DrawingArea(RoadNetwork rn, RoadPropertiesPanel rdPrPnl) {
@@ -77,18 +81,39 @@ public class DrawingArea extends Canvas {
 	}
     public void drawSelected(Graphics2D g){
     	if(roadPnl.getSelectedRoad()==null)return;
-    	Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
-    	g.setStroke(dashed);
-    	g.setColor(Color.WHITE.darker());
-    	g.draw(roadPnl.getSelectedRoad().roadMapping().getBounds());
-    	
+    	if(wholeRoadSelectable){
+    		Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
+    		g.setStroke(dashed);
+    		g.setColor(Color.WHITE.darker());
+    		drawSelectedRoad(g);
+    	}
+    	Stroke gmStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
+    	g.setStroke(gmStroke);
+    	g.setColor(Color.YELLOW);
+    	drawSelectedGeometry(g);
     }
+	private void drawSelectedGeometry(Graphics2D g) {
+		int ind=roadPnl.getGmPnl().getSelectedIndex();
+		if(roadPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			RoadMappingPoly rmp=(RoadMappingPoly)roadPnl.getSelectedRoad().roadMapping();
+			g.draw(rmp.getRoadMappings().get(ind).getBounds());
+		}else{
+			g.draw(roadPnl.getSelectedRoad().roadMapping().getBounds());
+		}
+	}
 	protected void setTransform() {
         transform.setToIdentity();
         transform.scale(scale, scale);
         transform.translate(xOffset, yOffset);
     }
-	
+	private void drawSelectedRoad(Graphics2D g){
+		if(roadPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			RoadMappingPoly rmp=(RoadMappingPoly)roadPnl.getSelectedRoad().roadMapping();
+			g.draw(rmp.getBounds());
+		}else{
+			g.draw(roadPnl.getSelectedRoad().roadMapping().getBounds());
+		}
+	}
 	public double getScale(){
 		return scale;
 	}
@@ -483,5 +508,11 @@ public class DrawingArea extends Canvas {
     }
 	public RoadPropertiesPanel getRoadPnl() {
 		return roadPnl;
+	}
+	public boolean isWholeRoadSelectable() {
+		return wholeRoadSelectable;
+	}
+	public void setWholeRoadSelectable(boolean wholeRoadSelectable) {
+		this.wholeRoadSelectable = wholeRoadSelectable;
 	}
 }

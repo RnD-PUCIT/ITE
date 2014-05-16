@@ -73,6 +73,7 @@ public class OpenDriveHandlerJaxb {
 
     private boolean create(String filename, OpenDRIVE openDriveNetwork, RoadNetwork roadNetwork)
             throws IllegalArgumentException {
+        roadNetwork.setOdrNetwork(openDriveNetwork);
         createControllerMapping(openDriveNetwork);
 
         for (Road road : openDriveNetwork.getRoad()) {
@@ -81,7 +82,8 @@ public class OpenDriveHandlerJaxb {
                 if (hasLaneSectionType(road, laneSectionType)) {
                     RoadSegment roadSegmentRight = createRoadSegment(laneSectionType, roadMapping, road);
                     if (roadSegmentRight != null) {
-                        setBounds(roadSegmentRight);
+                        setBounds(roadSegmentRight.roadMapping(), roadSegmentRight.laneCount()
+                                * roadSegmentRight.roadMapping().laneWidth() / 2.0);
                         roadSegmentRight.setOdrRoad(road);
                         roadNetwork.add(roadSegmentRight);
                     }
@@ -96,30 +98,36 @@ public class OpenDriveHandlerJaxb {
         return true;
     }
 
-    private void setBounds(RoadSegment roadSegment) {
-        double roadLength = roadSegment.roadLength();
-        double width = roadSegment.roadMapping().roadWidth() / 2;
-        GeneralPath refLine = new GeneralPath();
-        GeneralPath edge = new GeneralPath();
-        PosTheta p = roadSegment.roadMapping().map(0, width);
-        refLine.moveTo(p.x, p.y);
-        p = roadSegment.roadMapping().map(roadLength, -width);
-        edge.moveTo(p.x, p.y);
-        double s = 0.0 + pathStep;
-        while (s <= roadLength) {
-            p = roadSegment.roadMapping().map(s, width);
-            refLine.lineTo(p.x, p.y);
-            s += pathStep;
-        }
-        s -= pathStep;
-        while (s >= 0) {
-            p = roadSegment.roadMapping().map(s, -width);
-            edge.lineTo(p.x, p.y);
+    private void setBounds(RoadMapping roadMapping, double width) {
+        if (!(roadMapping instanceof RoadMappingPoly)) {
+            double roadLength = roadMapping.roadLength();
+            GeneralPath refLine = new GeneralPath();
+            GeneralPath edge = new GeneralPath();
+            PosTheta p = roadMapping.map(0, width);
+            refLine.moveTo(p.x, p.y);
+            p = roadMapping.map(roadLength, -width);
+            edge.moveTo(p.x, p.y);
+            double s = 0.0 + pathStep;
+            while (s <= roadLength) {
+                p = roadMapping.map(s, width);
+                refLine.lineTo(p.x, p.y);
+                s += pathStep;
+            }
             s -= pathStep;
+            while (s >= 0) {
+                p = roadMapping.map(s, -width);
+                edge.lineTo(p.x, p.y);
+                s -= pathStep;
+            }
+            refLine.append(edge.getPathIterator(AffineTransform.getScaleInstance(1, 1)), true);
+            refLine.closePath();
+            roadMapping.setBounds(refLine);
+        } else {
+            RoadMappingPoly roadMappingPoly = (RoadMappingPoly) roadMapping;
+            for (RoadMapping rm : roadMappingPoly) {
+                setBounds(rm, width);
+            }
         }
-        refLine.append(edge.getPathIterator(AffineTransform.getScaleInstance(1, 1)), true);
-        refLine.closePath();
-        roadSegment.roadMapping().setBounds(refLine);
     }
     private void createControllerMapping(OpenDRIVE openDriveNetwork) {
         for (Controller controller : openDriveNetwork.getController()) {

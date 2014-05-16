@@ -51,7 +51,7 @@ public abstract class RoadMapping {
     public abstract RoadMapping.PosTheta map(double roadPos, double lateralOffset);
 
     /** boundry of the road (Added by Shmeel) */
-    private Shape bounds;
+    protected Shape bounds;
     /**
      * Polygon with integer coordinates.
      */
@@ -197,7 +197,7 @@ public abstract class RoadMapping {
     }
     
     /**
-     * 
+     * Added by Shmeel
      * @param x
      *            x-coordinate of the point
      * @param y

@@ -1,21 +1,20 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.xml.bind.JAXBException;
 
 import org.movsim.input.network.OpenDriveReader;
@@ -23,38 +22,15 @@ import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.viewer.App;
 import org.xml.sax.SAXException;
 
-import javax.swing.border.TitledBorder;
-import javax.swing.border.EmptyBorder;
-
 public class AppFrame extends JFrame {
-	/**
-	 * 
-	 */
 	JPanel drawingPnl;
 	private static final long serialVersionUID = 14320973455L;
-	RoadPropertiesPanel rdPrPnl;
+	private RoadPropertiesPanel rdPrPnl;
+	private StatusPanel statusPnl;
 	public RoadPropertiesPanel getRdPrPnl(){
 		return rdPrPnl;
 	}
 	public AppFrame() {
-//		OpenDRIVE od=new OpenDRIVE();
-//		Header h=new Header();
-//		ArrayList<org.movsim.network.autogen.opendrive.OpenDRIVE.Road>rds=new ArrayList<>();
-//		org.movsim.network.autogen.opendrive.OpenDRIVE.Road r=new org.movsim.network.autogen.opendrive.OpenDRIVE.Road();
-//		r.setId("2");
-//		r.setName("road");
-//		rds.add(r);
-//		h.setName("aldi");
-//		h.setNorth(1.57);
-//		od.setHeader(h);
-//		od.getRoad().add(r);
-//		od.getRoad().add(r);
-//		
-//		Marshalling.writeToXml(od);
-		
-		
-		
-		
 		setSize(new Dimension(1024, 768));
 		setPreferredSize(new Dimension(1024, 768));
 		setMinimumSize(new Dimension(700, 500));
@@ -75,7 +51,7 @@ public class AppFrame extends JFrame {
 						
 						@Override
 						public void run() {
-							String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cloverleaf"};
+							String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\four_way_junction"};
 							try {
 								App.main(s);
 							} catch (URISyntaxException | IOException e) {
@@ -99,18 +75,34 @@ public class AppFrame extends JFrame {
 		pack();
 		RoadNetwork rn=new RoadNetwork();
 		try {
-			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cleaf.xodr");
+			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\polytest.xodr");
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
 		rdPrPnl= new RoadPropertiesPanel(rn);
 		drawingPnl=new JPanel();
 		DrawingArea drawingArea = new DrawingArea(rn,rdPrPnl);
+		rdPrPnl.setDrawingArea(drawingArea);
+		DrawingAreaMouseListener ms=(DrawingAreaMouseListener)drawingArea.getMouseMotionListeners()[0];
 		drawingPnl.add(drawingArea);
-		drawingPnl.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLoweredBevelBorder(), "Drawing Area", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP, new Font("arial",Font.BOLD,14), Color.RED));
-		rdPrPnl.setBorder(new TitledBorder(new EmptyBorder(10, 10, 10, 10), "Road Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+//		drawingPnl.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Drawing Area", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP, new Font("arial",Font.BOLD,14),null));
+		rdPrPnl.setBorder(new TitledBorder(new EmptyBorder(5, 5, 5, 5), "Road Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(drawingPnl, BorderLayout.CENTER);
-		getContentPane().add(rdPrPnl, BorderLayout.EAST);
+		JPanel pn=new JPanel();
+		pn.add(rdPrPnl);
+		getContentPane().add(pn, BorderLayout.EAST);
+		statusPnl=new StatusPanel();
+		statusPnl.setStatus("Status");
+		getContentPane().add(statusPnl, BorderLayout.SOUTH);
+		ms.setStatusPnl(statusPnl);
+		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
+		add(new ToolBar(drawingArea),BorderLayout.NORTH);
+	}
+	public StatusPanel getStatusPnl() {
+		return statusPnl;
+	}
+	public void setStatusPnl(StatusPanel statusPnl) {
+		this.statusPnl = statusPnl;
 	}
 
 }
