@@ -1,47 +1,64 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 
-public class RoadPropertiesPanel extends JPanel {
+public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1683090113017092656L;
 	private RoadSegment selectedRoad;
+	private JToggleButton pin;
 
 	private LinkPanel linkPanel;
 	private GeometryPanel gmPnl;
 	private RoadFieldsPanel rdFldPnl;
+	private LanesPanel lanesPnl;
 	GridBagConstraints gbc;
 	private DrawingArea drawingArea;
+	JScrollPane sp;
 	public RoadPropertiesPanel(RoadNetwork rn) {
+		sp=new JScrollPane();
+		sp.getViewport().add(this);
+		sp.setMaximumSize(new Dimension(250,700));
 		setBorder(new EmptyBorder(5, 5, 5, 5));
+		pin=new JToggleButton("Pin");
+		pin.addActionListener(this);
 		gmPnl=new GeometryPanel(rn);
+		lanesPnl=new LanesPanel(rn);
 		linkPanel=new LinkPanel(rn);
 		rdFldPnl=new RoadFieldsPanel(rn);
 		setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
+		add(pin,gbc);
 		gbc.fill = GridBagConstraints.BOTH;
 		gbc.insets=new Insets(5, 5, 5, 5);
 		add(rdFldPnl,gbc);
 		if(selectedRoad!=null && selectedRoad.getOdrRoad().getLink()!=null)
 			add(linkPanel, gbc);
 		add(gmPnl,gbc);
-		setVisible(false);
+		add(lanesPnl,gbc);
+		sp.setVisible(false);
 	}
 	
 	public void updateGraphics(){
+		drawingArea.revalidate();
 		drawingArea.paint(drawingArea.getGraphics());
 	}
 	public void updatePanel(){
@@ -49,6 +66,7 @@ public class RoadPropertiesPanel extends JPanel {
 		rdFldPnl.updateFields(selectedRoad);
 		updateLinkPanel();
 		gmPnl.updateGeomPanel(selectedRoad);
+		lanesPnl.updateLanesPanel(selectedRoad);
 	}
 	private void updateLinkPanel() {
 		boolean linkAdded = isAdded(linkPanel);
@@ -102,6 +120,20 @@ public class RoadPropertiesPanel extends JPanel {
 
 	public void setDrawingArea(DrawingArea drawingArea) {
 		this.drawingArea = drawingArea;
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		((JToggleButton)e.getSource()).setText(pin.isSelected()?"Pinned":"Pin");
+	}
+	@Override
+	public void setVisible(boolean b){
+		sp.setVisible(b || pin.isSelected());
+		super.setVisible(b || pin.isSelected());
+	}
+
+	public JScrollPane getSp() {
+		return sp;
 	}
 	
 }

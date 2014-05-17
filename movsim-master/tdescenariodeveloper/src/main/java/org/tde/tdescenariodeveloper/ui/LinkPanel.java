@@ -19,19 +19,23 @@ import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 
 public class LinkPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 76435681L;
 	RoadNetwork rn;
 	RoadSegment selectedRoad;
-	private JComboBox cbElementType;
-	private JComboBox cbElementId;
-	private JComboBox cbContactPoint;
-	private JComboBox cbSelectLink;
+	private JComboBox<String> cbElementType;
+	private JComboBox<String> cbElementId;
+	private JComboBox<String> cbContactPoint;
+	private JComboBox<String> cbSelectLink;
 	GridBagConstraints c,gbc_lbl,gbc_tf;
 	public LinkPanel(RoadNetwork rn) {
 		this.rn=rn;
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Link", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		cbSelectLink = new JComboBox(new String[]{"Predecessor","Successor"});
+		cbSelectLink = new JComboBox<>(new String[]{"Predecessor","Successor"});
 		cbSelectLink.setToolTipText("Predecessor/Sucsessor road");
 		cbSelectLink.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -59,7 +63,7 @@ public class LinkPanel extends JPanel {
 		add(cbSelectLink,c);
 		JLabel lblElementId = new JLabel("Element id");
 		add(lblElementId,gbc_lbl);
-		cbElementId = new JComboBox();
+		cbElementId = new JComboBox<>();
 		lblElementId.setLabelFor(cbElementId);
 		cbElementId.setToolTipText("Id of predecessor/successor road");
 		cbElementId.setRequestFocusEnabled(false);
@@ -71,7 +75,7 @@ public class LinkPanel extends JPanel {
 		add(cbElementId,gbc_tf);
 		JLabel lblType = new JLabel("Element type");
 		add(lblType,gbc_lbl);
-		cbElementType = new JComboBox(new String[]{"road","junction"});
+		cbElementType = new JComboBox<>(new String[]{"road","junction"});
 		cbElementType.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
@@ -80,7 +84,7 @@ public class LinkPanel extends JPanel {
 		add(cbElementType,gbc_tf);
 		JLabel lblContactPoint = new JLabel("Contact Point");
 		add(lblContactPoint,gbc_lbl);
-		cbContactPoint = new JComboBox(new String[]{"start","end"});
+		cbContactPoint = new JComboBox<>(new String[]{"start","end"});
 		cbContactPoint.setToolTipText("Where the road should be attached");
 		cbContactPoint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

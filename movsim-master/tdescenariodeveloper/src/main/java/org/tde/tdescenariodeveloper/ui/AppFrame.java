@@ -13,6 +13,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.xml.bind.JAXBException;
@@ -51,7 +52,7 @@ public class AppFrame extends JFrame {
 						
 						@Override
 						public void run() {
-							String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\four_way_junction"};
+							String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cloverleaf"};
 							try {
 								App.main(s);
 							} catch (URISyntaxException | IOException e) {
@@ -75,7 +76,7 @@ public class AppFrame extends JFrame {
 		pack();
 		RoadNetwork rn=new RoadNetwork();
 		try {
-			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\polytest.xodr");
+			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cleaf.xodr");
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
@@ -88,9 +89,7 @@ public class AppFrame extends JFrame {
 //		drawingPnl.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK), "Drawing Area", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.TOP, new Font("arial",Font.BOLD,14),null));
 		rdPrPnl.setBorder(new TitledBorder(new EmptyBorder(5, 5, 5, 5), "Road Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(drawingPnl, BorderLayout.CENTER);
-		JPanel pn=new JPanel();
-		pn.add(rdPrPnl);
-		getContentPane().add(pn, BorderLayout.EAST);
+		getContentPane().add(rdPrPnl.getSp(), BorderLayout.EAST);
 		statusPnl=new StatusPanel();
 		statusPnl.setStatus("Status");
 		getContentPane().add(statusPnl, BorderLayout.SOUTH);
