@@ -15,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsListener;
 
 public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	/**
@@ -34,14 +35,18 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	public RoadPropertiesPanel(RoadNetwork rn) {
 		sp=new JScrollPane();
 		sp.getViewport().add(this);
-		sp.setMaximumSize(new Dimension(250,700));
+		sp.setPreferredSize(new Dimension(260,700));
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		pin=new JToggleButton("Pin");
 		pin.addActionListener(this);
 		gmPnl=new GeometryPanel(rn);
 		lanesPnl=new LanesPanel(rn);
 		linkPanel=new LinkPanel(rn);
-		rdFldPnl=new RoadFieldsPanel(rn);
+		
+		RoadFieldsListener rfl=new RoadFieldsListener(this);
+		rdFldPnl=new RoadFieldsPanel(rn, rfl);
+		rfl.setRdFldsPnl();
+		
 		setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -129,11 +134,28 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	@Override
 	public void setVisible(boolean b){
 		sp.setVisible(b || pin.isSelected());
-		super.setVisible(b || pin.isSelected());
+		((JPanel)drawingArea.getParent()).revalidate();
+		//super.setVisible(b || pin.isSelected());
 	}
 
 	public JScrollPane getSp() {
 		return sp;
+	}
+
+	public RoadFieldsPanel getRdFldPnl() {
+		return rdFldPnl;
+	}
+
+	public LinkPanel getLinkPanel() {
+		return linkPanel;
+	}
+
+	public LanesPanel getLanesPnl() {
+		return lanesPnl;
+	}
+
+	public void setRdFldPnl(RoadFieldsPanel rdFldPnl) {
+		this.rdFldPnl = rdFldPnl;
 	}
 	
 }

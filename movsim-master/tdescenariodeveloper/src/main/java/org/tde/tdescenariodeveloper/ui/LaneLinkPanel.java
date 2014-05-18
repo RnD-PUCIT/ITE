@@ -39,7 +39,7 @@ public class LaneLinkPanel extends JPanel {
 	GridBagConstraints c,gbc_lbl,gbc_tf;
 	Junction jn;
 	JPanel linkInfoPnl;
-	boolean showFullJunc=false;
+	boolean showFullJunc=true;
 	
 	public LaneLinkPanel(RoadNetwork rn) {
 		this.rn=rn;
@@ -170,10 +170,10 @@ public class LaneLinkPanel extends JPanel {
 			lables.add(new JLabel(" Conn. road"));
 			lables.add(new JLabel(" In. road"));
 			lables.add(new JLabel(" Cont. Point"));
-			c.insets=new Insets(3, 3, 3, 3);
+			c.insets=new Insets(2,2,2,2);
 //			linkInfoPnl.add(new Label("Junction: "+jn.getId()),c);
 			
-			linkInfoPnl.add(lables,c);
+			//linkInfoPnl.add(lables,c);
 			for(Connection cn:jn.getConnection()){
 				if(showFullJunc)linkInfoPnl.add(conToPnl(cn, connecting, incoming),c);
 				else {
@@ -219,7 +219,7 @@ public class LaneLinkPanel extends JPanel {
 		GridBagConstraints gbc_lbl=new GridBagConstraints();
 		gbc_lbl.weightx=1;
 		gbc_lbl.fill=GridBagConstraints.BOTH;
-		gbc_lbl.insets=new Insets(3, 3, 3, 3);
+		gbc_lbl.insets=new Insets(2, 2, 2, 2);
 		gbc_lbl.anchor=GridBagConstraints.NORTHWEST;
 		p.add(id,gbc_lbl);
 		p.add(connecting,gbc_lbl);

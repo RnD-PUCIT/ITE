@@ -3,25 +3,35 @@ package org.tde.tdescenariodeveloper.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsListener;
+import org.tde.tdescenariodevelopment.utils.GraphicsHelper;
 
 public class RoadFieldsPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5593310264102814959L;
 	RoadSegment selectedRoad;
 	RoadNetwork rn;
-	private JTextField tfId;
+	private JLabel tfId;
 	private JTextField tfName;
-	private JTextField tfLength;
-	private JTextField tfJunction;
-	public RoadFieldsPanel(RoadNetwork rn) {
+	private JLabel tfLength;
+	private JComboBox<String> cbJunction;
+	public RoadFieldsPanel(RoadNetwork rn, RoadFieldsListener rfl) {
 		this.rn = rn;
 		setLayout(new GridBagLayout());
-		
 		Insets ins=new Insets(5,5,5,5);
 		JLabel lblId = new JLabel("Id");
 		GridBagConstraints gbc_lbl = new GridBagConstraints();
@@ -31,7 +41,7 @@ public class RoadFieldsPanel extends JPanel {
 		gbc_lbl.fill=GridBagConstraints.BOTH;
 		add(lblId, gbc_lbl);
 		
-		tfId = new JTextField();
+		tfId = new JLabel();
 		lblId.setLabelFor(tfId);
 		GridBagConstraints gbc_tf = new GridBagConstraints();
 		gbc_tf.insets = ins;
@@ -42,24 +52,25 @@ public class RoadFieldsPanel extends JPanel {
 		
 		JLabel lblName = new JLabel("Name");
 		add(lblName, gbc_lbl);
-		
 		tfName = new JTextField();
+		tfName.getDocument().addDocumentListener(rfl);
 		lblName.setLabelFor(tfName);
 		add(tfName, gbc_tf);
 		
 		JLabel lblLength = new JLabel("Length");
 		add(lblLength, gbc_lbl);
 		
-		tfLength = new JTextField();
+		tfLength = new JLabel();
 		lblLength.setLabelFor(tfLength);
 		add(tfLength, gbc_tf);
 		
 		JLabel lblJunction = new JLabel("Junction");
 		add(lblJunction, gbc_lbl);
 		
-		tfJunction = new JTextField();
-		lblJunction.setLabelFor(tfJunction);
-		add(tfJunction, gbc_tf);
+		cbJunction = new JComboBox<String>();
+		cbJunction.addActionListener(rfl);
+		lblJunction.setLabelFor(cbJunction);
+		add(cbJunction, gbc_tf);
 		
 	}
 	public void setSelectedRoad(RoadSegment selectedRoad) {
@@ -70,11 +81,35 @@ public class RoadFieldsPanel extends JPanel {
 		tfId.setText(selectedRoad.getOdrRoad().getId());
 		tfName.setText(selectedRoad.getRoadName());
 		tfLength.setText(selectedRoad.getRoadLength()+"");
-		tfJunction.setText(selectedRoad.getOdrRoad().getJunction());
+		String jnc=selectedRoad.getOdrRoad().getJunction();
+		if(jnc.equals("-1"))jnc="None";
+		String[]jncs=new String[rn.getOdrNetwork().getJunction().size()];
+		for(int i=0;i<jncs.length;i++){
+			jncs[i]=rn.getOdrNetwork().getJunction().get(i).getId();
+		}
+		cbJunction.removeAllItems();
+		cbJunction.addItem("None");
+		for(String s:jncs)cbJunction.addItem(s);
+		cbJunction.setSelectedItem(jnc);
 	}
 	public void updateFields(RoadSegment selectedRoad2) {
 		selectedRoad=selectedRoad2;
 		updateFields();
+	}
+	public RoadSegment getSelectedRoad() {
+		return selectedRoad;
+	}
+	public RoadNetwork getRn() {
+		return rn;
+	}
+	public JLabel getTfId() {
+		return tfId;
+	}
+	public JTextField getTfName() {
+		return tfName;
+	}
+	public JComboBox<String> getCbJunction() {
+		return cbJunction;
 	}
 	
 }

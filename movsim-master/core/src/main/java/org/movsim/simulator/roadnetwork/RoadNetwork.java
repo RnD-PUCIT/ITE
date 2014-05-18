@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * Iterable collection of the road segments in the road network.
  */
 public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
-    /** true if any property of any road is changed. */
+    /** returns true if any new element is added. */
     boolean modified = true;
     /** The Constant LOG. */
     private static final Logger LOG = LoggerFactory.getLogger(RoadNetwork.class);
@@ -51,6 +51,12 @@ public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
     private boolean isWithCrashExit;
     private boolean hasVariableMessageSign;
 
+    /** resets road network */
+    public void reset() {
+        roadSegments.clear();
+        name = null;
+        odrNetwork = null;
+    }
     /**
      * Sets the name of the road network.
      * 

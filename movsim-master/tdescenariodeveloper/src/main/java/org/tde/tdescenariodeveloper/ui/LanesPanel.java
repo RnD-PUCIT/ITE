@@ -23,8 +23,9 @@ import org.movsim.simulator.roadnetwork.RoadSegment;
 public class LanesPanel extends JPanel implements ActionListener{
 	RoadNetwork rn;
 	RoadSegment selectedRoad;
-	JTextField id,width,type,level,maxSpeed;
-	JComboBox<String>cbLanes;
+	JTextField width,maxSpeed;
+	JLabel level;
+	JComboBox<String>cbLanes,cbtype;
 	JButton add,remove;
 	LaneLinkPanel lnLinkPnl;
 	private int lnInd=0;
@@ -57,24 +58,18 @@ public class LanesPanel extends JPanel implements ActionListener{
 		
 		cbLanes=new JComboBox<String>();
 		cbLanes.addActionListener(this);
-		JLabel lbl=new JLabel("Select lane");
+		JLabel lbl=new JLabel("Select lane (Id)");
 		lbl.setLabelFor(cbLanes);
 		add(lbl,gbc_lbl);
 		add(cbLanes,gbc_tf);
 		
-		id=new JTextField(10);
-		lbl=new JLabel("Id");
-		lbl.setLabelFor(id);
-		add(lbl,gbc_lbl);
-		add(id,gbc_tf);
-
-		type=new JTextField(10);
+		cbtype=new JComboBox<>(new String[]{"driving","mwyExit","mwyEntry"});
 		lbl=new JLabel("Type");
-		lbl.setLabelFor(type);
+		lbl.setLabelFor(cbtype);
 		add(lbl,gbc_lbl);
-		add(type,gbc_tf);
+		add(cbtype,gbc_tf);
 		
-		level=new JTextField(10);
+		level=new JLabel();
 		lbl=new JLabel("Level");
 		lbl.setLabelFor(level);
 		add(lbl,gbc_lbl);
@@ -91,8 +86,6 @@ public class LanesPanel extends JPanel implements ActionListener{
 		lbl.setLabelFor(maxSpeed);
 		add(lbl,gbc_lbl);
 		add(maxSpeed,gbc_tf);
-		
-		
 	}
 	public void updateLanesPanel(RoadSegment selectedRoad) {
 		this.selectedRoad = selectedRoad;
@@ -117,8 +110,7 @@ public class LanesPanel extends JPanel implements ActionListener{
 	}
 	private void laneChanged() {
 		Lane ln=selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(lnInd);
-		id.setText(ln.getId()+"");
-		type.setText(ln.getType()+"");
+		cbtype.setSelectedItem(ln.getType()+"");
 		level.setText(ln.getLevel()+"");
 		width.setText(ln.getWidth().get(0).getA()+"");
 		maxSpeed.setText(ln.getSpeed()!=null && ln.getSpeed().size()>0?ln.getSpeed().get(0).getMax()+"":"");

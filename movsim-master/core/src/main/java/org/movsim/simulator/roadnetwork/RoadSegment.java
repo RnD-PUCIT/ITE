@@ -1343,4 +1343,8 @@ public class RoadSegment extends DefaultWeightedEdge implements Iterable<Vehicle
         this.odrRoad = road;
     }
 
+    public void setRoadName(String roadName) {
+        this.roadName = roadName;
+    }
+
 }

@@ -64,6 +64,7 @@ public class DrawingArea extends Canvas {
 	private boolean drawAxis=true;
 	private boolean drawBounds=false;
 	private boolean wholeRoadSelectable=true;
+	private boolean drawRoadNames=false;
     
     
 	public DrawingArea(RoadNetwork rn, RoadPropertiesPanel rdPrPnl) {
@@ -234,7 +235,7 @@ public class DrawingArea extends Canvas {
             drawSlopes(g);
         }
 
-        if (drawRoadId) {
+        if (drawRoadId || drawRoadNames) {
             drawRoadSectionIds(g);
         }
         if (drawAxis) {
@@ -474,7 +475,8 @@ public class DrawingArea extends Canvas {
             final Font font = new Font("SansSerif", Font.PLAIN, fontHeight); //$NON-NLS-1$
             g.setFont(font);
             g.setColor(Color.BLACK);
-            g.drawString("R" + roadSegment.userId(), (int) (posTheta.x), (int) (posTheta.y)); //$NON-NLS-1$
+            if(drawRoadNames)g.drawString(roadSegment.getRoadName(), (int) (posTheta.x), (int) (posTheta.y)); //$NON-NLS-1$
+            else g.drawString(roadSegment.userId(), (int) (posTheta.x), (int) (posTheta.y)); //$NON-NLS-1$
         }
     }
     private void drawSources(Graphics2D g) {
@@ -514,5 +516,14 @@ public class DrawingArea extends Canvas {
 	}
 	public void setWholeRoadSelectable(boolean wholeRoadSelectable) {
 		this.wholeRoadSelectable = wholeRoadSelectable;
+	}
+	public void setDrawRoadId(boolean drawRoadId) {
+		this.drawRoadId = drawRoadId;
+	}
+	public void setDrawRoadNames(boolean drawRoadNames) {
+		this.drawRoadNames = drawRoadNames;
+	}
+	public void setDrawAxis(boolean drawAxis) {
+		this.drawAxis = drawAxis;
 	}
 }

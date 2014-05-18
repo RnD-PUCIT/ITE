@@ -21,12 +21,14 @@ import javax.xml.bind.JAXBException;
 import org.movsim.input.network.OpenDriveReader;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.viewer.App;
+import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
 import org.xml.sax.SAXException;
 
 public class AppFrame extends JFrame {
 	JPanel drawingPnl;
 	private static final long serialVersionUID = 14320973455L;
 	private RoadPropertiesPanel rdPrPnl;
+	private RoadNetwork rn;
 	private StatusPanel statusPnl;
 	public RoadPropertiesPanel getRdPrPnl(){
 		return rdPrPnl;
@@ -66,7 +68,17 @@ public class AppFrame extends JFrame {
 		
 		JMenuItem mntmSave = new JMenuItem("save");
 		mnFile.add(mntmSave);
-		
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+					new Thread(new Runnable() {
+						
+						@Override
+						public void run() {
+							Marshalling.writeToXml(rn.getOdrNetwork());
+						}
+					}).start();
+			}
+		});
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		
@@ -76,10 +88,13 @@ public class AppFrame extends JFrame {
 		pack();
 		RoadNetwork rn=new RoadNetwork();
 		try {
-			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cleaf.xodr");
+			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\hello.xml");
+			this.rn=rn;
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
+		JunctionsPanel jncPnl=new JunctionsPanel(rn);
+		jncPnl.updateJunction();
 		rdPrPnl= new RoadPropertiesPanel(rn);
 		drawingPnl=new JPanel();
 		DrawingArea drawingArea = new DrawingArea(rn,rdPrPnl);
@@ -92,7 +107,8 @@ public class AppFrame extends JFrame {
 		getContentPane().add(rdPrPnl.getSp(), BorderLayout.EAST);
 		statusPnl=new StatusPanel();
 		statusPnl.setStatus("Status");
-		getContentPane().add(statusPnl, BorderLayout.SOUTH);
+//		getContentPane().add(statusPnl, BorderLayout.SOUTH);
+		getContentPane().add(jncPnl.getSp(), BorderLayout.SOUTH);
 		ms.setStatusPnl(statusPnl);
 		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
 		add(new ToolBar(drawingArea),BorderLayout.NORTH);
