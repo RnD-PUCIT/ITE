@@ -15,8 +15,8 @@ import javax.swing.event.DocumentListener;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsListener;
-import org.tde.tdescenariodevelopment.utils.GraphicsHelper;
+import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class RoadFieldsPanel extends JPanel {
 	/**
@@ -24,13 +24,13 @@ public class RoadFieldsPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 5593310264102814959L;
 	RoadSegment selectedRoad;
-	RoadNetwork rn;
 	private JLabel tfId;
 	private JTextField tfName;
 	private JLabel tfLength;
 	private JComboBox<String> cbJunction;
-	public RoadFieldsPanel(RoadNetwork rn, RoadFieldsListener rfl) {
-		this.rn = rn;
+	RoadPropertiesPanel rdPrPnl;
+	public RoadFieldsPanel(RoadPropertiesPanel rpp,RoadFieldsPanelListener rfl) {
+		rdPrPnl=rpp;
 		setLayout(new GridBagLayout());
 		Insets ins=new Insets(5,5,5,5);
 		JLabel lblId = new JLabel("Id");
@@ -83,9 +83,9 @@ public class RoadFieldsPanel extends JPanel {
 		tfLength.setText(selectedRoad.getRoadLength()+"");
 		String jnc=selectedRoad.getOdrRoad().getJunction();
 		if(jnc.equals("-1"))jnc="None";
-		String[]jncs=new String[rn.getOdrNetwork().getJunction().size()];
+		String[]jncs=new String[rdPrPnl.getRn().getOdrNetwork().getJunction().size()];
 		for(int i=0;i<jncs.length;i++){
-			jncs[i]=rn.getOdrNetwork().getJunction().get(i).getId();
+			jncs[i]=rdPrPnl.getRn().getOdrNetwork().getJunction().get(i).getId();
 		}
 		cbJunction.removeAllItems();
 		cbJunction.addItem("None");
@@ -100,7 +100,7 @@ public class RoadFieldsPanel extends JPanel {
 		return selectedRoad;
 	}
 	public RoadNetwork getRn() {
-		return rn;
+		return rdPrPnl.getRn();
 	}
 	public JLabel getTfId() {
 		return tfId;

@@ -51,7 +51,7 @@ public class OpenDriveHandlerJaxb {
     /** Checks uniqueness of signal ids in <road> definitions. */
     private final Set<String> uniqueTrafficLightIdsInRoads = new HashSet<>();
 
-    OpenDriveHandlerJaxb() {
+    public OpenDriveHandlerJaxb() {
     }
 
     /**
@@ -71,7 +71,7 @@ public class OpenDriveHandlerJaxb {
         return openDriveHandlerJaxb.create(filename, openDriveNetwork, roadNetwork);
     }
 
-    private boolean create(String filename, OpenDRIVE openDriveNetwork, RoadNetwork roadNetwork)
+    public boolean create(String filename, OpenDRIVE openDriveNetwork, RoadNetwork roadNetwork)
             throws IllegalArgumentException {
         roadNetwork.setOdrNetwork(openDriveNetwork);
         createControllerMapping(openDriveNetwork);
@@ -162,7 +162,7 @@ public class OpenDriveHandlerJaxb {
         return null;
     }
 
-    private static RoadMapping createRoadMapping(Road road) throws IllegalArgumentException {
+    public static RoadMapping createRoadMapping(Road road) throws IllegalArgumentException {
         Preconditions.checkArgument(road.getLanes().getLaneSection().size() == 1,
                 "exactly one <laneSection> needs to be defined, more <laneSection>s cannot be handled!");
 
@@ -214,7 +214,7 @@ public class OpenDriveHandlerJaxb {
         return roadMapping;
     }
 
-    private RoadSegment createRoadSegment(LaneSectionType laneType, RoadMapping roadMapping, Road road) {
+    public RoadSegment createRoadSegment(LaneSectionType laneType, RoadMapping roadMapping, Road road) {
         // TODO cstr not working for bidirectional case !!
         final RoadSegment roadSegment = new RoadSegment(roadMapping);
 

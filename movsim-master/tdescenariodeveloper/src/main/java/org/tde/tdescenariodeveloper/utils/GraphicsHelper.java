@@ -1,4 +1,4 @@
-package org.tde.tdescenariodevelopment.utils;
+package org.tde.tdescenariodeveloper.utils;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.LineBorder;
@@ -31,14 +32,36 @@ public class GraphicsHelper {
 		JOptionPane.showMessageDialog(null, msg);
 	}
 	public static void showToast(String msg,int time){
-		ToastMessage m=new ToastMessage(msg, time);
+		new ToastMessage(msg, time);
+	}
+	public static void makeRed(JTextField tf){
+		tf.setForeground(Color.RED);
+	}
+	public static void makeBlack(JTextField tf){
+		tf.setForeground(Color.BLACK);
+	}
+	public static void makeBlack(JTextField ...tf){
+		for(JTextField t:tf){
+			t.setForeground(Color.BLACK);
+		}
+	}
+	public static void makeRed(JTextField ...tf){
+		for(JTextField t:tf){
+			t.setForeground(Color.RED);
+		}
 	}
 }
 class ToastMessage extends JDialog {
 
-    int miliseconds;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -7487975221498478043L;
+	int miliseconds;
     final JDialog d;
     public ToastMessage(String toastString, int time) {
+    	setFocusable(false);
+    	setFocusableWindowState(false);
         this.miliseconds = time;
         d=this;
         setBounds(100, 100, 400, 30);

@@ -32,7 +32,6 @@ public class LaneLinkPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 76435681L;
-	RoadNetwork rn;
 	LanesPanel lnPnl;
 	private JComboBox<String> cbElementId;
 	private JComboBox<String> cbSelectLink;
@@ -40,9 +39,10 @@ public class LaneLinkPanel extends JPanel {
 	Junction jn;
 	JPanel linkInfoPnl;
 	boolean showFullJunc=true;
+	RoadPropertiesPanel rdPrPnl;
 	
-	public LaneLinkPanel(RoadNetwork rn) {
-		this.rn=rn;
+	public LaneLinkPanel(RoadPropertiesPanel rpp) {
+		rdPrPnl=rpp;
 		linkInfoPnl=new JPanel(new GridBagLayout());
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Lane link", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
@@ -95,7 +95,7 @@ public class LaneLinkPanel extends JPanel {
 			String pretype=lnPnl.getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementType();
 			switch(pretype){
 			case "road":
-				for(Road r:rn.getOdrNetwork().getRoad()){
+				for(Road r:rdPrPnl.getRn().getOdrNetwork().getRoad()){
 					if(r.getId().equals(preid)){
 						for(Lane ln:r.getLanes().getLaneSection().get(0).getRight().getLane()){
 							cbElementId.addItem(ln.getId()+"");
@@ -106,7 +106,7 @@ public class LaneLinkPanel extends JPanel {
 				setLinkFields("Predecessor",false);
 				break;
 			case "junction":
-				for(Junction j:rn.getOdrNetwork().getJunction()){
+				for(Junction j:rdPrPnl.getRn().getOdrNetwork().getJunction()){
 					if(preid.equals(j.getId()+"")){
 						jn=j;
 						break;
@@ -122,7 +122,7 @@ public class LaneLinkPanel extends JPanel {
 			String suctype=lnPnl.getSelectedRoad().getOdrRoad().getLink().getSuccessor().getElementType();
 			switch(suctype){
 			case "road":
-				for(Road r:rn.getOdrNetwork().getRoad()){
+				for(Road r:rdPrPnl.getRn().getOdrNetwork().getRoad()){
 					if(r.getId().equals(sucid)){
 						for(Lane ln:r.getLanes().getLaneSection().get(0).getRight().getLane()){
 							cbElementId.addItem(ln.getId()+"");
@@ -133,7 +133,7 @@ public class LaneLinkPanel extends JPanel {
 				setLinkFields("Successor",false);
 				break;
 			case "junction":
-				for(Junction j:rn.getOdrNetwork().getJunction()){
+				for(Junction j:rdPrPnl.getRn().getOdrNetwork().getJunction()){
 					if(sucid.equals(j.getId()+"")){
 						jn=j;
 						break;
@@ -253,7 +253,7 @@ public class LaneLinkPanel extends JPanel {
 		return p;
 	}
 	private Road getRoad(int id){
-		for(RoadSegment rs:rn){
+		for(RoadSegment rs:rdPrPnl.getRn()){
 			if(id==Integer.parseInt(rs.getOdrRoad().getId())){
 				return rs.getOdrRoad();
 			}

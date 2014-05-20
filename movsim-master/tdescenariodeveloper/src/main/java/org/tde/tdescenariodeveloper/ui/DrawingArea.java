@@ -9,10 +9,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -22,7 +20,6 @@ import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.AbstractTrafficSource;
 import org.movsim.simulator.roadnetwork.Lanes;
-import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.movsim.simulator.roadnetwork.Slope;
 import org.movsim.simulator.roadnetwork.SpeedLimit;
@@ -33,7 +30,6 @@ import org.movsim.viewer.roadmapping.PaintRoadMapping;
 
 public class DrawingArea extends Canvas {
 	private static final long serialVersionUID = 1653L;
-	private RoadNetwork rn;
     private int bufferHeight=700;
     private int bufferWidth=1000;
     private Image backgroundBuffer=new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_ARGB);
@@ -41,7 +37,7 @@ public class DrawingArea extends Canvas {
     double scale=1.0;
     int xOffset=0,yOffset=0;
     protected AffineTransform transform = new AffineTransform();
-    RoadPropertiesPanel roadPnl;
+    RoadPropertiesPanel roadPrPnl;
     float lineWidth=0.5f;
     float lineLength=4.5f;
     float gapLength=3.0f;
@@ -63,17 +59,15 @@ public class DrawingArea extends Canvas {
     final DrawingAreaKeyListener keyListener;
 	private boolean drawAxis=true;
 	private boolean drawBounds=false;
-	private boolean wholeRoadSelectable=true;
 	private boolean drawRoadNames=false;
     
     
-	public DrawingArea(RoadNetwork rn, RoadPropertiesPanel rdPrPnl) {
-		this.roadPnl=rdPrPnl;
+	public DrawingArea(RoadPropertiesPanel rdPrPnl) {
+		this.roadPrPnl=rdPrPnl;
 		setSize(new Dimension(bufferWidth,bufferHeight));
-		this.rn=rn;
-		keyListener=new DrawingAreaKeyListener(this, rn);
+		keyListener=new DrawingAreaKeyListener(this);
 		addKeyListener(keyListener);
-		mouseListener=new DrawingAreaMouseListener(this, keyListener, rn);
+		mouseListener=new DrawingAreaMouseListener(this, keyListener);
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(mouseListener);
@@ -81,25 +75,23 @@ public class DrawingArea extends Canvas {
 		
 	}
     public void drawSelected(Graphics2D g){
-    	if(roadPnl.getSelectedRoad()==null)return;
-    	if(wholeRoadSelectable){
-    		Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
-    		g.setStroke(dashed);
-    		g.setColor(Color.WHITE.darker());
-    		drawSelectedRoad(g);
-    	}
+    	if(roadPrPnl.getSelectedRoad()==null)return;
+		Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
+		g.setStroke(dashed);
+		g.setColor(Color.WHITE.darker());
+		drawSelectedRoad(g);
     	Stroke gmStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
     	g.setStroke(gmStroke);
     	g.setColor(Color.YELLOW);
     	drawSelectedGeometry(g);
     }
 	private void drawSelectedGeometry(Graphics2D g) {
-		int ind=roadPnl.getGmPnl().getSelectedIndex();
-		if(roadPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-			RoadMappingPoly rmp=(RoadMappingPoly)roadPnl.getSelectedRoad().roadMapping();
+		int ind=roadPrPnl.getGmPnl().getSelectedIndex();
+		if(roadPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			RoadMappingPoly rmp=(RoadMappingPoly)roadPrPnl.getSelectedRoad().roadMapping();
 			g.draw(rmp.getRoadMappings().get(ind).getBounds());
 		}else{
-			g.draw(roadPnl.getSelectedRoad().roadMapping().getBounds());
+			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
 		}
 	}
 	protected void setTransform() {
@@ -108,11 +100,11 @@ public class DrawingArea extends Canvas {
         transform.translate(xOffset, yOffset);
     }
 	private void drawSelectedRoad(Graphics2D g){
-		if(roadPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-			RoadMappingPoly rmp=(RoadMappingPoly)roadPnl.getSelectedRoad().roadMapping();
+		if(roadPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			RoadMappingPoly rmp=(RoadMappingPoly)roadPrPnl.getSelectedRoad().roadMapping();
 			g.draw(rmp.getBounds());
 		}else{
-			g.draw(roadPnl.getSelectedRoad().roadMapping().getBounds());
+			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
 		}
 	}
 	public double getScale(){
@@ -176,7 +168,7 @@ public class DrawingArea extends Canvas {
         this.backgroundColor = backgroundColor;
     }
     private void drawRoadSegments(Graphics2D g) {
-        for (final RoadSegment roadSegment : rn) {
+        for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             drawRoadSegment(g, roadMapping);
             drawRoadSegmentLines(g, roadMapping); // in one step (parallel or sequential update)?!
@@ -246,7 +238,7 @@ public class DrawingArea extends Canvas {
         }
     }
     private void drawBounds(Graphics2D g) {
-    	for(RoadSegment rs:rn){
+    	for(RoadSegment rs:roadPrPnl.getRn()){
     		g.draw(rs.roadMapping().getBounds());
     	}
 	}
@@ -264,7 +256,7 @@ public class DrawingArea extends Canvas {
 	}
 
 	private void drawTrafficLights(Graphics2D g) {
-        for (final RoadSegment roadSegment : rn) {
+        for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             drawTrafficLightsOnRoad(g, roadSegment);
         }
     }
@@ -381,7 +373,7 @@ public class DrawingArea extends Canvas {
     }
     
     private void drawSpeedLimits(Graphics2D g) {
-        for (final RoadSegment roadSegment : rn) {
+        for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             drawSpeedLimitsOnRoad(g, roadSegment);
         }
     }
@@ -436,7 +428,7 @@ public class DrawingArea extends Canvas {
     }
 
     private void drawSlopes(Graphics2D g) {
-        for (final RoadSegment roadSegment : rn) {
+        for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             drawSlopesOnRoad(g, roadSegment);
         }
     }
@@ -468,7 +460,7 @@ public class DrawingArea extends Canvas {
         }
     }
     private void drawRoadSectionIds(Graphics2D g) {
-        for (final RoadSegment roadSegment : rn) {
+        for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             final RoadMapping.PosTheta posTheta = roadMapping.map(0.0);
             final int fontHeight = 12;
@@ -480,7 +472,7 @@ public class DrawingArea extends Canvas {
         }
     }
     private void drawSources(Graphics2D g) {
-        for (final RoadSegment roadSegment : rn) {
+        for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             assert roadMapping != null;
             final int radius = (int) ((roadMapping.laneCount() + 2) * roadMapping.laneWidth());
@@ -494,7 +486,7 @@ public class DrawingArea extends Canvas {
         }
     }
     private void drawSinks(Graphics2D g) {
-        for (final RoadSegment roadSegment : rn) {
+        for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             assert roadMapping != null;
             final int radius = (int) ((roadMapping.laneCount() + 2) * roadMapping.laneWidth());
@@ -508,15 +500,6 @@ public class DrawingArea extends Canvas {
             }
         }
     }
-	public RoadPropertiesPanel getRoadPnl() {
-		return roadPnl;
-	}
-	public boolean isWholeRoadSelectable() {
-		return wholeRoadSelectable;
-	}
-	public void setWholeRoadSelectable(boolean wholeRoadSelectable) {
-		this.wholeRoadSelectable = wholeRoadSelectable;
-	}
 	public void setDrawRoadId(boolean drawRoadId) {
 		this.drawRoadId = drawRoadId;
 	}
@@ -525,5 +508,8 @@ public class DrawingArea extends Canvas {
 	}
 	public void setDrawAxis(boolean drawAxis) {
 		this.drawAxis = drawAxis;
+	}
+	public RoadPropertiesPanel getRoadPrPnl() {
+		return roadPrPnl;
 	}
 }

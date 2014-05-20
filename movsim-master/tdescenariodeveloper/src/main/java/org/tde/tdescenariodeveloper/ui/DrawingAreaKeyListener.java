@@ -7,9 +7,8 @@ import org.movsim.simulator.roadnetwork.RoadNetwork;
 
 public class DrawingAreaKeyListener extends DrawingAreaController implements KeyListener {
 
-    public DrawingAreaKeyListener(DrawingArea trafficCanvas,
-			RoadNetwork roadNetwork) {
-		super(trafficCanvas, roadNetwork);
+    public DrawingAreaKeyListener(DrawingArea trafficCanvas) {
+		super(trafficCanvas);
 	}
 
 

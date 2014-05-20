@@ -25,11 +25,10 @@ import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
 import org.xml.sax.SAXException;
 
 public class AppFrame extends JFrame {
-	JPanel drawingPnl;
 	private static final long serialVersionUID = 14320973455L;
 	private RoadPropertiesPanel rdPrPnl;
-	private RoadNetwork rn;
 	private StatusPanel statusPnl;
+	private JunctionsPanel jp;
 	public RoadPropertiesPanel getRdPrPnl(){
 		return rdPrPnl;
 	}
@@ -74,7 +73,7 @@ public class AppFrame extends JFrame {
 						
 						@Override
 						public void run() {
-							Marshalling.writeToXml(rn.getOdrNetwork());
+							Marshalling.writeToXml(rdPrPnl.getRn().getOdrNetwork());
 						}
 					}).start();
 			}
@@ -88,16 +87,15 @@ public class AppFrame extends JFrame {
 		pack();
 		RoadNetwork rn=new RoadNetwork();
 		try {
-			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\hello.xml");
-			this.rn=rn;
+			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\mycleaf.xodr");
 		} catch (JAXBException | SAXException e1) {
 			e1.printStackTrace();
 		}
-		JunctionsPanel jncPnl=new JunctionsPanel(rn);
-		jncPnl.updateJunction();
-		rdPrPnl= new RoadPropertiesPanel(rn);
-		drawingPnl=new JPanel();
-		DrawingArea drawingArea = new DrawingArea(rn,rdPrPnl);
+		rdPrPnl= new RoadPropertiesPanel(rn,this);
+		jp=new JunctionsPanel(rdPrPnl);
+		jp.updateJunction();
+		JPanel drawingPnl=new JPanel();
+		DrawingArea drawingArea = new DrawingArea(rdPrPnl);
 		rdPrPnl.setDrawingArea(drawingArea);
 		DrawingAreaMouseListener ms=(DrawingAreaMouseListener)drawingArea.getMouseMotionListeners()[0];
 		drawingPnl.add(drawingArea);
@@ -108,7 +106,7 @@ public class AppFrame extends JFrame {
 		statusPnl=new StatusPanel();
 		statusPnl.setStatus("Status");
 //		getContentPane().add(statusPnl, BorderLayout.SOUTH);
-		getContentPane().add(jncPnl.getSp(), BorderLayout.SOUTH);
+		getContentPane().add(jp.getSp(), BorderLayout.SOUTH);
 		ms.setStatusPnl(statusPnl);
 		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
 		add(new ToolBar(drawingArea),BorderLayout.NORTH);
@@ -119,5 +117,7 @@ public class AppFrame extends JFrame {
 	public void setStatusPnl(StatusPanel statusPnl) {
 		this.statusPnl = statusPnl;
 	}
-
+	public JunctionsPanel getJp() {
+		return jp;
+	}
 }

@@ -12,16 +12,16 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
-import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class DrawingAreaMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
     private final DrawingArea trafficCanvas;
     public final DrawingAreaController controller;
-    private final RoadNetwork roadNetwork;
     private boolean inDrag;
     private int startDragX;
     private int startDragY;
@@ -35,10 +35,9 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     /**
      * @param trafficCanvas
      */
-    public DrawingAreaMouseListener(DrawingArea trafficCanvas, DrawingAreaController controller, RoadNetwork roadNetwork) {
+    public DrawingAreaMouseListener(DrawingArea trafficCanvas, DrawingAreaController controller) {
         this.trafficCanvas = trafficCanvas;
         this.controller = controller;
-        this.roadNetwork = roadNetwork;
     }
 
 
@@ -57,19 +56,19 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 			JOptionPane.showMessageDialog(null, e1.getMessage());
 		}
         boolean isSelectedSet=false;
-        for(int i=roadNetwork.size()-1;i>=0 && !isSelectedSet;i--){
-        	RoadSegment rs=roadNetwork.getRoadSegments().get(i);
+        for(int i=trafficCanvas.getRoadPrPnl().getRn().size()-1;i>=0 && !isSelectedSet;i--){
+        	RoadSegment rs=trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().get(i);
         	if(!(rs.roadMapping() instanceof RoadMappingPoly)){
 	    		if(rs.roadMapping().contains(transformedPoint.getX(), transformedPoint.getY())){
-	    			trafficCanvas.getRoadPnl().setSelectedRoad(rs);
+	    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
 	    			isSelectedSet=true;
 	    		}
         	}else{
         		int ind=0;
         		for(RoadMapping rm:((RoadMappingPoly)rs.roadMapping())){
         			if(rm.contains(transformedPoint.getX(), transformedPoint.getY())){
-    	    			trafficCanvas.getRoadPnl().setSelectedRoad(rs);
-    	    			trafficCanvas.getRoadPnl().getGmPnl().setSelectedGeometry(ind);
+    	    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
+    	    			trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(ind);
     	    			isSelectedSet=true;
     	    		}
         			ind++;
@@ -77,10 +76,10 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         	}
     	}
         if(!isSelectedSet){
-        	trafficCanvas.getRoadPnl().setSelectedRoadNull();
-        	trafficCanvas.getRoadPnl().setVisible(false);
+        	trafficCanvas.getRoadPrPnl().setSelectedRoadNull();
+        	trafficCanvas.getRoadPrPnl().setVisible(false);
         }
-        else trafficCanvas.getRoadPnl().setVisible(true);
+        else trafficCanvas.getRoadPrPnl().setVisible(true);
         trafficCanvas.paint(trafficCanvas.getGraphics());
     }
 
@@ -99,26 +98,20 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         X0.clear();
         Y0.clear();
         try {
-        	if(trafficCanvas.getRoadPnl().getSelectedRoad()!=null){
+        	if(trafficCanvas.getRoadPrPnl().getSelectedRoad()!=null){
         		trafficCanvas.transform.inverseTransform(new Point2D.Float(startDragX, startDragY), startTransformed);
-        		if(!(trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly)){
-        			if(trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
-        				X0.add(trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().getX0());
-        				Y0.add(trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().getY0());
+        		if(!(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly)){
+        			if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
+        				X0.add(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().getX0());
+        				Y0.add(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().getY0());
         			}
         		}else{
-        			RoadMappingPoly rmp=(RoadMappingPoly) trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping();
+        			RoadMappingPoly rmp=(RoadMappingPoly) trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping();
         			if(rmp.contains(startTransformed)){
-        				if(trafficCanvas.isWholeRoadSelectable()){
-        					for(int ii=0;ii<rmp.getRoadMappings().size();ii++){
-        						X0.add(rmp.getRoadMappings().get(ii).getX0());
-        						Y0.add(rmp.getRoadMappings().get(ii).getY0());
-        					}
-        				}
-        				else {
-        					X0.add(rmp.getRoadMappings().get(trafficCanvas.getRoadPnl().getGmPnl().getSelectedIndex()).getX0());
-        					Y0.add(rmp.getRoadMappings().get(trafficCanvas.getRoadPnl().getGmPnl().getSelectedIndex()).getY0());						
-        				}
+    					for(int ii=0;ii<rmp.getRoadMappings().size();ii++){
+    						X0.add(rmp.getRoadMappings().get(ii).getX0());
+    						Y0.add(rmp.getRoadMappings().get(ii).getY0());
+    					}
         			}
         		}
         	}
@@ -139,34 +132,32 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     public void mouseReleased(MouseEvent e) {
     	Point p=e.getPoint();
     	if(inDrag){
-       	 	 if(trafficCanvas.getRoadPnl().getSelectedRoad()!=null){
-    		 boolean isPoly=trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly;
+       	 	 if(trafficCanvas.getRoadPrPnl().getSelectedRoad()!=null){
+    		 boolean isPoly=trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly;
     		 try {
 				trafficCanvas.transform.inverseTransform(new Point2D.Float(p.x, p.y), endTransformed);
 				if(!isPoly){
-					if(trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
-						trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setX0(X0.get(0)+endTransformed.getX()-startTransformed.getX());
-						trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setY0(Y0.get(0)+endTransformed.getY()-startTransformed.getY());
-						trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().adjustBounds(endTransformed.getX()-startTransformed.getX(),endTransformed.getY()-startTransformed.getY());
+					if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
+						int selRd=trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().indexOf(trafficCanvas.getRoadPrPnl().getSelectedRoad());
+						selRd=selRd<0?0:selRd;
+						trafficCanvas.getRoadPrPnl().getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setX(X0.get(0)+endTransformed.getX()-startTransformed.getX());
+						trafficCanvas.getRoadPrPnl().getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setY(Y0.get(0)+endTransformed.getY()-startTransformed.getY());
+						RoadNetworkUtils.refresh(trafficCanvas.getRoadPrPnl());
+						trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(0);
+						trafficCanvas.getRoadPrPnl().setSelectedRoad(trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().get(selRd));
 					}
 	    		 }
 	    		 else{
-					RoadMappingPoly rmp = (RoadMappingPoly) trafficCanvas
-							.getRoadPnl().getSelectedRoad().roadMapping();
-					if (trafficCanvas.isWholeRoadSelectable()) {
-						for (int ii=0;ii<X0.size();ii++) {
-							RoadMapping rm=rmp.getRoadMappings().get(ii);
-							rm.setX0(X0.get(ii) + endTransformed.getX() - startTransformed.getX());
-							rm.setY0(Y0.get(ii) + endTransformed.getY() - startTransformed.getY());
-							rm.adjustBounds(endTransformed.getX()-startTransformed.getX(),endTransformed.getY()-startTransformed.getY());
-						}
+	    			 int selRd=trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().indexOf(trafficCanvas.getRoadPrPnl().getSelectedRoad());
+	    			 selRd=selRd<0?0:selRd;
+					for (int ii=0;ii<X0.size();ii++) {
+						Geometry rm=trafficCanvas.getRoadPrPnl().getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(ii);
+						rm.setX(X0.get(ii) + endTransformed.getX() - startTransformed.getX());
+						rm.setY(Y0.get(ii) + endTransformed.getY() - startTransformed.getY());
+						RoadNetworkUtils.refresh(trafficCanvas.getRoadPrPnl());
 					}
-					else{
-						int gmSelInd=trafficCanvas.getRoadPnl().getGmPnl().getSelectedIndex();
-						rmp.getRoadMappings().get(gmSelInd).setX0(X0.get(0)+endTransformed.getX()-startTransformed.getX());
-						rmp.getRoadMappings().get(gmSelInd).setY0(Y0.get(0)+endTransformed.getY()-startTransformed.getY());
-						rmp.getRoadMappings().get(gmSelInd).adjustBounds(endTransformed.getX()-startTransformed.getX(),endTransformed.getY()-startTransformed.getY());
-					}
+					trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(0);
+					trafficCanvas.getRoadPrPnl().setSelectedRoad(trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().get(selRd));
 	    		}
 			} catch (NoninvertibleTransformException e1) {
 				JOptionPane.showMessageDialog(null, e1.getMessage());
@@ -204,38 +195,31 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         final Point p = e.getPoint();
         boolean inBounds=false;
         if (inDrag) {//start transform should be updated every time
-        	if(trafficCanvas.getRoadPnl().getSelectedRoad()!=null){
-        		if(trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-        			inBounds=((RoadMappingPoly)trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping()).contains(startTransformed);
+        	if(trafficCanvas.getRoadPrPnl().getSelectedRoad()!=null){
+        		if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+        			inBounds=((RoadMappingPoly)trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping()).contains(startTransformed);
         		}
         		else{
-        			inBounds=trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().contains(startTransformed);
+        			inBounds=trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().contains(startTransformed);
         		}
         	}
-        	 if(trafficCanvas.getRoadPnl().getSelectedRoad()!=null && inBounds){
-        		 boolean isPoly=trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly;
+        	 if(trafficCanvas.getRoadPrPnl().getSelectedRoad()!=null && inBounds){
+        		 boolean isPoly=trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly;
 	    		 try {
 					trafficCanvas.transform.inverseTransform(new Point2D.Float(p.x, p.y), endTransformed);
 					if(!isPoly){
-						if(trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
-							trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setX0(X0.get(0)+endTransformed.getX()-startTransformed.getX());
-							trafficCanvas.getRoadPnl().getSelectedRoad().roadMapping().setY0(Y0.get(0)+endTransformed.getY()-startTransformed.getY());
+						if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
+							trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().setX0(X0.get(0)+endTransformed.getX()-startTransformed.getX());
+							trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().setY0(Y0.get(0)+endTransformed.getY()-startTransformed.getY());
 						}
 		    		 }
 		    		 else{
 						RoadMappingPoly rmp = (RoadMappingPoly) trafficCanvas
-								.getRoadPnl().getSelectedRoad().roadMapping();
-						if (trafficCanvas.isWholeRoadSelectable()) {
-							for (int ii=0;ii<X0.size();ii++) {
-								RoadMapping rm=rmp.getRoadMappings().get(ii);
-								rm.setX0(X0.get(ii) + endTransformed.getX() - startTransformed.getX());
-								rm.setY0(Y0.get(ii) + endTransformed.getY() - startTransformed.getY());
-							}
-						}
-						else{
-							int gmSelInd=trafficCanvas.getRoadPnl().getGmPnl().getSelectedIndex();
-							rmp.getRoadMappings().get(gmSelInd).setX0(X0.get(0)+endTransformed.getX()-startTransformed.getX());
-							rmp.getRoadMappings().get(gmSelInd).setY0(Y0.get(0)+endTransformed.getY()-startTransformed.getY());
+								.getRoadPrPnl().getSelectedRoad().roadMapping();
+						for (int ii=0;ii<X0.size();ii++) {
+							RoadMapping rm=rmp.getRoadMappings().get(ii);
+							rm.setX0(X0.get(ii) + endTransformed.getX() - startTransformed.getX());
+							rm.setY0(Y0.get(ii) + endTransformed.getY() - startTransformed.getY());
 						}
 		    		}
 				} catch (NoninvertibleTransformException e1) {

@@ -5,11 +5,8 @@ import org.movsim.simulator.roadnetwork.RoadNetwork;
 
 public class DrawingAreaController {
     final DrawingArea trafficCanvas;
-    protected final RoadNetwork roadNetwork;
-
-    public DrawingAreaController(DrawingArea trafficCanvas, RoadNetwork roadNetwork) {
+    public DrawingAreaController(DrawingArea trafficCanvas) {
         this.trafficCanvas = trafficCanvas;
-        this.roadNetwork = roadNetwork;
     }
 
     public void commandZoomIn() {

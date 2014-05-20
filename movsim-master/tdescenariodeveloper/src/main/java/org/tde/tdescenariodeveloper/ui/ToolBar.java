@@ -17,7 +17,7 @@ public class ToolBar extends JToolBar implements ItemListener{
 	 */
 	private static final long serialVersionUID = -4127064504014635395L;
 
-JCheckBox selectWholeRoad,name,id,axis;
+JCheckBox name,id,axis;
 
 DrawingArea drawingArea;
 	public ToolBar(DrawingArea drawingArea) {
@@ -31,21 +31,14 @@ DrawingArea drawingArea;
 		name=new JCheckBox("name");
 		id=new JCheckBox("id");
 		axis=new JCheckBox("draw axis");
-		selectWholeRoad=new JCheckBox("Select whole road");
-		selectWholeRoad.addItemListener(this);
 		name.addItemListener(this);
 		id.addItemListener(this);
 		axis.addItemListener(this);
-		add(selectWholeRoad,gbc);
 		add(name,gbc);
 		add(id,gbc);
 		add(axis,gbc);
-		selectWholeRoad.setSelected(true);
 		id.setSelected(true);
 		axis.setSelected(true);
-	}
-	public boolean isWholeRoadSelected(){
-		return selectWholeRoad.isSelected();
 	}
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -66,7 +59,6 @@ DrawingArea drawingArea;
 		else if(chsrc==axis){
 			drawingArea.setDrawAxis(axis.isSelected());
 		}
-		if(chsrc==selectWholeRoad)drawingArea.setWholeRoadSelectable(selectWholeRoad.isSelected());
-		drawingArea.getRoadPnl().updateGraphics();
+		drawingArea.getRoadPrPnl().updateGraphics();
 	}
 }

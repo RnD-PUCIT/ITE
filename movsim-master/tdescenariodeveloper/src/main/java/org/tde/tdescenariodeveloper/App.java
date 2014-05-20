@@ -1,7 +1,7 @@
 package org.tde.tdescenariodeveloper;
 
 import org.tde.tdescenariodeveloper.ui.AppFrame;
-import org.tde.tdescenariodevelopment.utils.GraphicsHelper;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 
 

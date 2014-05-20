@@ -23,15 +23,15 @@ public class LinkPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 76435681L;
-	RoadNetwork rn;
 	RoadSegment selectedRoad;
 	private JComboBox<String> cbElementType;
 	private JComboBox<String> cbElementId;
 	private JComboBox<String> cbContactPoint;
 	private JComboBox<String> cbSelectLink;
 	GridBagConstraints c,gbc_lbl,gbc_tf;
-	public LinkPanel(RoadNetwork rn) {
-		this.rn=rn;
+	RoadPropertiesPanel rdPrPnl;
+	public LinkPanel(RoadPropertiesPanel rpp) {
+		rdPrPnl=rpp;
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Link", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
@@ -99,11 +99,11 @@ public class LinkPanel extends JPanel {
 			return;
 		}
 		int curLinkSelected = cbSelectLink.getSelectedIndex();
-		if (rn.isModified()) {
+		if (rdPrPnl.getRn().isModified()) {
 			cbElementId.removeAllItems();
-			for (RoadSegment rs : rn)
+			for (RoadSegment rs : rdPrPnl.getRn())
 				cbElementId.addItem(rs.getOdrRoad().getId() + "");
-			for (Junction jc : rn.getOdrNetwork().getJunction())
+			for (Junction jc : rdPrPnl.getRn().getOdrNetwork().getJunction())
 				cbElementId.addItem(jc.getId() + "");
 		}
 		switch (curLinkSelected) {

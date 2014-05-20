@@ -21,7 +21,6 @@ import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 
 public class LanesPanel extends JPanel implements ActionListener{
-	RoadNetwork rn;
 	RoadSegment selectedRoad;
 	JTextField width,maxSpeed;
 	JLabel level;
@@ -29,9 +28,10 @@ public class LanesPanel extends JPanel implements ActionListener{
 	JButton add,remove;
 	LaneLinkPanel lnLinkPnl;
 	private int lnInd=0;
-	public LanesPanel(RoadNetwork rn) {
-		this.rn=rn;
-		lnLinkPnl=new LaneLinkPanel(rn);
+	RoadPropertiesPanel rdPrPnl;
+	public LanesPanel(RoadPropertiesPanel rpp) {
+		rdPrPnl=rpp;
+		lnLinkPnl=new LaneLinkPanel(rdPrPnl);
 		lnLinkPnl.setLanePanel(this);
 		setLayout(new GridBagLayout());
 		Insets ins=new Insets(5,5,5,5);
@@ -94,7 +94,7 @@ public class LanesPanel extends JPanel implements ActionListener{
 	public void updatelanesPanel() {
 		if(selectedRoad==null)return;
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true),"Lane"+(selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()>1?"s ("+selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()+")":"") , TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		if(rn.isModified()){
+		if(rdPrPnl.getRn().isModified()){
 			cbLanes.removeAllItems();
 			for(Lane ln:selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane()){
 				cbLanes.addItem(ln.getId()+"");

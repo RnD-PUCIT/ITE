@@ -55,7 +55,6 @@ public class RoadNetwork implements SimulationTimeStep, Iterable<RoadSegment> {
     public void reset() {
         roadSegments.clear();
         name = null;
-        odrNetwork = null;
     }
     /**
      * Sets the name of the road network.

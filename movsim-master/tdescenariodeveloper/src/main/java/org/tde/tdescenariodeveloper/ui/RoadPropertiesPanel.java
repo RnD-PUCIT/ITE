@@ -15,7 +15,8 @@ import javax.swing.border.EmptyBorder;
 
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsListener;
+import org.tde.tdescenariodeveloper.eventhandling.GeometryPanelListener;
+import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
 
 public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	/**
@@ -24,28 +25,36 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1683090113017092656L;
 	private RoadSegment selectedRoad;
 	private JToggleButton pin;
-
 	private LinkPanel linkPanel;
 	private GeometryPanel gmPnl;
 	private RoadFieldsPanel rdFldPnl;
 	private LanesPanel lanesPnl;
 	GridBagConstraints gbc;
 	private DrawingArea drawingArea;
+	private AppFrame appFrame;
 	JScrollPane sp;
-	public RoadPropertiesPanel(RoadNetwork rn) {
+	RoadNetwork rn;
+	RoadFieldsPanelListener rfpl;
+	GeometryPanelListener gpl;
+	public RoadPropertiesPanel(RoadNetwork rn,AppFrame appfr) {
+		appFrame=appfr;
+		this.rn=rn;
 		sp=new JScrollPane();
 		sp.getViewport().add(this);
 		sp.setPreferredSize(new Dimension(260,700));
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		pin=new JToggleButton("Pin");
 		pin.addActionListener(this);
-		gmPnl=new GeometryPanel(rn);
-		lanesPnl=new LanesPanel(rn);
-		linkPanel=new LinkPanel(rn);
+		lanesPnl=new LanesPanel(this);
+		linkPanel=new LinkPanel(this);
 		
-		RoadFieldsListener rfl=new RoadFieldsListener(this);
-		rdFldPnl=new RoadFieldsPanel(rn, rfl);
-		rfl.setRdFldsPnl();
+		RoadFieldsPanelListener rfl=new RoadFieldsPanelListener(this);
+		rdFldPnl=new RoadFieldsPanel(this, rfl);
+		rfpl=rfl;
+		
+		GeometryPanelListener gpl=new GeometryPanelListener(this);
+		gmPnl=new GeometryPanel(this,gpl);
+		this.gpl=gpl;
 		
 		setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
@@ -61,17 +70,22 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 		add(lanesPnl,gbc);
 		sp.setVisible(false);
 	}
-	
+	public void blockListeners(boolean b){
+		gpl.setBlocked(b);
+		rfpl.setBlocked(b);
+	}
 	public void updateGraphics(){
 		drawingArea.revalidate();
 		drawingArea.paint(drawingArea.getGraphics());
 	}
 	public void updatePanel(){
+		blockListeners(true);
 		setVisible(true);
 		rdFldPnl.updateFields(selectedRoad);
 		updateLinkPanel();
-		gmPnl.updateGeomPanel(selectedRoad);
+		gmPnl.updateGeomPanel();
 		lanesPnl.updateLanesPanel(selectedRoad);
+		blockListeners(false);
 	}
 	private void updateLinkPanel() {
 		boolean linkAdded = isAdded(linkPanel);
@@ -156,6 +170,18 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 
 	public void setRdFldPnl(RoadFieldsPanel rdFldPnl) {
 		this.rdFldPnl = rdFldPnl;
+	}
+
+	public RoadNetwork getRn() {
+		return rn;
+	}
+
+	public void setRn(RoadNetwork rn) {
+		this.rn = rn;
+	}
+
+	public AppFrame getAppFrame() {
+		return appFrame;
 	}
 	
 }

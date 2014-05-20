@@ -13,6 +13,6 @@ public class RoadFieldsUpdater {
 	}
 	public void updateRoadJunction(){
 		roadPropertiesPanel.getSelectedRoad().getOdrRoad().setJunction((String)roadPropertiesPanel.getRdFldPnl().getCbJunction().getSelectedItem());
-//		roadPropertiesPanel.getSelectedRoad().setRoadName(roadPropertiesPanel.getRdFldPnl().getTfName().getText());
+		roadPropertiesPanel.getAppFrame().getJp().updateJunction();
 	}
 }
