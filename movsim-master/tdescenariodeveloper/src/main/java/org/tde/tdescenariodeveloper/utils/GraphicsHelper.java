@@ -5,9 +5,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.Toolkit;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,8 +21,28 @@ import javax.swing.border.LineBorder;
 
 public class GraphicsHelper {
 	
-	
-	
+	public static JFrame finalizeFrame(JFrame f){
+		f.pack();
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Dimension d=Toolkit.getDefaultToolkit().getScreenSize();
+		f.setSize(d.width,d.height-40);
+		f.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		return f;
+	}
+	public static void showShape(Shape shp){
+		JFrame f=new JFrame();
+		finalizeFrame(f);
+		((Graphics2D)f.getGraphics()).draw(shp);
+		f.setVisible(true);
+	}
+	public static boolean isDouble(String v){
+		try{
+			Double.parseDouble(v);
+		}catch(NumberFormatException e){
+			return false;
+		}
+		return true;
+	}
 	public static void setWindowsUI(){
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -27,6 +50,9 @@ public class GraphicsHelper {
 				| IllegalAccessException | UnsupportedLookAndFeelException e) {
 			JOptionPane.showMessageDialog(null, "UI not set: "+e.getMessage());
 		}
+	}
+	public static String valueFromUser(String msg){
+		return JOptionPane.showInputDialog(msg);
 	}
 	public static void showMessage(String msg){
 		JOptionPane.showMessageDialog(null, msg);
@@ -70,7 +96,7 @@ class ToastMessage extends JDialog {
         JPanel panel = new JPanel(new FlowLayout());
         panel.setBackground(new Color(0,0,0));
         setOpacity(0.6f);
-        panel.setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
+        panel.setBorder(new LineBorder(Color.WHITE, 2,true));
         getContentPane().add(panel, BorderLayout.CENTER);
 
         JLabel lblToastString = new JLabel("");

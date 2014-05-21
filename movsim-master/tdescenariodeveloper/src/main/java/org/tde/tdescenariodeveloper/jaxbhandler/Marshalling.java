@@ -11,12 +11,12 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE;
 
 
 public class Marshalling {
-	public static void writeToXml(OpenDRIVE od){
+	public static void writeToXml(OpenDRIVE od,File f){
 		try {
 			JAXBContext cxt=JAXBContext.newInstance(OpenDRIVE.class);
 			Marshaller marshaller=cxt.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(od, new File("hello.xml"));
+			marshaller.marshal(od, f);
 		} catch (JAXBException e) {
 		}
 	}

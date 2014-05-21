@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
@@ -26,7 +27,7 @@ public class GeometryPanel extends JPanel{
 	JTextField s,tfx,tfy,hdg,l,curvature;
 	JButton add,remove;
 	int gmInd=0;
-	JPanel gmTypePnl;
+	JPanel arcTypePnl;
 	RoadPropertiesPanel rdPrPnl;
 	GeometryPanelListener gpl;
 	public GeometryPanel(RoadPropertiesPanel roadPropertiesPanel, GeometryPanelListener gpl) {
@@ -37,7 +38,7 @@ public class GeometryPanel extends JPanel{
 		remove=new JButton("Remove");
 		remove.addActionListener(gpl);
 		
-		gmTypePnl=new JPanel(new GridBagLayout());
+		arcTypePnl=new JPanel(new GridBagLayout());
 		setMinimumSize(new Dimension(50, 50));
 		setLayout(new GridBagLayout());
 		Insets ins=new Insets(5,5,5,5);
@@ -103,8 +104,8 @@ public class GeometryPanel extends JPanel{
 		curvature.getDocument().addDocumentListener(gpl);
 		lbl=new JLabel("Curvature");
 		lbl.setLabelFor(curvature);
-		gmTypePnl.add(lbl,gbc_lbl);
-		gmTypePnl.add(curvature,gbc_tf);
+		arcTypePnl.add(lbl,gbc_lbl);
+		arcTypePnl.add(curvature,gbc_tf);
 		
 		add(lblGmType,gbc_lbl);
 		add(cbGmType,gbc_tf);
@@ -124,6 +125,8 @@ public class GeometryPanel extends JPanel{
 		gpl.setDocListLocked(true);
 		makeBlackFont();
 		DecimalFormat df=new DecimalFormat("##.####");
+		if(gmInd+1>rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size())
+			gmInd=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()-1;
 		s.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getS()));
 		tfx.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getX()));
 		tfy.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getY()));
@@ -138,17 +141,23 @@ public class GeometryPanel extends JPanel{
 			tfy.setEnabled(true);
 			hdg.setEnabled(true);
 		}
-		if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getLine()!=null){
-			if(isAdded(gmTypePnl))remove(gmTypePnl);
+		if(rdPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly && gmInd>0){
+			remove.setEnabled(true);
+		}else{
+			remove.setEnabled(false);
+		}
+		if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).isSetLine()){
+			if(isAdded(arcTypePnl))remove(arcTypePnl);
 			cbGmType.setSelectedItem("line");
 		}
 		else if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getArc()!=null){
-			if(!isAdded(gmTypePnl)){
+			if(!isAdded(arcTypePnl)){
 				GridBagConstraints gbc_tf = new GridBagConstraints();
 				gbc_tf.fill = GridBagConstraints.BOTH;
 				gbc_tf.gridwidth=GridBagConstraints.REMAINDER;
-				add(gmTypePnl,gbc_tf);
+				add(arcTypePnl,gbc_tf);
 			}
+			
 			curvature.setText(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getArc().getCurvature()+"");
 			cbGmType.setSelectedItem("arc");
 		}
@@ -161,21 +170,25 @@ public class GeometryPanel extends JPanel{
 	public int getSelectedIndex() {
 		return gmInd;
 	}
-	public void setSelectedGeometry(int ind) {
+	public void setSelectedGeometry(int ind,boolean update) {
 		if(rdPrPnl.getSelectedRoad()==null){
 			throw new NullPointerException("selectedroad is null : setSelectedGeometry");
 		}
 		gmInd=ind;
-		cbGeom.setSelectedIndex(gmInd);
+//		if(cbGeom.getItemCount()!=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size())throw new IllegalStateException("Geometry Combobox count not equals road geometries count.");
+		if(update)cbGeom.setSelectedIndex(gmInd);
+	}
+	public void setSelectedGeometry(int ind) {
+		setSelectedGeometry(ind,true);
+	}
+	public void resetSelectedIndex(){
+		gmInd=0;
 	}
 	public JComboBox<String> getCbGeom() {
 		return cbGeom;
 	}
 	public int getGmInd() {
 		return gmInd;
-	}
-	public void setGmInd(int gmInd) {
-		this.gmInd = gmInd;
 	}
 	public JComboBox<String> getCbGmType() {
 		return cbGmType;
@@ -201,8 +214,8 @@ public class GeometryPanel extends JPanel{
 	public JButton getRemove() {
 		return remove;
 	}
-	public JPanel getGmTypePnl() {
-		return gmTypePnl;
+	public JPanel getarcTypePnl() {
+		return arcTypePnl;
 	}
 	public void makeBlackFont(){
 		GraphicsHelper.makeBlack(s,tfx,hdg,l,curvature);

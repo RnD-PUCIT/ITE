@@ -80,11 +80,11 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	}
 	public void updatePanel(){
 		blockListeners(true);
-		setVisible(true);
 		rdFldPnl.updateFields(selectedRoad);
 		updateLinkPanel();
 		gmPnl.updateGeomPanel();
 		lanesPnl.updateLanesPanel(selectedRoad);
+		setVisible(true);
 		blockListeners(false);
 	}
 	private void updateLinkPanel() {
@@ -113,9 +113,12 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	}
 	
 	public void setSelectedRoad(RoadSegment selectedRoad) {
+		setSelectedRoad(selectedRoad, true);
+	}
+	public void setSelectedRoad(RoadSegment selectedRoad,boolean update) {
 		if(selectedRoad==null)return;
 		this.selectedRoad = selectedRoad;
-		updatePanel();
+		if(update)updatePanel();
 	}
 	public void setSelectedRoadNull() {
 		this.selectedRoad = null;

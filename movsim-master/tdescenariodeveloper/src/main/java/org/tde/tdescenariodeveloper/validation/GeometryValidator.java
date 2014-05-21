@@ -43,7 +43,7 @@ public class GeometryValidator {
 			Double.parseDouble(rdPrPnl.getGmPnl().getTfX().getText());
 			Double.parseDouble(rdPrPnl.getGmPnl().getTfY().getText());
 		}catch(NumberFormatException e){
-			throw new InvalidInputException("Input isn't parsable");
+			throw new InvalidInputException("Coordinates are not parsable");
 		}
 		return rdPrPnl.getGmPnl().getSelectedIndex()==0;
 	}
@@ -53,20 +53,34 @@ public class GeometryValidator {
 		try{
 			d=Double.parseDouble(rdPrPnl.getGmPnl().getHdg().getText());
 		}catch(NumberFormatException e){
-			throw new InvalidInputException("Input isn't parsable");
+			throw new InvalidInputException("Direction isn't parsable");
 		}
 		return d>-6.2831853071796 && d<6.2831853071796;
 	}
 
+	public boolean isValidGmType() {
+		if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetLine()){
+			return true;
+		}else if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetArc()){
+			try{
+				Double.parseDouble(rdPrPnl.getGmPnl().getCurvature().getText());
+				return true;
+			}catch(NumberFormatException e){
+				throw new InvalidInputException("curvature isn't parsable");
+			}
+		}
+		return false;
+	}
+
 	public boolean isValidCurv() {
-		if(!rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetArc()){
-			return false;
+		if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetArc()){
+			try{
+				Double.parseDouble(rdPrPnl.getGmPnl().getCurvature().getText());
+				return true;
+			}catch(NumberFormatException e){
+				throw new InvalidInputException("curvature isn't parsable");
+			}
 		}
-		try{
-			Double.parseDouble(rdPrPnl.getGmPnl().getCurvature().getText());
-		}catch(NumberFormatException e){
-			throw new InvalidInputException("Input isn't parsable");
-		}
-		return true;
+		return false;
 	}
 }

@@ -26,10 +26,12 @@
 
 package org.movsim.simulator.roadnetwork;
 
+import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.simulator.vehicles.Vehicle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +65,10 @@ public class LaneSegment implements Iterable<Vehicle> {
     private final RoadSegment roadSegment;
     private LaneSegment sinkLaneSegment;
     private LaneSegment sourceLaneSegment;
-
+    /** boundary of the lane (Added by Shmeel) */
+    private Shape bounds;
+    /** Open drive reference of the lane (Added by Shmeel) */
+    private Lane odrLane;
     // physical lane, not the laneIndex
     private final int lane;
     private Lanes.Type type;
@@ -784,6 +789,22 @@ public class LaneSegment implements Iterable<Vehicle> {
     public String toString() {
         return "LaneSegment [sinkLaneSegment=" + sinkLaneSegment + ", sourceLaneSegment=" + sourceLaneSegment
                 + ", lane=" + lane + ", type=" + type + ", removedVehicleCount=" + removedVehicleCount + "]";
+    }
+
+    public Shape getBounds() {
+        return bounds;
+    }
+
+    public void setBounds(Shape bounds) {
+        this.bounds = bounds;
+    }
+
+    public Lane getOdrLane() {
+        return odrLane;
+    }
+
+    public void setOdrLane(Lane odrLane) {
+        this.odrLane = odrLane;
     }
 
 }

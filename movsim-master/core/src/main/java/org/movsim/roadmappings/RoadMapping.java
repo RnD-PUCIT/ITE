@@ -565,4 +565,8 @@ public abstract class RoadMapping {
         AffineTransform at = AffineTransform.getTranslateInstance(d, e);
         bounds = at.createTransformedShape(bounds);
     }
+
+    public void setLaneWidth(double laneWidth) {
+        this.laneWidth = laneWidth;
+    }
 }

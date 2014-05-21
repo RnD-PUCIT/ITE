@@ -1347,4 +1347,8 @@ public class RoadSegment extends DefaultWeightedEdge implements Iterable<Vehicle
         this.roadName = roadName;
     }
 
+    public LaneSegment[] getLaneSegments() {
+        return laneSegments;
+    }
+
 }

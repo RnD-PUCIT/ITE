@@ -19,6 +19,7 @@ import org.movsim.autogen.TrafficLightStatus;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.AbstractTrafficSource;
+import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.Lanes;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.movsim.simulator.roadnetwork.Slope;
@@ -60,6 +61,7 @@ public class DrawingArea extends Canvas {
 	private boolean drawAxis=true;
 	private boolean drawBounds=false;
 	private boolean drawRoadNames=false;
+	private boolean drawLaneBounds=true;
     
     
 	public DrawingArea(RoadPropertiesPanel rdPrPnl) {
@@ -236,8 +238,19 @@ public class DrawingArea extends Canvas {
         if (drawBounds) {
         	drawBounds(g);
         }
+        if (drawLaneBounds) {
+        	g.setColor(Color.BLUE);
+        	drawLaneBounds(g);
+        }
     }
-    private void drawBounds(Graphics2D g) {
+    private void drawLaneBounds(Graphics2D g) {
+    	for(RoadSegment rs:roadPrPnl.getRn()){
+    		for(LaneSegment ls:rs.getLaneSegments()){
+    			g.draw(ls.getBounds());
+    		}
+    	}
+	}
+	private void drawBounds(Graphics2D g) {
     	for(RoadSegment rs:roadPrPnl.getRn()){
     		g.draw(rs.roadMapping().getBounds());
     	}

@@ -63,7 +63,7 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 		if(evt.getSource() instanceof JComboBox<?>)srcCb=(JComboBox<String>)evt.getSource();
 		if(srcCb==rdPrPnl.getGmPnl().getCbGeom()){
 			if(rdPrPnl.getGmPnl().getCbGeom().getSelectedItem()==null)return;
-			rdPrPnl.getGmPnl().setGmInd(rdPrPnl.getGmPnl().getCbGeom().getSelectedIndex());
+			rdPrPnl.getGmPnl().setSelectedGeometry(rdPrPnl.getGmPnl().getCbGeom().getSelectedIndex(),false);
 			rdPrPnl.getGmPnl().geometryChanged();
 		}
 		else if(srcBtn==rdPrPnl.getGmPnl().getAdd()){
@@ -75,8 +75,16 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 			rdPrPnl.updateGraphics();
 		}
 		else if(srcCb==rdPrPnl.getGmPnl().getCbGmType()){
-			updater.updateGmType();
-			rdPrPnl.updateGraphics();
+			try{
+				if(validator.isValidGmType()){
+					updater.updateGmType();
+					rdPrPnl.updateGraphics();
+				}else{
+					GraphicsHelper.makeRed(rdPrPnl.getGmPnl().getCurvature());
+				}
+			}catch(NumberFormatException e){
+				GraphicsHelper.showToast(e.getMessage(), 4000);
+			}
 		}
 		inActionUpdate=false;
 	}
@@ -128,7 +136,7 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 		else if(doc==rdPrPnl.getGmPnl().getCurvature().getDocument()){
 			try{
 				if(validator.isValidCurv()){
-					GraphicsHelper.makeBlack(rdPrPnl.getGmPnl().getHdg());
+					GraphicsHelper.makeBlack(rdPrPnl.getGmPnl().getCurvature());
 					updater.updateCurv();
 					rdPrPnl.updateGraphics();
 				}

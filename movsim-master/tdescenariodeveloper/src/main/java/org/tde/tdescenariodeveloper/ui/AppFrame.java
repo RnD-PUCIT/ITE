@@ -2,9 +2,9 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -13,7 +13,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.xml.bind.JAXBException;
@@ -22,6 +21,8 @@ import org.movsim.input.network.OpenDriveReader;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.viewer.App;
 import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
+import org.tde.tdescenariodeveloper.utils.FileUtils;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.xml.sax.SAXException;
 
 public class AppFrame extends JFrame {
@@ -33,12 +34,9 @@ public class AppFrame extends JFrame {
 		return rdPrPnl;
 	}
 	public AppFrame() {
-		setSize(new Dimension(1024, 768));
 		setPreferredSize(new Dimension(1024, 768));
 		setMinimumSize(new Dimension(700, 500));
-		setExtendedState(Frame.MAXIMIZED_BOTH);
 		setTitle("Vehicular Traffic  Flow Scenario Development Environment");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -73,7 +71,9 @@ public class AppFrame extends JFrame {
 						
 						@Override
 						public void run() {
-							Marshalling.writeToXml(rdPrPnl.getRn().getOdrNetwork());
+							File f=null;
+							f=FileUtils.saveFile("xodr");
+							if(f!=null)Marshalling.writeToXml(rdPrPnl.getRn().getOdrNetwork(),f);
 						}
 					}).start();
 			}
@@ -110,6 +110,7 @@ public class AppFrame extends JFrame {
 		ms.setStatusPnl(statusPnl);
 		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
 		add(new ToolBar(drawingArea),BorderLayout.NORTH);
+		GraphicsHelper.finalizeFrame(this);
 	}
 	public StatusPanel getStatusPnl() {
 		return statusPnl;

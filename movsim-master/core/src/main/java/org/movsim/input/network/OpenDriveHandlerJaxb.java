@@ -3,6 +3,7 @@ package org.movsim.input.network;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +30,7 @@ import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingArc;
 import org.movsim.roadmappings.RoadMappingLine;
 import org.movsim.roadmappings.RoadMappingPoly;
+import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.Lanes;
 import org.movsim.simulator.roadnetwork.Lanes.LaneSectionType;
 import org.movsim.simulator.roadnetwork.Lanes.RoadLinkElementType;
@@ -71,6 +73,10 @@ public class OpenDriveHandlerJaxb {
         return openDriveHandlerJaxb.create(filename, openDriveNetwork, roadNetwork);
     }
 
+    /** RoadSegment being populated (Shared). (Added by Shmeel) */
+    private RoadSegment tmpRs;
+    private boolean polyInProcess = false;
+    private ArrayList<GeneralPath> shps = new ArrayList<GeneralPath>();
     public boolean create(String filename, OpenDRIVE openDriveNetwork, RoadNetwork roadNetwork)
             throws IllegalArgumentException {
         roadNetwork.setOdrNetwork(openDriveNetwork);
@@ -82,10 +88,14 @@ public class OpenDriveHandlerJaxb {
                 if (hasLaneSectionType(road, laneSectionType)) {
                     RoadSegment roadSegmentRight = createRoadSegment(laneSectionType, roadMapping, road);
                     if (roadSegmentRight != null) {
+                        tmpRs = roadSegmentRight;
                         setBounds(roadSegmentRight.roadMapping(), roadSegmentRight.laneCount()
                                 * roadSegmentRight.roadMapping().laneWidth() / 2.0);
+
                         roadSegmentRight.setOdrRoad(road);
                         roadNetwork.add(roadSegmentRight);
+                    } else {
+                        tmpRs = null;
                     }
                 }
             }
@@ -101,32 +111,89 @@ public class OpenDriveHandlerJaxb {
     private void setBounds(RoadMapping roadMapping, double width) {
         if (!(roadMapping instanceof RoadMappingPoly)) {
             double roadLength = roadMapping.roadLength();
-            GeneralPath refLine = new GeneralPath();
-            GeneralPath edge = new GeneralPath();
-            PosTheta p = roadMapping.map(0, width);
-            refLine.moveTo(p.x, p.y);
+            GeneralPath leftEdge = new GeneralPath();
+            GeneralPath LastLaneEdge = new GeneralPath();
+            PosTheta p;
+            GeneralPath[] lanesEdges = new GeneralPath[tmpRs.laneCount() + 1];
+            for (int c = 0; c < lanesEdges.length; c++) {
+                lanesEdges[c] = new GeneralPath();
+            }
+            double wd = width;
+            for (int i = 0; i < lanesEdges.length; i += 2) {
+                p = roadMapping.map(0, wd);
+                lanesEdges[i].moveTo(p.x, p.y);
+                wd -= roadMapping.laneWidth() * 2;
+            }
+            wd = width - roadMapping.laneWidth();
+            for (int i = 1; i < lanesEdges.length; i += 2) {
+                p = roadMapping.map(roadLength, wd);
+                lanesEdges[i].moveTo(p.x, p.y);
+                wd -= roadMapping.laneWidth() * 2;
+            }
+            p = roadMapping.map(0, width);
+            leftEdge.moveTo(p.x, p.y);
             p = roadMapping.map(roadLength, -width);
-            edge.moveTo(p.x, p.y);
+            LastLaneEdge.moveTo(p.x, p.y);
             double s = 0.0 + pathStep;
             while (s <= roadLength) {
                 p = roadMapping.map(s, width);
-                refLine.lineTo(p.x, p.y);
+                leftEdge.lineTo(p.x, p.y);
+                wd = width;
+                for (int i = 0; i < lanesEdges.length; i += 2) {
+                    p = roadMapping.map(s, wd);
+                    lanesEdges[i].lineTo(p.x, p.y);
+                    wd -= roadMapping.laneWidth() * 2;
+                }
                 s += pathStep;
             }
             s -= pathStep;
             while (s >= 0) {
                 p = roadMapping.map(s, -width);
-                edge.lineTo(p.x, p.y);
+                LastLaneEdge.lineTo(p.x, p.y);
+                wd = width - roadMapping.laneWidth();
+                for (int i = 1; i < lanesEdges.length; i += 2) {
+                    p = roadMapping.map(s, wd);
+                    lanesEdges[i].lineTo(p.x, p.y);
+                    wd -= roadMapping.laneWidth() * 2;
+                }
                 s -= pathStep;
             }
-            refLine.append(edge.getPathIterator(AffineTransform.getScaleInstance(1, 1)), true);
-            refLine.closePath();
-            roadMapping.setBounds(refLine);
+            for (int c = 0; c < lanesEdges.length - 1; c++) {
+                GeneralPath left = (GeneralPath) lanesEdges[c].clone();
+                GeneralPath right = (GeneralPath) lanesEdges[c + 1].clone();
+                left.append(right.getPathIterator(AffineTransform.getScaleInstance(1, 1)), true);
+                left.closePath();
+                if (polyInProcess) {
+                    shps.add(left);
+                } else {
+                    tmpRs.getLaneSegments()[c].setBounds(left);
+                }
+            }
+            leftEdge.append(LastLaneEdge.getPathIterator(AffineTransform.getScaleInstance(1, 1)), true);
+            leftEdge.closePath();
+            roadMapping.setBounds(leftEdge);
         } else {
+            polyInProcess = true;
             RoadMappingPoly roadMappingPoly = (RoadMappingPoly) roadMapping;
             for (RoadMapping rm : roadMappingPoly) {
                 setBounds(rm, width);
             }
+            GeneralPath[] pths = new GeneralPath[tmpRs.laneCount()];
+            for (int i = 0; i < pths.length; i++) {
+                pths[i] = new GeneralPath();
+            }
+            int c = 0;
+            while (c < shps.size()) {
+                for (int j = 0; j < pths.length; j++) {
+                    pths[j].append(shps.get(c++), false);
+                }
+            }
+            int i = 0;
+            for (LaneSegment ls : tmpRs.getLaneSegments()) {
+                ls.setBounds(pths[i++]);
+            }
+            shps.clear();
+            polyInProcess = false;
         }
     }
     private void createControllerMapping(OpenDRIVE openDriveNetwork) {
@@ -209,6 +276,9 @@ public class OpenDriveHandlerJaxb {
                 } else {
                     throw new IllegalArgumentException("Unknown geometry for road: " + road);
                 }
+            }
+            for (RoadMapping rm : roadMappingPoly) {
+                rm.setLaneWidth(roadMapping.laneWidth());
             }
         }
         return roadMapping;
