@@ -2,29 +2,29 @@ package org.tde.tdescenariodeveloper.validation;
 
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.tde.tdescenariodeveloper.exception.InvalidInputException;
-import org.tde.tdescenariodeveloper.ui.RoadPropertiesPanel;
+import org.tde.tdescenariodeveloper.ui.RoadContext;
 
 public class GeometryValidator {
-	RoadPropertiesPanel rdPrPnl;
-	public GeometryValidator(RoadPropertiesPanel rdPrPnl) {
-		this.rdPrPnl=rdPrPnl;
+	RoadContext rdCxt;
+	public GeometryValidator(RoadContext rdCxt) {
+		this.rdCxt=rdCxt;
 	}
 
 	public boolean isValidS() {
 		double endLimit,startLimit,s;
-		if(rdPrPnl.getGmPnl().getSelectedIndex()==0){
-			s=Double.parseDouble(rdPrPnl.getGmPnl().getS().getText());
+		if(rdCxt.getGmPnl().getSelectedIndex()==0){
+			s=Double.parseDouble(rdCxt.getGmPnl().getS().getText());
 			if(s==0.0)return true;
 			else throw new InvalidInputException("First geometry can only have 0.0 offset");
 		}
 		if(isPrevGmExist()){
-			startLimit=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()-1).getS();
+			startLimit=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()-1).getS();
 		}
 		else startLimit=0;
-		Geometry g=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex());
+		Geometry g=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex());
 		endLimit=g.getLength()+g.getS();
 		try{
-			s=Double.parseDouble(rdPrPnl.getGmPnl().getS().getText());
+			s=Double.parseDouble(rdCxt.getGmPnl().getS().getText());
 			if(s<endLimit && s>startLimit)return true;
 		}catch(NumberFormatException e){
 			return false;
@@ -33,25 +33,25 @@ public class GeometryValidator {
 	}
 
 	public boolean isNextGmExist(){
-		return rdPrPnl.getGmPnl().getSelectedIndex()+1<rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size();
+		return rdCxt.getGmPnl().getSelectedIndex()+1<rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size();
 	}
 	public boolean isPrevGmExist(){
-		return rdPrPnl.getGmPnl().getSelectedIndex()>0;
+		return rdCxt.getGmPnl().getSelectedIndex()>0;
 	}
 	public boolean isValidXY(){
 		try{
-			Double.parseDouble(rdPrPnl.getGmPnl().getTfX().getText());
-			Double.parseDouble(rdPrPnl.getGmPnl().getTfY().getText());
+			Double.parseDouble(rdCxt.getGmPnl().getTfX().getText());
+			Double.parseDouble(rdCxt.getGmPnl().getTfY().getText());
 		}catch(NumberFormatException e){
 			throw new InvalidInputException("Coordinates are not parsable");
 		}
-		return rdPrPnl.getGmPnl().getSelectedIndex()==0;
+		return rdCxt.getGmPnl().getSelectedIndex()==0;
 	}
 
 	public boolean isValidHdg() {
 		double d;
 		try{
-			d=Double.parseDouble(rdPrPnl.getGmPnl().getHdg().getText());
+			d=Double.parseDouble(rdCxt.getGmPnl().getHdg().getText());
 		}catch(NumberFormatException e){
 			throw new InvalidInputException("Direction isn't parsable");
 		}
@@ -59,11 +59,11 @@ public class GeometryValidator {
 	}
 
 	public boolean isValidGmType() {
-		if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetLine()){
+		if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).isSetLine()){
 			return true;
-		}else if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetArc()){
+		}else if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).isSetArc()){
 			try{
-				Double.parseDouble(rdPrPnl.getGmPnl().getCurvature().getText());
+				Double.parseDouble(rdCxt.getGmPnl().getCurvature().getText());
 				return true;
 			}catch(NumberFormatException e){
 				throw new InvalidInputException("curvature isn't parsable");
@@ -73,9 +73,9 @@ public class GeometryValidator {
 	}
 
 	public boolean isValidCurv() {
-		if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetArc()){
+		if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).isSetArc()){
 			try{
-				Double.parseDouble(rdPrPnl.getGmPnl().getCurvature().getText());
+				Double.parseDouble(rdCxt.getGmPnl().getCurvature().getText());
 				return true;
 			}catch(NumberFormatException e){
 				throw new InvalidInputException("curvature isn't parsable");

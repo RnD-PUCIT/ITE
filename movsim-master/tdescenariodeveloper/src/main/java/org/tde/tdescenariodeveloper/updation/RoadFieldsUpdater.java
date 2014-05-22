@@ -1,10 +1,10 @@
 package org.tde.tdescenariodeveloper.updation;
 
-import org.tde.tdescenariodeveloper.ui.RoadPropertiesPanel;
+import org.tde.tdescenariodeveloper.ui.RoadContext;
 
 public class RoadFieldsUpdater {
-	RoadPropertiesPanel roadPropertiesPanel;
-	public RoadFieldsUpdater(RoadPropertiesPanel rpp) {
+	RoadContext roadPropertiesPanel;
+	public RoadFieldsUpdater(RoadContext rpp) {
 		roadPropertiesPanel=rpp;
 	}
 	public void updateRoadName(){

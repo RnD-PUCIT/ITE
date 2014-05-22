@@ -5,9 +5,9 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -17,21 +17,23 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.movsim.network.autogen.opendrive.Lane;
-import org.movsim.simulator.roadnetwork.RoadNetwork;
-import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
 
-public class LanesPanel extends JPanel implements ActionListener{
-	RoadSegment selectedRoad;
-	JTextField width,maxSpeed;
+public class LanesPanel extends JPanel{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8013762005282847367L;
+	JTextField tfwidth,maxSpeed;
 	JLabel level;
 	JComboBox<String>cbLanes,cbtype;
 	JButton add,remove;
 	LaneLinkPanel lnLinkPnl;
 	private int lnInd=0;
-	RoadPropertiesPanel rdPrPnl;
-	public LanesPanel(RoadPropertiesPanel rpp) {
-		rdPrPnl=rpp;
-		lnLinkPnl=new LaneLinkPanel(rdPrPnl);
+	RoadContext rdCxt;
+	public LanesPanel(RoadContext rpp,LanesPanelListener lpl) {
+		rdCxt=rpp;
+		lnLinkPnl=new LaneLinkPanel(rdCxt);
 		lnLinkPnl.setLanePanel(this);
 		setLayout(new GridBagLayout());
 		Insets ins=new Insets(5,5,5,5);
@@ -41,7 +43,9 @@ public class LanesPanel extends JPanel implements ActionListener{
 		gbc_lbl.fill=GridBagConstraints.BOTH;
 		gbc_lbl.weightx=1;
 		add=new JButton("Add new");
+		add.addActionListener(lpl);
 		remove=new JButton("Remove");
+		remove.addActionListener(lpl);
 		add(add,gbc_lbl);
 		gbc_lbl.weightx=2;
 		
@@ -54,16 +58,25 @@ public class LanesPanel extends JPanel implements ActionListener{
 		gbc_tf.weightx=3;
 		
 		
-		
+		JPanel tmp=new JPanel(new GridBagLayout());
+		tmp.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+		tfwidth=new JTextField(10);
+		tfwidth.getDocument().addDocumentListener(lpl);
+		JLabel lbl=new JLabel("Lane width");
+		lbl.setLabelFor(tfwidth);
+		tmp.add(lbl,gbc_lbl);
+		tmp.add(tfwidth,gbc_tf);
+		add(tmp,gbc_tf);
 		
 		cbLanes=new JComboBox<String>();
-		cbLanes.addActionListener(this);
-		JLabel lbl=new JLabel("Select lane (Id)");
+		cbLanes.addActionListener(lpl);
+		lbl=new JLabel("Select lane (Id)");
 		lbl.setLabelFor(cbLanes);
 		add(lbl,gbc_lbl);
 		add(cbLanes,gbc_tf);
 		
 		cbtype=new JComboBox<>(new String[]{"driving","mwyExit","mwyEntry"});
+		cbtype.addActionListener(lpl);
 		lbl=new JLabel("Type");
 		lbl.setLabelFor(cbtype);
 		add(lbl,gbc_lbl);
@@ -75,44 +88,30 @@ public class LanesPanel extends JPanel implements ActionListener{
 		add(lbl,gbc_lbl);
 		add(level,gbc_tf);
 		
-		width=new JTextField(10);
-		lbl=new JLabel("Width");
-		lbl.setLabelFor(width);
-		add(lbl,gbc_lbl);
-		add(width,gbc_tf);
+
 		
 		maxSpeed=new JTextField(10);
+		maxSpeed.getDocument().addDocumentListener(lpl);
 		lbl=new JLabel("Max speed");
 		lbl.setLabelFor(maxSpeed);
 		add(lbl,gbc_lbl);
 		add(maxSpeed,gbc_tf);
 	}
-	public void updateLanesPanel(RoadSegment selectedRoad) {
-		this.selectedRoad = selectedRoad;
-		updatelanesPanel();
-	}
 	public void updatelanesPanel() {
-		if(selectedRoad==null)return;
-		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true),"Lane"+(selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()>1?"s ("+selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()+")":"") , TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		if(rdPrPnl.getRn().isModified()){
-			cbLanes.removeAllItems();
-			for(Lane ln:selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane()){
-				cbLanes.addItem(ln.getId()+"");
-			}
-		}
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent evt) {
-		if(cbLanes.getSelectedItem()==null)return;
-		lnInd=cbLanes.getSelectedIndex();
+		if(rdCxt.getSelectedRoad()==null)return;
+		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true),"Lane"+(rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()>1?"s ("+rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()+")":"") , TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		cbLanes.removeAllItems();
+		tfwidth.setText(getOdrLanes().get(0).getWidth().get(0).getA()+"");
+		for(Lane ln:rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane())
+			cbLanes.addItem(ln.getId()+"");
+		cbLanes.setSelectedIndex(lnInd);
 		laneChanged();
 	}
-	private void laneChanged() {
-		Lane ln=selectedRoad.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(lnInd);
+	public void laneChanged() {
+		remove.setEnabled(getOdrLanes().size()>1);
+		Lane ln=rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(lnInd);
 		cbtype.setSelectedItem(ln.getType()+"");
 		level.setText(ln.getLevel()+"");
-		width.setText(ln.getWidth().get(0).getA()+"");
 		maxSpeed.setText(ln.getSpeed()!=null && ln.getSpeed().size()>0?ln.getSpeed().get(0).getMax()+"":"");
 		if(ln.getLink()!=null){
 			if(!isAdded(lnLinkPnl)){
@@ -125,17 +124,65 @@ public class LanesPanel extends JPanel implements ActionListener{
 		}else{
 			if(isAdded(lnLinkPnl))remove(lnLinkPnl);
 		}
-		((RoadPropertiesPanel)getParent()).updateGraphics();
+		((RoadContext)getParent()).updateGraphics();
 		
 	}
-	public RoadSegment getSelectedRoad() {
-		return selectedRoad;
-	}
-	public int getLnInd() {
-		return lnInd;
+	public List<Lane> getOdrLanes(){
+		return rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane();
 	}
 	public boolean isAdded(Component c){
 		return (LanesPanel)c.getParent()==this;
 	}
-	
+	public void setSelectedLane(int ind,boolean update) {
+//		try{
+//			if(rdCxt.getSelectedRoad()==null)
+//				throw new NullPointerException("setSelectedLane: selectedroad is null");
+//			else if(ind+1>getOdrLanes().size() || ind<0)throw new LaneException("Lane index out of bounds");
+//			else if(ind+1<cbLanes.getItemCount())
+//				throw new IllegalSelectorException();
+			lnInd=ind;
+			if(update)cbLanes.setSelectedIndex(ind);
+			
+//		}catch(NullPointerException e){
+//			GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
+//		}
+//		catch(LaneException e){
+//			GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
+//			lnInd=0;
+//			setSelectedLane(ind, update);
+//		}
+//		catch(IllegalSelectorException e){
+//			GraphicsHelper.showToast("Item doesn't exit in list", rdCxt.getToastDurationMilis());
+//		}
+	}
+	public void setSelectedLane(int ind) {
+		setSelectedLane(ind,true);
+	}
+	public RoadContext getRdPrPnl() {
+		return rdCxt;
+	}
+	public int getSelectedIndex() {
+		return lnInd;
+	}
+	public JComboBox<String> getCbLanes() {
+		return cbLanes;
+	}
+	public JComboBox<String> getCbtype() {
+		return cbtype;
+	}
+	public JTextField getTfWidth() {
+		return tfwidth;
+	}
+	public JTextField getMaxSpeed() {
+		return maxSpeed;
+	}
+	public JButton getAdd() {
+		return add;
+	}
+	public JButton getRemove() {
+		return remove;
+	}
+	public LaneLinkPanel getLnLinkPnl() {
+		return lnLinkPnl;
+	}
 }

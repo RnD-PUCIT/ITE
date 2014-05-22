@@ -1,9 +1,9 @@
-package org.tde.tdescenariodeveloper.ui;
+package org.tde.tdescenariodeveloper.eventhandling;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import org.movsim.simulator.roadnetwork.RoadNetwork;
+import org.tde.tdescenariodeveloper.ui.DrawingArea;
 
 public class DrawingAreaKeyListener extends DrawingAreaController implements KeyListener {
 

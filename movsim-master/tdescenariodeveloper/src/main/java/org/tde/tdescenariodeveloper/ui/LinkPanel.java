@@ -29,9 +29,9 @@ public class LinkPanel extends JPanel {
 	private JComboBox<String> cbContactPoint;
 	private JComboBox<String> cbSelectLink;
 	GridBagConstraints c,gbc_lbl,gbc_tf;
-	RoadPropertiesPanel rdPrPnl;
-	public LinkPanel(RoadPropertiesPanel rpp) {
-		rdPrPnl=rpp;
+	RoadContext rdCxt;
+	public LinkPanel(RoadContext rpp) {
+		rdCxt=rpp;
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Link", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
@@ -99,11 +99,11 @@ public class LinkPanel extends JPanel {
 			return;
 		}
 		int curLinkSelected = cbSelectLink.getSelectedIndex();
-		if (rdPrPnl.getRn().isModified()) {
+		if (rdCxt.getRn().isModified()) {
 			cbElementId.removeAllItems();
-			for (RoadSegment rs : rdPrPnl.getRn())
+			for (RoadSegment rs : rdCxt.getRn())
 				cbElementId.addItem(rs.getOdrRoad().getId() + "");
-			for (Junction jc : rdPrPnl.getRn().getOdrNetwork().getJunction())
+			for (Junction jc : rdCxt.getRn().getOdrNetwork().getJunction())
 				cbElementId.addItem(jc.getId() + "");
 		}
 		switch (curLinkSelected) {

@@ -1,4 +1,4 @@
-package org.tde.tdescenariodeveloper.ui;
+package org.tde.tdescenariodeveloper.eventhandling;
 
 import java.awt.Cursor;
 import java.awt.Point;
@@ -17,6 +17,8 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.ui.DrawingArea;
+import org.tde.tdescenariodeveloper.ui.StatusPanel;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class DrawingAreaMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
@@ -61,7 +63,10 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         	RoadSegment rs=trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().get(i);
         	if(!(rs.roadMapping() instanceof RoadMappingPoly)){
 	    		if(rs.roadMapping().contains(transformedPoint.getX(), transformedPoint.getY())){
-	    			trafficCanvas.getRoadPrPnl().getGmPnl().resetSelectedIndex();
+	    			trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(0,false);
+	    			for(int lnInd=0;lnInd<rs.getLaneSegments().length;lnInd++){
+	    				if(rs.getLaneSegments()[lnInd].getBounds().contains(transformedPoint))trafficCanvas.getRoadPrPnl().getLanesPnl().setSelectedLane(lnInd, false);
+	    			}
 	    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
 	    			selected=true;
 	    		}
@@ -70,9 +75,11 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         		for(int ind=rmp.getRoadMappings().size()-1;ind>=0 && !selected;ind--){
         			rm=rmp.getRoadMappings().get(ind);
         			if(rm.contains(transformedPoint.getX(), transformedPoint.getY())){
-        				trafficCanvas.getRoadPrPnl().getGmPnl().resetSelectedIndex();;
+        				trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(ind,false);
+        				for(int lnInd=0;lnInd<rs.getLaneSegments().length;lnInd++){
+    	    				if(rs.getLaneSegments()[lnInd].getBounds().contains(transformedPoint))trafficCanvas.getRoadPrPnl().getLanesPnl().setSelectedLane(lnInd, false);
+    	    			}
     	    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
-    	    			trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(ind);
     	    			selected=true;
     	    		}
         		}

@@ -11,7 +11,6 @@ import java.text.DecimalFormat;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
@@ -28,10 +27,10 @@ public class GeometryPanel extends JPanel{
 	JButton add,remove;
 	int gmInd=0;
 	JPanel arcTypePnl;
-	RoadPropertiesPanel rdPrPnl;
+	RoadContext rdCxt;
 	GeometryPanelListener gpl;
-	public GeometryPanel(RoadPropertiesPanel roadPropertiesPanel, GeometryPanelListener gpl) {
-		rdPrPnl=roadPropertiesPanel;
+	public GeometryPanel(RoadContext roadPropertiesPanel, GeometryPanelListener gpl) {
+		rdCxt=roadPropertiesPanel;
 		this.gpl=gpl;
 		add=new JButton("Add new");
 		add.addActionListener(gpl);
@@ -112,12 +111,13 @@ public class GeometryPanel extends JPanel{
 	}
 	public void updateGeomPanel(){
 		gpl.setDocListLocked(true);
-		if(rdPrPnl.getSelectedRoad()==null)return;
-		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true),"Geometr"+(rdPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly?"ies ("+rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()+")":"y") , TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		if(rdCxt.getSelectedRoad()==null)return;
+		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true),"Geometr"+(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly?"ies ("+rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()+")":"y") , TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		cbGeom.removeAllItems();
-		for(Geometry gm:rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry()){
+		for(Geometry gm:rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry()){
 			cbGeom.addItem(gm.getS()+"");
 		}
+		cbGeom.setSelectedIndex(gmInd);
 		geometryChanged();
 		gpl.setDocListLocked(false);
 	}
@@ -125,32 +125,32 @@ public class GeometryPanel extends JPanel{
 		gpl.setDocListLocked(true);
 		makeBlackFont();
 		DecimalFormat df=new DecimalFormat("##.####");
-		if(gmInd+1>rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size())
-			gmInd=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()-1;
-		s.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getS()));
-		tfx.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getX()));
-		tfy.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getY()));
-		l.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getLength()));
-		hdg.setText(df.format(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getHdg()));
+		if(gmInd+1>rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size())
+			gmInd=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()-1;
+		s.setText(df.format(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getS()));
+		tfx.setText(df.format(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getX()));
+		tfy.setText(df.format(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getY()));
+		l.setText(df.format(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getLength()));
+		hdg.setText(df.format(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getHdg()));
 		if(gmInd!=0){
-			tfx.setEnabled(false);
-			tfy.setEnabled(false);
-			hdg.setEnabled(false);
+			tfx.setEditable(false);
+			tfy.setEditable(false);
+			hdg.setEditable(false);
 		}else{
-			tfx.setEnabled(true);
-			tfy.setEnabled(true);
-			hdg.setEnabled(true);
+			tfx.setEditable(true);
+			tfy.setEditable(true);
+			hdg.setEditable(true);
 		}
-		if(rdPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly && gmInd>0){
+		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly && gmInd>0){
 			remove.setEnabled(true);
 		}else{
 			remove.setEnabled(false);
 		}
-		if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).isSetLine()){
+		if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).isSetLine()){
 			if(isAdded(arcTypePnl))remove(arcTypePnl);
 			cbGmType.setSelectedItem("line");
 		}
-		else if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getArc()!=null){
+		else if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getArc()!=null){
 			if(!isAdded(arcTypePnl)){
 				GridBagConstraints gbc_tf = new GridBagConstraints();
 				gbc_tf.fill = GridBagConstraints.BOTH;
@@ -158,11 +158,11 @@ public class GeometryPanel extends JPanel{
 				add(arcTypePnl,gbc_tf);
 			}
 			
-			curvature.setText(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getArc().getCurvature()+"");
+			curvature.setText(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(gmInd).getArc().getCurvature()+"");
 			cbGmType.setSelectedItem("arc");
 		}
 		gpl.setDocListLocked(false);
-		((RoadPropertiesPanel)getParent()).updateGraphics();
+		((RoadContext)getParent()).updateGraphics();
 	}
 	private boolean isAdded(Component c){
 		return ((GeometryPanel)c.getParent()==this);
@@ -171,11 +171,8 @@ public class GeometryPanel extends JPanel{
 		return gmInd;
 	}
 	public void setSelectedGeometry(int ind,boolean update) {
-		if(rdPrPnl.getSelectedRoad()==null){
-			throw new NullPointerException("selectedroad is null : setSelectedGeometry");
-		}
 		gmInd=ind;
-//		if(cbGeom.getItemCount()!=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size())throw new IllegalStateException("Geometry Combobox count not equals road geometries count.");
+//		if(cbGeom.getItemCount()!=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size())throw new IllegalStateException("Geometry Combobox count not equals road geometries count.");
 		if(update)cbGeom.setSelectedIndex(gmInd);
 	}
 	public void setSelectedGeometry(int ind) {

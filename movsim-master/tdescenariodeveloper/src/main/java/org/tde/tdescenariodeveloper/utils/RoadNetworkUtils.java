@@ -8,19 +8,35 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-import org.tde.tdescenariodeveloper.ui.RoadPropertiesPanel;
+import org.tde.tdescenariodeveloper.ui.RoadContext;
 
 public class RoadNetworkUtils {
-	public static void refresh(RoadPropertiesPanel rdPrPnl){
-		SwingUtilities.invokeLater(new Refresher(rdPrPnl));
+	public static void refresh(RoadContext rdCxt){
+		SwingUtilities.invokeLater(new Refresher(rdCxt));
 	}
-	public static void updateCoordinatesAndHeadings(RoadPropertiesPanel rdPrPnl) {
-		if(rdPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-			RoadMappingPoly rmp=(RoadMappingPoly)rdPrPnl.getSelectedRoad().roadMapping();
+	public static boolean areValidLaneIds(RoadContext rdCxt){
+		if(rdCxt.getLanesPnl().getOdrLanes().get(0).getId()!=-1)return false;
+		for(int i=1;i<rdCxt.getLanesPnl().getOdrLanes().size();i++){
+			if(rdCxt.getLanesPnl().getOdrLanes().get(i).getId()>rdCxt.getLanesPnl().getOdrLanes().get(i-1).getId()){
+				return false;
+			}
+		}
+		return true;
+	}
+	public static void updateLaneIds(RoadContext rdCxt){
+		if(!areValidLaneIds(rdCxt)){
+			for(int i=0;i<rdCxt.getLanesPnl().getOdrLanes().size();i++){
+				rdCxt.getLanesPnl().getOdrLanes().get(i).setId(-(i+1));
+			}
+		}
+	}
+	public static void updateCoordinatesAndHeadings(RoadContext rdCxt) {
+		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			RoadMappingPoly rmp=(RoadMappingPoly)rdCxt.getSelectedRoad().roadMapping();
 			for(int i=1;i<rmp.getRoadMappings().size();i++){
-				rmp=(RoadMappingPoly)OpenDriveHandlerJaxb.createRoadMapping(rdPrPnl.getSelectedRoad().getOdrRoad());
-				Geometry gm=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i);
-				PosTheta preEnd=rmp.getRoadMappings().get(i-1).map(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i-1).getLength());
+				rmp=(RoadMappingPoly)OpenDriveHandlerJaxb.createRoadMapping(rdCxt.getSelectedRoad().getOdrRoad());
+				Geometry gm=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i);
+				PosTheta preEnd=rmp.getRoadMappings().get(i-1).map(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i-1).getLength());
 				gm.setHdg(preEnd.theta());
 				gm.setX(preEnd.x);
 				gm.setY(preEnd.y);
@@ -29,24 +45,28 @@ public class RoadNetworkUtils {
 	}
 }
 class Refresher extends SwingWorker<Object, String>{
-	RoadPropertiesPanel rdPrPnl;
-	public Refresher(RoadPropertiesPanel rp) {
-		this.rdPrPnl=rp;
+	RoadContext rdCxt;
+	public Refresher(RoadContext rp) {
+		this.rdCxt=rp;
 	}
 
 	@Override
 	protected Object doInBackground() throws Exception {
-		int gmInd=rdPrPnl.getGmPnl().getSelectedIndex();
-		int ind=rdPrPnl.getRn().getOdrNetwork().getRoad().indexOf(rdPrPnl.getSelectedRoad().getOdrRoad());
+		int gmInd=rdCxt.getGmPnl().getSelectedIndex();
+		int lnInd=rdCxt.getLanesPnl().getSelectedIndex();
+		int ind=rdCxt.getRn().getOdrNetwork().getRoad().indexOf(rdCxt.getSelectedRoad().getOdrRoad());
 		if(ind<0)ind=0;
 		if(gmInd<0)gmInd=0;
-		rdPrPnl.getRn().reset();
-		new OpenDriveHandlerJaxb().create("", rdPrPnl.getRn().getOdrNetwork(), rdPrPnl.getRn());
-		if(rdPrPnl.getRn().getRoadSegments().size()-1<ind)ind=rdPrPnl.getRn().getRoadSegments().size()-1;
-		RoadSegment rs=rdPrPnl.getRn().getRoadSegments().get(ind);
+		if(lnInd<0)lnInd=0;
+		rdCxt.getRn().reset();
+		new OpenDriveHandlerJaxb().create("", rdCxt.getRn().getOdrNetwork(), rdCxt.getRn());
+		if(rdCxt.getRn().getRoadSegments().size()-1<ind)ind=rdCxt.getRn().getRoadSegments().size()-1;
+		RoadSegment rs=rdCxt.getRn().getRoadSegments().get(ind);
 		if(rs.getOdrRoad().getPlanView().getGeometry().size()-1<gmInd)gmInd=rs.getOdrRoad().getPlanView().getGeometry().size()-1;
-		rdPrPnl.getGmPnl().setSelectedGeometry(gmInd,false);
-		rdPrPnl.setSelectedRoad(rs);
+		if(rs.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()-1<lnInd)lnInd=rs.getOdrRoad().getPlanView().getGeometry().size()-1;
+		rdCxt.getGmPnl().setSelectedGeometry(gmInd,false);
+		rdCxt.getLanesPnl().setSelectedLane(lnInd, false);
+		rdCxt.setSelectedRoad(rs);
 		return null;
 	}
 	

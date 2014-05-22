@@ -1,6 +1,6 @@
-package org.tde.tdescenariodeveloper.ui;
+package org.tde.tdescenariodeveloper.eventhandling;
 
-import org.movsim.simulator.roadnetwork.RoadNetwork;
+import org.tde.tdescenariodeveloper.ui.DrawingArea;
 
 
 public class DrawingAreaController {

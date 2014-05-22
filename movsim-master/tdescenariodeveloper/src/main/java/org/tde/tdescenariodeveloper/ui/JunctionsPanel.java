@@ -38,9 +38,9 @@ public class JunctionsPanel extends JPanel {
 	private JComboBox<String> cbSelectJunc;
 	GridBagConstraints c,gbc_lbl,gbc_tf;
 	JPanel linkInfoPnl;
-	RoadPropertiesPanel rdPrPnl;
-	public JunctionsPanel(RoadPropertiesPanel rpp) {
-		rdPrPnl=rpp;
+	RoadContext rdCxt;
+	public JunctionsPanel(RoadContext rpp) {
+		rdCxt=rpp;
 		sp=new JScrollPane();
 		sp.setPreferredSize(new Dimension(500,150));
 		sp.getViewport().add(this);
@@ -91,7 +91,7 @@ public class JunctionsPanel extends JPanel {
 	}
 	private void setPanel(String slct) throws NotFoundException {
 		boolean found=false;
-		for(Junction j:rdPrPnl.getRn().getOdrNetwork().getJunction()){
+		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
 			if(j.getId().equals(slct)){
 				found=true;
 				updateJunctionPanel(j);
@@ -104,7 +104,7 @@ public class JunctionsPanel extends JPanel {
 	}
 	public void updateJunction(){
 		cbSelectJunc.removeAll();
-		for(Junction j:rdPrPnl.getRn().getOdrNetwork().getJunction()){
+		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
 			cbSelectJunc.addItem(j.getId());
 		}
 	}
@@ -186,7 +186,7 @@ public class JunctionsPanel extends JPanel {
 		return p;
 	}
 	private Road getRoad(int id){
-		for(RoadSegment rs:rdPrPnl.getRn()){
+		for(RoadSegment rs:rdCxt.getRn()){
 			if(id==Integer.parseInt(rs.getOdrRoad().getId())){
 				return rs.getOdrRoad();
 			}

@@ -9,68 +9,68 @@ import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.exception.InvalidInputException;
-import org.tde.tdescenariodeveloper.ui.RoadPropertiesPanel;
+import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class GeometryUpdater {
-	RoadPropertiesPanel rdPrPnl;
-	public GeometryUpdater(RoadPropertiesPanel rdPrPnl) {
-		this.rdPrPnl=rdPrPnl;
+	RoadContext rdCxt;
+	public GeometryUpdater(RoadContext rdCxt) {
+		this.rdCxt=rdCxt;
 	}
 
 	public void updateSoffset() {
-		if(rdPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-			Geometry g=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex());
-			Geometry prevG=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()-1);
+		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			Geometry g=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex());
+			Geometry prevG=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()-1);
 			
-			double s=Double.parseDouble(rdPrPnl.getGmPnl().getS().getText());
+			double s=Double.parseDouble(rdCxt.getGmPnl().getS().getText());
 			g.setS(s);
-			g.setLength(getNext()!=null?getNext().getS()-s:rdPrPnl.getSelectedRoad().roadLength()-s);
+			g.setLength(getNext()!=null?getNext().getS()-s:rdCxt.getSelectedRoad().roadLength()-s);
 			prevG.setLength(s-prevG.getS());
-			RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-			RoadNetworkUtils.refresh(rdPrPnl);
+			RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+			RoadNetworkUtils.refresh(rdCxt);
 		}
 	}
 	public void updateLength() throws InvalidInputException{
-		double l=Double.parseDouble(rdPrPnl.getGmPnl().getL().getText());
-		if(rdPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-			RoadMappingPoly rmp=(RoadMappingPoly) rdPrPnl.getSelectedRoad().roadMapping();
+		double l=Double.parseDouble(rdCxt.getGmPnl().getL().getText());
+		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			RoadMappingPoly rmp=(RoadMappingPoly) rdCxt.getSelectedRoad().roadMapping();
 			try{
 				if(l<0.0)throw new InvalidInputException("Length can't be -ve");
-				rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).setLength(l);
-				for(int i=rdPrPnl.getGmPnl().getSelectedIndex()+1;i<rmp.getRoadMappings().size();i++){
-					rmp=(RoadMappingPoly) OpenDriveHandlerJaxb.createRoadMapping(rdPrPnl.getSelectedRoad().getOdrRoad());
-					Geometry preGm=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i-1);
+				rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).setLength(l);
+				for(int i=rdCxt.getGmPnl().getSelectedIndex()+1;i<rmp.getRoadMappings().size();i++){
+					rmp=(RoadMappingPoly) OpenDriveHandlerJaxb.createRoadMapping(rdCxt.getSelectedRoad().getOdrRoad());
+					Geometry preGm=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i-1);
 					RoadMapping prerm=rmp.getRoadMappings().get(i-1);
-					Geometry gm=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i);
+					Geometry gm=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i);
 					gm.setS(preGm.getS()+preGm.getLength());
 					PosTheta p=prerm.map(prerm.roadLength());
 					gm.setX(p.x);
 					gm.setY(p.y);
 					gm.setHdg(p.theta());
 				}
-				rdPrPnl.getSelectedRoad().getOdrRoad().setLength(getGmSum());
-				RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-				RoadNetworkUtils.refresh(rdPrPnl);
+				rdCxt.getSelectedRoad().getOdrRoad().setLength(getGmSum());
+				RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+				RoadNetworkUtils.refresh(rdCxt);
 			}catch(NumberFormatException e){
-				GraphicsHelper.showToast(e.getMessage(), 5000);
+				GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
 		else{
 			try{
-				rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setLength(l);
-				rdPrPnl.getSelectedRoad().getOdrRoad().setLength(l);
-				RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-				RoadNetworkUtils.refresh(rdPrPnl);
+				rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setLength(l);
+				rdCxt.getSelectedRoad().getOdrRoad().setLength(l);
+				RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+				RoadNetworkUtils.refresh(rdCxt);
 			}catch(NumberFormatException e){
-				GraphicsHelper.showToast(e.getMessage(), 5000);
+				GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
 	}
 	public double getGmSum(){
 		double sum=0.0;
-		for(Geometry g:rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry()){
+		for(Geometry g:rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry()){
 			sum+=g.getLength();
 		}
 		return sum;
@@ -78,23 +78,23 @@ public class GeometryUpdater {
 
 
 	public boolean isNextGmExist(){
-		return rdPrPnl.getGmPnl().getSelectedIndex()+1<rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size();
+		return rdCxt.getGmPnl().getSelectedIndex()+1<rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size();
 	}
 	public boolean isPrevGmExist(){
-		return rdPrPnl.getGmPnl().getSelectedIndex()>0;
+		return rdCxt.getGmPnl().getSelectedIndex()>0;
 	}
 	public Geometry getNext(){
 		if(isNextGmExist()){
-			return rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()+1);
+			return rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()+1);
 		}
 		return null;
 	}
 
 	public void addnew() {
-		Geometry g=rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()-1);
+		Geometry g=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()-1);
 		double s=g.getS()+g.getLength();
 		Geometry g2=new Geometry();
-		RoadSegment rs=rdPrPnl.getSelectedRoad();
+		RoadSegment rs=rdCxt.getSelectedRoad();
 		if(rs.roadMapping() instanceof RoadMappingPoly){
 			RoadMappingPoly rmp=(RoadMappingPoly)rs.roadMapping();
 			PosTheta p=rmp.getRoadMappings().get(rmp.getRoadMappings().size()-1).map(rmp.getRoadMappings().get(rmp.getRoadMappings().size()-1).roadLength());
@@ -111,67 +111,67 @@ public class GeometryUpdater {
 		g2.setS(s);
 		g2.setLine(new Line());
 		g2.setLength(g.getLength());
-		rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().add(g2);
-		rdPrPnl.getSelectedRoad().getOdrRoad().setLength(getGmSum());
-		RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-		RoadNetworkUtils.refresh(rdPrPnl);
+		rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().add(g2);
+		rdCxt.getSelectedRoad().getOdrRoad().setLength(getGmSum());
+		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+		RoadNetworkUtils.refresh(rdCxt);
 	}
 
 	public void removeCurrent() {
-		if(rdPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-			if(rdPrPnl.getGmPnl().getSelectedIndex()>0){
-				rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().remove(rdPrPnl.getGmPnl().getSelectedIndex());
-				rdPrPnl.getGmPnl().updateGeomPanel();
-				rdPrPnl.getSelectedRoad().getOdrRoad().setLength(getGmSum());
-				RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-				RoadNetworkUtils.refresh(rdPrPnl);
+		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
+			if(rdCxt.getGmPnl().getSelectedIndex()>0){
+				rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().remove(rdCxt.getGmPnl().getSelectedIndex());
+				rdCxt.getGmPnl().updateGeomPanel();
+				rdCxt.getSelectedRoad().getOdrRoad().setLength(getGmSum());
+				RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+				RoadNetworkUtils.refresh(rdCxt);
 			}
 			else{
-				GraphicsHelper.showToast("Remove geometries otherthan first one.", 4000);
+				GraphicsHelper.showToast("Remove geometries otherthan first one.", rdCxt.getToastDurationMilis());
 			}
 		}
 		else{
-			GraphicsHelper.showToast("Not deleted: A road must have one geometry.", 4000);
-			rdPrPnl.getGmPnl().getRemove().setEnabled(false);
+			GraphicsHelper.showToast("Not deleted: A road must have one geometry.", rdCxt.getToastDurationMilis());
+			rdCxt.getGmPnl().getRemove().setEnabled(false);
 		}
 	}
 
 	public void updateXY() {
-		double x=Double.parseDouble(rdPrPnl.getGmPnl().getTfX().getText());
-		double y=Double.parseDouble(rdPrPnl.getGmPnl().getTfY().getText());
-		rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setX(x);
-		rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setY(y);
-		RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-		RoadNetworkUtils.refresh(rdPrPnl);
+		double x=Double.parseDouble(rdCxt.getGmPnl().getTfX().getText());
+		double y=Double.parseDouble(rdCxt.getGmPnl().getTfY().getText());
+		rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setX(x);
+		rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setY(y);
+		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+		RoadNetworkUtils.refresh(rdCxt);
 	}
 	public void updateHdg(){
-		double hdg=Double.parseDouble(rdPrPnl.getGmPnl().getHdg().getText());
-		rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setHdg(hdg);
-		RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-		RoadNetworkUtils.refresh(rdPrPnl);
+		double hdg=Double.parseDouble(rdCxt.getGmPnl().getHdg().getText());
+		rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setHdg(hdg);
+		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+		RoadNetworkUtils.refresh(rdCxt);
 	}
 	public void updateCurv(){
-		double curv=Double.parseDouble(rdPrPnl.getGmPnl().getCurvature().getText());
-		rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).getArc().setCurvature(curv);
-		RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-		RoadNetworkUtils.refresh(rdPrPnl);
+		double curv=Double.parseDouble(rdCxt.getGmPnl().getCurvature().getText());
+		rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getArc().setCurvature(curv);
+		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+		RoadNetworkUtils.refresh(rdCxt);
 	}
 	public void updateGmType(){
-		if(((String)rdPrPnl.getGmPnl().getCbGmType().getSelectedItem()).equals("line")){
-			rdPrPnl.getGmPnl().getarcTypePnl().setVisible(false);
-			if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetLine()){
+		if(((String)rdCxt.getGmPnl().getCbGmType().getSelectedItem()).equals("line")){
+			rdCxt.getGmPnl().getarcTypePnl().setVisible(false);
+			if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).isSetLine()){
 				return;
 			}
 			else{
-				rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).setArc(null);
-				rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).setLine(new Line());
-				RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-				RoadNetworkUtils.refresh(rdPrPnl);
+				rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).setArc(null);
+				rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).setLine(new Line());
+				RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+				RoadNetworkUtils.refresh(rdCxt);
 			}
 		}else{
-			rdPrPnl.getGmPnl().getarcTypePnl().setVisible(true);
-			if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).isSetArc()){
-				rdPrPnl.getGmPnl().getCurvature().setText(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).getArc().getCurvature()+"");
+			rdCxt.getGmPnl().getarcTypePnl().setVisible(true);
+			if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).isSetArc()){
+				rdCxt.getGmPnl().getCurvature().setText(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getArc().getCurvature()+"");
 				return;
 			}
 			else{
@@ -179,14 +179,14 @@ public class GeometryUpdater {
 				String s=GraphicsHelper.valueFromUser("Enter curvature: e.g -0.001456");
 				if(GraphicsHelper.isDouble(s)){
 					arc.setCurvature(Double.parseDouble(s));
-					rdPrPnl.getGmPnl().getCurvature().setText(arc.getCurvature()+"");
-					rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).setLine(null);
-					rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).setArc(arc);
-					RoadNetworkUtils.updateCoordinatesAndHeadings(rdPrPnl);
-					RoadNetworkUtils.refresh(rdPrPnl);
+					rdCxt.getGmPnl().getCurvature().setText(arc.getCurvature()+"");
+					rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).setLine(null);
+					rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).setArc(arc);
+					RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
+					RoadNetworkUtils.refresh(rdCxt);
 				}else{
-					rdPrPnl.getGmPnl().getCbGmType().setSelectedItem("line");
-					GraphicsHelper.showToast("Value entered is not a number", 4000);
+					rdCxt.getGmPnl().getCbGmType().setSelectedItem("line");
+					GraphicsHelper.showToast("Value entered is not a number", rdCxt.getToastDurationMilis());
 				}
 			}
 		}

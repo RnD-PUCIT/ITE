@@ -16,9 +16,10 @@ import javax.swing.border.EmptyBorder;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.eventhandling.GeometryPanelListener;
+import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
 
-public class RoadPropertiesPanel extends JPanel implements ActionListener{
+public class RoadContext extends JPanel implements ActionListener{
 	/**
 	 * 
 	 */
@@ -29,14 +30,16 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	private GeometryPanel gmPnl;
 	private RoadFieldsPanel rdFldPnl;
 	private LanesPanel lanesPnl;
-	GridBagConstraints gbc;
+	private GridBagConstraints gbc;
 	private DrawingArea drawingArea;
 	private AppFrame appFrame;
-	JScrollPane sp;
-	RoadNetwork rn;
-	RoadFieldsPanelListener rfpl;
-	GeometryPanelListener gpl;
-	public RoadPropertiesPanel(RoadNetwork rn,AppFrame appfr) {
+	private JScrollPane sp;
+	private RoadNetwork rn;
+	private RoadFieldsPanelListener rfpl;
+	private GeometryPanelListener gpl;
+	private LanesPanelListener lpl;
+	private int toastDurationMilis=4000;
+	public RoadContext(RoadNetwork rn,AppFrame appfr) {
 		appFrame=appfr;
 		this.rn=rn;
 		sp=new JScrollPane();
@@ -45,7 +48,6 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		pin=new JToggleButton("Pin");
 		pin.addActionListener(this);
-		lanesPnl=new LanesPanel(this);
 		linkPanel=new LinkPanel(this);
 		
 		RoadFieldsPanelListener rfl=new RoadFieldsPanelListener(this);
@@ -55,6 +57,10 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 		GeometryPanelListener gpl=new GeometryPanelListener(this);
 		gmPnl=new GeometryPanel(this,gpl);
 		this.gpl=gpl;
+		
+		LanesPanelListener lpl=new LanesPanelListener(this);
+		lanesPnl=new LanesPanel(this,lpl);
+		this.lpl=lpl;
 		
 		setLayout(new GridBagLayout());
 		gbc = new GridBagConstraints();
@@ -73,6 +79,7 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 	public void blockListeners(boolean b){
 		gpl.setBlocked(b);
 		rfpl.setBlocked(b);
+		lpl.setLocked(b);
 	}
 	public void updateGraphics(){
 		drawingArea.revalidate();
@@ -83,7 +90,7 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 		rdFldPnl.updateFields(selectedRoad);
 		updateLinkPanel();
 		gmPnl.updateGeomPanel();
-		lanesPnl.updateLanesPanel(selectedRoad);
+		lanesPnl.updatelanesPanel();
 		setVisible(true);
 		blockListeners(false);
 	}
@@ -185,6 +192,12 @@ public class RoadPropertiesPanel extends JPanel implements ActionListener{
 
 	public AppFrame getAppFrame() {
 		return appFrame;
+	}
+	public int getToastDurationMilis() {
+		return toastDurationMilis;
+	}
+	public void setToastDurationMilis(int toastDurationMilis) {
+		this.toastDurationMilis = toastDurationMilis;
 	}
 	
 }

@@ -28,6 +28,8 @@ import org.movsim.simulator.roadnetwork.TrafficSink;
 import org.movsim.simulator.trafficlights.TrafficLight;
 import org.movsim.simulator.trafficlights.TrafficLightLocation;
 import org.movsim.viewer.roadmapping.PaintRoadMapping;
+import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaKeyListener;
+import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 
 public class DrawingArea extends Canvas {
 	private static final long serialVersionUID = 1653L;
@@ -35,10 +37,11 @@ public class DrawingArea extends Canvas {
     private int bufferWidth=1000;
     private Image backgroundBuffer=new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_ARGB);
     protected Color backgroundColor=new Color(7,147,7);;
-    double scale=1.0;
-    int xOffset=0,yOffset=0;
-    protected AffineTransform transform = new AffineTransform();
-    RoadPropertiesPanel roadPrPnl;
+    public double scale=1.0;
+    public int xOffset=0;
+	public int yOffset=0;
+    public AffineTransform transform = new AffineTransform();
+    RoadContext roadPrPnl;
     float lineWidth=0.5f;
     float lineLength=4.5f;
     float gapLength=3.0f;
@@ -59,12 +62,14 @@ public class DrawingArea extends Canvas {
     final DrawingAreaMouseListener mouseListener;
     final DrawingAreaKeyListener keyListener;
 	private boolean drawAxis=true;
-	private boolean drawBounds=false;
+	private boolean drawRoadBounds=false;
 	private boolean drawRoadNames=false;
-	private boolean drawLaneBounds=true;
+	private boolean drawLaneBounds=false;
+	private boolean drawSelectedLane=true;
+	private boolean drawSelectedGeometry=true;
     
     
-	public DrawingArea(RoadPropertiesPanel rdPrPnl) {
+	public DrawingArea(RoadContext rdPrPnl) {
 		this.roadPrPnl=rdPrPnl;
 		setSize(new Dimension(bufferWidth,bufferHeight));
 		keyListener=new DrawingAreaKeyListener(this);
@@ -82,10 +87,19 @@ public class DrawingArea extends Canvas {
 		g.setStroke(dashed);
 		g.setColor(Color.WHITE.darker());
 		drawSelectedRoad(g);
-    	Stroke gmStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
-    	g.setStroke(gmStroke);
-    	g.setColor(Color.YELLOW);
-    	drawSelectedGeometry(g);
+    	if(drawSelectedLane){
+    		Stroke lnStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{1.5f}, 0);
+	    	g.setStroke(lnStroke);
+	    	g.setColor(Color.BLUE);
+	    	drawSelectedLane(g);
+    	}
+    	if(drawSelectedGeometry){
+        	Stroke gmStroke = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
+        	g.setStroke(gmStroke);
+        	g.setColor(Color.YELLOW);
+        	drawSelectedGeometry(g);
+    	}
+	    	
     }
 	private void drawSelectedGeometry(Graphics2D g) {
 		int ind=roadPrPnl.getGmPnl().getSelectedIndex();
@@ -96,7 +110,7 @@ public class DrawingArea extends Canvas {
 			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
 		}
 	}
-	protected void setTransform() {
+	public void setTransform() {
         transform.setToIdentity();
         transform.scale(scale, scale);
         transform.translate(xOffset, yOffset);
@@ -108,6 +122,10 @@ public class DrawingArea extends Canvas {
 		}else{
 			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
 		}
+	}
+    private void drawSelectedLane(Graphics2D g) {
+    	g.setColor(Color.BLUE);
+    	g.draw(roadPrPnl.getSelectedRoad().getLaneSegments()[roadPrPnl.getLanesPnl().getSelectedIndex()].getBounds());
 	}
 	public double getScale(){
 		return scale;
@@ -235,22 +253,23 @@ public class DrawingArea extends Canvas {
         if (drawAxis) {
         	drawAxis(g);
         }
-        if (drawBounds) {
-        	drawBounds(g);
+        if (drawRoadBounds) {
+        	drawRoadBounds(g);
         }
         if (drawLaneBounds) {
         	g.setColor(Color.BLUE);
         	drawLaneBounds(g);
         }
     }
-    private void drawLaneBounds(Graphics2D g) {
+
+	private void drawLaneBounds(Graphics2D g) {
     	for(RoadSegment rs:roadPrPnl.getRn()){
     		for(LaneSegment ls:rs.getLaneSegments()){
     			g.draw(ls.getBounds());
     		}
     	}
 	}
-	private void drawBounds(Graphics2D g) {
+	private void drawRoadBounds(Graphics2D g) {
     	for(RoadSegment rs:roadPrPnl.getRn()){
     		g.draw(rs.roadMapping().getBounds());
     	}
@@ -522,7 +541,7 @@ public class DrawingArea extends Canvas {
 	public void setDrawAxis(boolean drawAxis) {
 		this.drawAxis = drawAxis;
 	}
-	public RoadPropertiesPanel getRoadPrPnl() {
+	public RoadContext getRoadPrPnl() {
 		return roadPrPnl;
 	}
 }

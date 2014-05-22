@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -30,9 +31,15 @@ public class GraphicsHelper {
 		return f;
 	}
 	public static void showShape(Shape shp){
+		showShape(shp,null);
+	}
+	public static void showShape(Shape shp,AffineTransform at){
 		JFrame f=new JFrame();
 		finalizeFrame(f);
-		((Graphics2D)f.getGraphics()).draw(shp);
+		Graphics2D g=((Graphics2D)f.getGraphics());
+		if(at!=null)g.setTransform(at);
+		g.draw(shp);
+		f.paint(g);
 		f.setVisible(true);
 	}
 	public static boolean isDouble(String v){

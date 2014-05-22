@@ -8,36 +8,36 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import org.tde.tdescenariodeveloper.ui.RoadPropertiesPanel;
+import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.RoadFieldsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.RoadFieldsValidator;
 
 public class RoadFieldsPanelListener implements DocumentListener,ActionListener {
-	RoadPropertiesPanel rdPrpPnl;
+	RoadContext rdCxt;
 	RoadFieldsUpdater roadFieldsUpdater;
 	RoadFieldsValidator validator;
-	private boolean blocked=false;
-	public RoadFieldsPanelListener(RoadPropertiesPanel roadPropertiesPanel) {
-		rdPrpPnl=roadPropertiesPanel;
-		this.roadFieldsUpdater=new RoadFieldsUpdater(rdPrpPnl);
-		validator=new RoadFieldsValidator(rdPrpPnl);
+	private boolean blocked=true;
+	public RoadFieldsPanelListener(RoadContext roadPropertiesPanel) {
+		rdCxt=roadPropertiesPanel;
+		this.roadFieldsUpdater=new RoadFieldsUpdater(rdCxt);
+		validator=new RoadFieldsValidator(rdCxt);
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(blocked)return;
 		JComboBox<String>src=null;
 		if(e.getSource() instanceof JComboBox<?>)src=(JComboBox<String>)e.getSource();
-		if(src==rdPrpPnl.getRdFldPnl().getCbJunction() && ((String)src.getSelectedItem())!=null && !((String)src.getSelectedItem()).equals("None")){
+		if(src==rdCxt.getRdFldPnl().getCbJunction() && ((String)src.getSelectedItem())!=null && !((String)src.getSelectedItem()).equals("None")){
 			boolean []isValid=validator.isJunctionValid();
 			if(isValid[0]){
 				if(isValid[1])
 					roadFieldsUpdater.updateRoadJunction();
 				else{
-					GraphicsHelper.showToast("Road "+rdPrpPnl.getSelectedRoad().userId()+" is not referenced in Junction "+rdPrpPnl.getRdFldPnl().getCbJunction().getSelectedItem(), 5000);
-					String jnc=rdPrpPnl.getSelectedRoad().getOdrRoad().getJunction();
+					GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" is not referenced in Junction "+rdCxt.getRdFldPnl().getCbJunction().getSelectedItem(), rdCxt.getToastDurationMilis());
+					String jnc=rdCxt.getSelectedRoad().getOdrRoad().getJunction();
 					if(jnc.equals("-1"))jnc="None";
-					rdPrpPnl.getRdFldPnl().getCbJunction().setSelectedItem(jnc);
+					rdCxt.getRdFldPnl().getCbJunction().setSelectedItem(jnc);
 				}
 				
 			}
@@ -66,9 +66,9 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener 
 	}
 	public void textChanged(DocumentEvent e){
 		Document doc=e.getDocument();
-		if(rdPrpPnl.getRdFldPnl().getTfName().getDocument()==doc){
+		if(rdCxt.getRdFldPnl().getTfName().getDocument()==doc){
 			roadFieldsUpdater.updateRoadName();
-			rdPrpPnl.updateGraphics();
+			rdCxt.updateGraphics();
 		}
 	}
 	public boolean isBlocked() {

@@ -9,23 +9,23 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import org.tde.tdescenariodeveloper.ui.RoadPropertiesPanel;
+import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.GeometryUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.GeometryValidator;
 
 public class GeometryPanelListener implements DocumentListener,ActionListener {
-	RoadPropertiesPanel rdPrPnl;
+	RoadContext rdCxt;
 	GeometryValidator validator;
 	GeometryUpdater updater;
 	boolean docListLocked=true;
 	boolean inDocUpdate=false;
 	boolean inActionUpdate=false;
-	boolean blocked=false;
-	public GeometryPanelListener(RoadPropertiesPanel roadPropertiesPanel) {
-		rdPrPnl=roadPropertiesPanel;
-		validator=new GeometryValidator(rdPrPnl);
-		updater=new GeometryUpdater(rdPrPnl);
+	boolean blocked=true;
+	public GeometryPanelListener(RoadContext roadPropertiesPanel) {
+		rdCxt=roadPropertiesPanel;
+		validator=new GeometryValidator(rdCxt);
+		updater=new GeometryUpdater(rdCxt);
 	}
 
 	@Override
@@ -55,107 +55,107 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		if(blocked)return;
-		if(inDocUpdate || rdPrPnl.getSelectedRoad()==null)return;
+		if(inDocUpdate || rdCxt.getSelectedRoad()==null)return;
 		inActionUpdate=true;
 		JButton srcBtn=null;
 		JComboBox<String>srcCb=null;
 		if(evt.getSource() instanceof JButton)srcBtn=(JButton)evt.getSource();
 		if(evt.getSource() instanceof JComboBox<?>)srcCb=(JComboBox<String>)evt.getSource();
-		if(srcCb==rdPrPnl.getGmPnl().getCbGeom()){
-			if(rdPrPnl.getGmPnl().getCbGeom().getSelectedItem()==null)return;
-			rdPrPnl.getGmPnl().setSelectedGeometry(rdPrPnl.getGmPnl().getCbGeom().getSelectedIndex(),false);
-			rdPrPnl.getGmPnl().geometryChanged();
+		if(srcCb==rdCxt.getGmPnl().getCbGeom()){
+			if(rdCxt.getGmPnl().getCbGeom().getSelectedItem()==null)return;
+			rdCxt.getGmPnl().setSelectedGeometry(rdCxt.getGmPnl().getCbGeom().getSelectedIndex(),false);
+			rdCxt.getGmPnl().geometryChanged();
 		}
-		else if(srcBtn==rdPrPnl.getGmPnl().getAdd()){
+		else if(srcBtn==rdCxt.getGmPnl().getAdd()){
 			updater.addnew();
-			rdPrPnl.updateGraphics();
+			rdCxt.updateGraphics();
 		}
-		else if(srcBtn==rdPrPnl.getGmPnl().getRemove()){
+		else if(srcBtn==rdCxt.getGmPnl().getRemove()){
 			updater.removeCurrent();
-			rdPrPnl.updateGraphics();
+			rdCxt.updateGraphics();
 		}
-		else if(srcCb==rdPrPnl.getGmPnl().getCbGmType()){
+		else if(srcCb==rdCxt.getGmPnl().getCbGmType()){
 			try{
 				if(validator.isValidGmType()){
 					updater.updateGmType();
-					rdPrPnl.updateGraphics();
+					rdCxt.updateGraphics();
 				}else{
-					GraphicsHelper.makeRed(rdPrPnl.getGmPnl().getCurvature());
+					GraphicsHelper.makeRed(rdCxt.getGmPnl().getCurvature());
 				}
 			}catch(NumberFormatException e){
-				GraphicsHelper.showToast(e.getMessage(), 4000);
+				GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
 		inActionUpdate=false;
 	}
 	public void textChnaged(DocumentEvent e){
-		if(docListLocked || rdPrPnl.getSelectedRoad()==null)return;
+		if(docListLocked || rdCxt.getSelectedRoad()==null)return;
 		Document doc=e.getDocument();
-		if(doc==rdPrPnl.getGmPnl().getS().getDocument()){
-			if(rdPrPnl.getGmPnl().getS().getText().equals(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).getS()) || rdPrPnl.getGmPnl().getS().getText().equals(""))
+		if(doc==rdCxt.getGmPnl().getS().getDocument()){
+			if(rdCxt.getGmPnl().getS().getText().equals(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getS()) || rdCxt.getGmPnl().getS().getText().equals(""))
 				return;
 			try{
 				if(validator.isValidS()){
-					GraphicsHelper.makeBlack(rdPrPnl.getGmPnl().getS());
+					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getS());
 					updater.updateSoffset();
 				}
 				else{
-					GraphicsHelper.makeRed(rdPrPnl.getGmPnl().getS());
+					GraphicsHelper.makeRed(rdCxt.getGmPnl().getS());
 				}
 			}catch (NumberFormatException e2) {
-				GraphicsHelper.makeRed(rdPrPnl.getGmPnl().getS());
-				GraphicsHelper.showToast(e2.getMessage(), 7000);
+				GraphicsHelper.makeRed(rdCxt.getGmPnl().getS());
+				GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
-		else if(doc==rdPrPnl.getGmPnl().getTfX().getDocument() || doc==rdPrPnl.getGmPnl().getTfY().getDocument()){
+		else if(doc==rdCxt.getGmPnl().getTfX().getDocument() || doc==rdCxt.getGmPnl().getTfY().getDocument()){
 			try{
 				if(validator.isValidXY()){
-					GraphicsHelper.makeBlack(rdPrPnl.getGmPnl().getTfX(),rdPrPnl.getGmPnl().getTfY());
+					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getTfX(),rdCxt.getGmPnl().getTfY());
 					updater.updateXY();
-					rdPrPnl.updateGraphics();
+					rdCxt.updateGraphics();
 				}else{
-					GraphicsHelper.makeRed(rdPrPnl.getGmPnl().getTfX(),rdPrPnl.getGmPnl().getTfY());
-					GraphicsHelper.showToast("Only first geometry's coordinates can be adjusted manually", 5000);
+					GraphicsHelper.makeRed(rdCxt.getGmPnl().getTfX(),rdCxt.getGmPnl().getTfY());
+					GraphicsHelper.showToast("Only first geometry's coordinates can be adjusted manually", rdCxt.getToastDurationMilis());
 				}
 			}catch(NumberFormatException e2){
-				GraphicsHelper.showToast(e2.getMessage(), 5000);
+				GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
-		else if(doc==rdPrPnl.getGmPnl().getL().getDocument()){
+		else if(doc==rdCxt.getGmPnl().getL().getDocument()){
 			try{
-				if(rdPrPnl.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdPrPnl.getGmPnl().getSelectedIndex()).getLength()==Double.parseDouble(rdPrPnl.getGmPnl().getL().getText())|| rdPrPnl.getGmPnl().getS().getText().equals(""))
+				if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getLength()==Double.parseDouble(rdCxt.getGmPnl().getL().getText())|| rdCxt.getGmPnl().getS().getText().equals(""))
 					return;
-				GraphicsHelper.makeBlack(rdPrPnl.getGmPnl().getL());
+				GraphicsHelper.makeBlack(rdCxt.getGmPnl().getL());
 				updater.updateLength();
-				rdPrPnl.updateGraphics();
+				rdCxt.updateGraphics();
 			}catch (NumberFormatException e2) {
-				GraphicsHelper.makeRed(rdPrPnl.getGmPnl().getL());
-				GraphicsHelper.showToast(e2.getMessage(), 7000);
+				GraphicsHelper.makeRed(rdCxt.getGmPnl().getL());
+				GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
-		else if(doc==rdPrPnl.getGmPnl().getCurvature().getDocument()){
+		else if(doc==rdCxt.getGmPnl().getCurvature().getDocument()){
 			try{
 				if(validator.isValidCurv()){
-					GraphicsHelper.makeBlack(rdPrPnl.getGmPnl().getCurvature());
+					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getCurvature());
 					updater.updateCurv();
-					rdPrPnl.updateGraphics();
+					rdCxt.updateGraphics();
 				}
 			}catch(NumberFormatException e2){
-				GraphicsHelper.showToast(e2.getMessage(), 5000);
+				GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
-		else if(doc==rdPrPnl.getGmPnl().getHdg().getDocument()){
+		else if(doc==rdCxt.getGmPnl().getHdg().getDocument()){
 			try{
 				if(validator.isValidHdg()){
-					GraphicsHelper.makeBlack(rdPrPnl.getGmPnl().getHdg());
+					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getHdg());
 					updater.updateHdg();
-					rdPrPnl.updateGraphics();
+					rdCxt.updateGraphics();
 				}else{
-					GraphicsHelper.makeRed(rdPrPnl.getGmPnl().getHdg());
-					GraphicsHelper.showToast("Enter value b/w -6.2831853071796 to 6.2831853071796", 5000);
+					GraphicsHelper.makeRed(rdCxt.getGmPnl().getHdg());
+					GraphicsHelper.showToast("Enter value b/w -6.2831853071796 to 6.2831853071796", rdCxt.getToastDurationMilis());
 				}
 			}catch(NumberFormatException e2){
-				GraphicsHelper.showToast(e2.getMessage(), 5000);
+				GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 			}
 		}
 	}
