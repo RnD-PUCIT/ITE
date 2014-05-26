@@ -108,6 +108,9 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getTfX().getDocument() || doc==rdCxt.getGmPnl().getTfY().getDocument()){
+			if(rdCxt.getGmPnl().getTfY().getText().equals("") || rdCxt.getGmPnl().getTfX().getText().equals("")){
+				return;
+			}
 			try{
 				if(validator.isValidXY()){
 					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getTfX(),rdCxt.getGmPnl().getTfY());
@@ -122,6 +125,9 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getL().getDocument()){
+			if(rdCxt.getGmPnl().getL().getText().equals("")){
+				return;
+			}
 			try{
 				if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getLength()==Double.parseDouble(rdCxt.getGmPnl().getL().getText())|| rdCxt.getGmPnl().getS().getText().equals(""))
 					return;
@@ -134,6 +140,9 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getCurvature().getDocument()){
+			if(rdCxt.getGmPnl().getCurvature().getText().equals("")){
+				return;
+			}
 			try{
 				if(validator.isValidCurv()){
 					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getCurvature());
@@ -145,6 +154,9 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getHdg().getDocument()){
+			if(rdCxt.getGmPnl().getHdg().getText().equals("")){
+				return;
+			}
 			try{
 				if(validator.isValidHdg()){
 					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getHdg());

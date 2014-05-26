@@ -58,7 +58,7 @@ public class GeometryPanel extends JPanel{
 		gbc_tf.weightx=3;
 		
 		cbGeom=new JComboBox<>();
-		cbGmType=new JComboBox<>(new String[]{"line","arc"});
+		cbGmType=new JComboBox<>();
 		cbGeom.addActionListener(gpl);
 		cbGmType.addActionListener(gpl);
 		JLabel lbl=new JLabel("Select (s offset)");
@@ -69,30 +69,35 @@ public class GeometryPanel extends JPanel{
 		add(cbGeom,gbc_tf);
 
 		s=new JTextField(10);
+		s.setHighlighter(null);
 		s.getDocument().addDocumentListener(gpl);
 		lbl=new JLabel("S offset");
 		lbl.setLabelFor(s);
 		add(lbl,gbc_lbl);
 		add(s,gbc_tf);
 		tfx=new JTextField(10);
+		tfx.setHighlighter(null);
 		tfx.getDocument().addDocumentListener(gpl);
 		lbl=new JLabel("X coordinate");
 		lbl.setLabelFor(tfx);
 		add(lbl,gbc_lbl);
 		add(tfx,gbc_tf);
 		tfy=new JTextField(10);
+		tfy.setHighlighter(null);
 		tfy.getDocument().addDocumentListener(gpl);
 		lbl=new JLabel("Y coordinate");
 		lbl.setLabelFor(tfy);
 		add(lbl,gbc_lbl);
 		add(tfy,gbc_tf);
 		hdg=new JTextField(10);
+		hdg.setHighlighter(null);
 		hdg.getDocument().addDocumentListener(gpl);
 		lbl=new JLabel("Direction");
 		lbl.setLabelFor(hdg);
 		add(lbl,gbc_lbl);
 		add(hdg,gbc_tf);
 		l=new JTextField(10);
+		l.setHighlighter(null);
 		l.getDocument().addDocumentListener(gpl);
 		lbl=new JLabel("Length");
 		lbl.setLabelFor(l);
@@ -100,6 +105,7 @@ public class GeometryPanel extends JPanel{
 		add(l,gbc_tf);
 		
 		curvature=new JTextField(10);
+		curvature.setHighlighter(null);
 		curvature.getDocument().addDocumentListener(gpl);
 		lbl=new JLabel("Curvature");
 		lbl.setLabelFor(curvature);
@@ -122,6 +128,9 @@ public class GeometryPanel extends JPanel{
 		gpl.setDocListLocked(false);
 	}
 	public void geometryChanged(){
+		cbGmType.removeAllItems();
+		cbGmType.addItem("Line");
+		cbGmType.addItem("Arc");
 		gpl.setDocListLocked(true);
 		makeBlackFont();
 		DecimalFormat df=new DecimalFormat("##.####");
@@ -219,5 +228,14 @@ public class GeometryPanel extends JPanel{
 	}
 	public JButton getAdd() {
 		return add;
+	}
+	public void reset() {
+		cbGeom.removeAllItems();
+		cbGmType.removeAllItems();
+		s.setText("");
+		tfx.setText("");
+		tfy.setText("");
+		hdg.setText("");
+		l.setText("");
 	}
 }

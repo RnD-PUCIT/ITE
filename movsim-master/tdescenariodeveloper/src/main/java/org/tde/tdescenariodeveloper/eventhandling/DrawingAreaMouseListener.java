@@ -30,7 +30,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     private int startDragY;
     private int xOffsetSave;
     private int yOffsetSave;
-    RoadMapping rm;
+    private RoadMapping rm;
     private StatusPanel statusPnl;
     Point2D.Double startTransformed=new Point2D.Double(),endTransformed=new Point2D.Double();
     private ArrayList<Double> X0=new ArrayList<>(),Y0=new ArrayList<>(); 
@@ -51,6 +51,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
      */
     @Override
     public void mouseClicked(MouseEvent e) {
+    	
     	Point point=e.getPoint();
         Point2D.Double transformedPoint=new Point2D.Double();
         try {
@@ -87,10 +88,16 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     	}
         if(!selected){
         	trafficCanvas.getRoadPrPnl().setSelectedRoadNull();
-        	trafficCanvas.getRoadPrPnl().setVisible(false);
+        	if(trafficCanvas.getRoadPrPnl().getPin().isSelected())trafficCanvas.getRoadPrPnl().setVisible(false);
+        	trafficCanvas.getRoadPrPnl().updateGraphics();
         }
-        else trafficCanvas.getRoadPrPnl().setVisible(true);
-        trafficCanvas.paint(trafficCanvas.getGraphics());
+        else {
+        	trafficCanvas.getRoadPrPnl().setVisible(true);
+        	trafficCanvas.getRoadPrPnl().updateGraphics();
+        	if(e.getButton()==MouseEvent.BUTTON3){
+        		trafficCanvas.getPopup().show(trafficCanvas, e.getX(), e.getY());
+        	}
+        }
     }
 
     /*
@@ -124,7 +131,6 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         		}
         	}
 		} catch (NoninvertibleTransformException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
         inDrag = true;
@@ -184,7 +190,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     	trafficCanvas.paint(trafficCanvas.getGraphics());
         inDrag = false;
     }
-
+    final int PROX_DIST = 3;
     /*
      * (non-Javadoc)
      * 
@@ -252,7 +258,6 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     	try {
 			trafficCanvas.transform.inverseTransform(e.getPoint(), p);
 		} catch (NoninvertibleTransformException e1) {
-			//TODO sdf
 		}
     	if(selected){
     		if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
@@ -280,8 +285,68 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         }
         trafficCanvas.paint(trafficCanvas.getGraphics());
     }
-
-
+/*    private void setCursor(Point2D p){
+    	
+    	Rectangle2D r = trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().getBounds().getBounds2D();
+    	int outcode = r.outcode(p);
+        switch(outcode) {
+        case Rectangle.OUT_TOP:
+            if(Math.abs(p.getY() - r.getY()) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.N_RESIZE_CURSOR));
+            }
+            break;
+        case Rectangle.OUT_TOP + Rectangle.OUT_LEFT:
+            if(Math.abs(p.getY() - r.getY()) < PROX_DIST &&
+               Math.abs(p.getX() - r.getX()) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.NW_RESIZE_CURSOR));
+            }
+            break;
+        case Rectangle.OUT_LEFT:
+            if(Math.abs(p.getX() - r.getX()) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.W_RESIZE_CURSOR));
+            }
+            break;
+        case Rectangle.OUT_LEFT + Rectangle.OUT_BOTTOM:
+            if(Math.abs(p.getX() - r.getX()) < PROX_DIST &&
+               Math.abs(p.getY() - (r.getY()+r.getHeight())) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.SW_RESIZE_CURSOR));
+            }
+            break;
+        case Rectangle.OUT_BOTTOM:
+            if(Math.abs(p.getY() - (r.getY()+r.getHeight())) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.S_RESIZE_CURSOR));
+            }
+            break;
+        case Rectangle.OUT_BOTTOM + Rectangle.OUT_RIGHT:
+            if(Math.abs(p.getX() - (r.getX()+r.getWidth())) < PROX_DIST &&
+               Math.abs(p.getY() - (r.getY()+r.getHeight())) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.SE_RESIZE_CURSOR));
+            }
+            break;
+        case Rectangle.OUT_RIGHT:
+            if(Math.abs(p.getX() - (r.getX()+r.getWidth())) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.E_RESIZE_CURSOR));
+            }
+            break;
+        case Rectangle.OUT_RIGHT + Rectangle.OUT_TOP:
+            if(Math.abs(p.getX() - (r.getX()+r.getWidth())) < PROX_DIST &&
+               Math.abs(p.getY() - r.getY()) < PROX_DIST) {
+                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
+                                    Cursor.NE_RESIZE_CURSOR));
+            }
+            break;
+        default:    // center
+            trafficCanvas.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+        }
+    }
+*/
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		

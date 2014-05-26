@@ -15,6 +15,7 @@ import javax.swing.event.DocumentListener;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.omg.PortableServer.ID_ASSIGNMENT_POLICY_ID;
 import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
@@ -53,6 +54,7 @@ public class RoadFieldsPanel extends JPanel {
 		JLabel lblName = new JLabel("Name");
 		add(lblName, gbc_lbl);
 		tfName = new JTextField();
+		tfName.setHighlighter(null);
 		tfName.getDocument().addDocumentListener(rfl);
 		lblName.setLabelFor(tfName);
 		add(tfName, gbc_tf);
@@ -110,6 +112,12 @@ public class RoadFieldsPanel extends JPanel {
 	}
 	public JComboBox<String> getCbJunction() {
 		return cbJunction;
+	}
+	public void reset() {
+		tfId.setText("");
+		tfName.setText("");
+		tfLength.setText("");
+		cbJunction.removeAllItems();
 	}
 	
 }

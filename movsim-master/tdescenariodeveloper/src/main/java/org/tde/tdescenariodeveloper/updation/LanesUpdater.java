@@ -1,8 +1,8 @@
 package org.tde.tdescenariodeveloper.updation;
 
 import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.Lane.Width;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
-import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class LanesUpdater {
@@ -21,10 +21,22 @@ public class LanesUpdater {
 		RoadNetworkUtils.refresh(rdCxt);
 	}
 	public void removeLastLane() {
-		GraphicsHelper.showMessage(rdCxt.getLanesPnl().getOdrLanes().size()+"");
 		rdCxt.getLanesPnl().getOdrLanes().remove(rdCxt.getLanesPnl().getOdrLanes().size()-1);
-		GraphicsHelper.showMessage(rdCxt.getLanesPnl().getOdrLanes().size()+"");
 		RoadNetworkUtils.updateLaneIds(rdCxt);
+		RoadNetworkUtils.refresh(rdCxt);
+	}
+	public void updateWidth(){
+		double d=Double.parseDouble(rdCxt.getLanesPnl().getTfWidth().getText());
+		Width w=new Width();
+		w.setA(d);
+		w.setB(0);
+		w.setC(0);
+		w.setD(0);
+		w.setSOffset(0);
+		for(Lane ln:rdCxt.getLanesPnl().getOdrLanes()){
+			ln.getWidth().clear();
+			ln.getWidth().add(w);
+		}
 		RoadNetworkUtils.refresh(rdCxt);
 	}
 }

@@ -121,7 +121,6 @@ public class GeometryUpdater {
 		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			if(rdCxt.getGmPnl().getSelectedIndex()>0){
 				rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().remove(rdCxt.getGmPnl().getSelectedIndex());
-				rdCxt.getGmPnl().updateGeomPanel();
 				rdCxt.getSelectedRoad().getOdrRoad().setLength(getGmSum());
 				RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
 				RoadNetworkUtils.refresh(rdCxt);

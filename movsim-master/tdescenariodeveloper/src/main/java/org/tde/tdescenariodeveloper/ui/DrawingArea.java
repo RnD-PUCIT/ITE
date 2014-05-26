@@ -36,7 +36,7 @@ public class DrawingArea extends Canvas {
     private int bufferHeight=700;
     private int bufferWidth=1000;
     private Image backgroundBuffer=new BufferedImage(bufferWidth, bufferHeight, BufferedImage.TYPE_INT_ARGB);
-    protected Color backgroundColor=new Color(7,147,7);;
+    protected Color backgroundColor=new Color(74,172,23);;
     public double scale=1.0;
     public int xOffset=0;
 	public int yOffset=0;
@@ -67,10 +67,11 @@ public class DrawingArea extends Canvas {
 	private boolean drawLaneBounds=false;
 	private boolean drawSelectedLane=true;
 	private boolean drawSelectedGeometry=true;
-    
+    private DrawingAreaPopupMenu popup;
     
 	public DrawingArea(RoadContext rdPrPnl) {
 		this.roadPrPnl=rdPrPnl;
+		popup=new DrawingAreaPopupMenu(roadPrPnl);
 		setSize(new Dimension(bufferWidth,bufferHeight));
 		keyListener=new DrawingAreaKeyListener(this);
 		addKeyListener(keyListener);
@@ -78,8 +79,7 @@ public class DrawingArea extends Canvas {
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(mouseListener);
-		setBackground(Color.GREEN.darker());
-		
+		setBackground(new Color(74,172,23));
 	}
     public void drawSelected(Graphics2D g){
     	if(roadPrPnl.getSelectedRoad()==null)return;
@@ -119,8 +119,10 @@ public class DrawingArea extends Canvas {
 		if(roadPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			RoadMappingPoly rmp=(RoadMappingPoly)roadPrPnl.getSelectedRoad().roadMapping();
 			g.draw(rmp.getBounds());
+//			g.draw(rmp.getBounds().getBounds2D());
 		}else{
 			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
+//			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds().getBounds2D());
 		}
 	}
     private void drawSelectedLane(Graphics2D g) {
@@ -543,5 +545,8 @@ public class DrawingArea extends Canvas {
 	}
 	public RoadContext getRoadPrPnl() {
 		return roadPrPnl;
+	}
+	public DrawingAreaPopupMenu getPopup() {
+		return popup;
 	}
 }

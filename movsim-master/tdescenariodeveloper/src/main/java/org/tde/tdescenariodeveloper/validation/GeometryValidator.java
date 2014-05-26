@@ -11,27 +11,31 @@ public class GeometryValidator {
 	}
 
 	public boolean isValidS() {
-		double endLimit,startLimit,s;
+		double s;
 		if(rdCxt.getGmPnl().getSelectedIndex()==0){
 			s=Double.parseDouble(rdCxt.getGmPnl().getS().getText());
 			if(s==0.0)return true;
 			else throw new InvalidInputException("First geometry can only have 0.0 offset");
 		}
-		if(isPrevGmExist()){
-			startLimit=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()-1).getS();
-		}
-		else startLimit=0;
-		Geometry g=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex());
-		endLimit=g.getLength()+g.getS();
+
 		try{
 			s=Double.parseDouble(rdCxt.getGmPnl().getS().getText());
-			if(s<endLimit && s>startLimit)return true;
+			if(s<getEndLimit() && s>getStartLimit())return true;
 		}catch(NumberFormatException e){
 			return false;
 		}
 		return false;
 	}
-
+	public double getStartLimit(){
+		if(isPrevGmExist()){
+			return rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()-1).getS();
+		}
+		return 0.0;
+	}
+	public double getEndLimit(){
+		Geometry g=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex());
+		return g.getLength()+g.getS();
+	}
 	public boolean isNextGmExist(){
 		return rdCxt.getGmPnl().getSelectedIndex()+1<rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size();
 	}

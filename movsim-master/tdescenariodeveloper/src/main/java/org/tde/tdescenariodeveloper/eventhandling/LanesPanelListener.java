@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.LanesUpdater;
@@ -71,6 +72,19 @@ public class LanesPanelListener implements DocumentListener, ActionListener {
 	}
 	private void textChanged(DocumentEvent e){
 		if(locked)return;
+		Document doc=e.getDocument();
+		if(doc==rdCxt.getLanesPnl().getTfWidth().getDocument()){
+			if(rdCxt.getLanesPnl().getTfWidth().getText().equals("")){
+				return;
+			}
+			try{
+				if(validator.isValidWidth()){
+					updater.updateWidth();
+				}
+			}catch(NumberFormatException e2){
+				GraphicsHelper.showToast("Lane width is not valid: (1 - 100)", rdCxt.getToastDurationMilis());
+			}
+		}
 	}
 
 	public void setLocked(boolean locked) {

@@ -61,6 +61,7 @@ public class LanesPanel extends JPanel{
 		JPanel tmp=new JPanel(new GridBagLayout());
 		tmp.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		tfwidth=new JTextField(10);
+		tfwidth.setHighlighter(null);
 		tfwidth.getDocument().addDocumentListener(lpl);
 		JLabel lbl=new JLabel("Lane width");
 		lbl.setLabelFor(tfwidth);
@@ -75,7 +76,7 @@ public class LanesPanel extends JPanel{
 		add(lbl,gbc_lbl);
 		add(cbLanes,gbc_tf);
 		
-		cbtype=new JComboBox<>(new String[]{"driving","mwyExit","mwyEntry"});
+		cbtype=new JComboBox<>();
 		cbtype.addActionListener(lpl);
 		lbl=new JLabel("Type");
 		lbl.setLabelFor(cbtype);
@@ -91,6 +92,8 @@ public class LanesPanel extends JPanel{
 
 		
 		maxSpeed=new JTextField(10);
+		maxSpeed.setHighlighter(null);
+		
 		maxSpeed.getDocument().addDocumentListener(lpl);
 		lbl=new JLabel("Max speed");
 		lbl.setLabelFor(maxSpeed);
@@ -108,6 +111,10 @@ public class LanesPanel extends JPanel{
 		laneChanged();
 	}
 	public void laneChanged() {
+		cbtype.removeAllItems();
+		cbtype.addItem("driving");
+		cbtype.addItem("mwyEntry");
+		cbtype.addItem("mwyExit");
 		remove.setEnabled(getOdrLanes().size()>1);
 		Lane ln=rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(lnInd);
 		cbtype.setSelectedItem(ln.getType()+"");
@@ -184,5 +191,13 @@ public class LanesPanel extends JPanel{
 	}
 	public LaneLinkPanel getLnLinkPnl() {
 		return lnLinkPnl;
+	}
+	public void reset() {
+		cbLanes.removeAllItems();
+		cbtype.removeAllItems();
+		tfwidth.setText("");
+		level.setText("");
+		maxSpeed.setText("");
+		lnLinkPnl.reset();
 	}
 }

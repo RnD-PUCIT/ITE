@@ -47,7 +47,7 @@ public class LaneLinkPanel extends JPanel {
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Lane link", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
 		
-		cbSelectLink = new JComboBox<>(new String[]{"Predecessor","Successor"});
+		cbSelectLink = new JComboBox<>();
 		cbSelectLink.setToolTipText("Predecessor/Sucsessor lane");
 		cbSelectLink.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -90,6 +90,9 @@ public class LaneLinkPanel extends JPanel {
 	public void updateLinkPanel() {
 		linkInfoPnl.removeAll();
 		cbElementId.removeAllItems();
+		cbSelectLink.removeAllItems();
+		cbSelectLink.addItem("Predecessor");
+		cbSelectLink.addItem("Successor");
 		if (lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getPredecessor()!=null){
 			String preid=lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementId();
 			String pretype=lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementType();
@@ -171,9 +174,9 @@ public class LaneLinkPanel extends JPanel {
 			lables.add(new JLabel(" In. road"));
 			lables.add(new JLabel(" Cont. Point"));
 			c.insets=new Insets(2,2,2,2);
-//			linkInfoPnl.add(new Label("Junction: "+jn.getId()),c);
+			linkInfoPnl.add(new JLabel("Junction: "+jn.getId()),c);
 			
-			//linkInfoPnl.add(lables,c);
+			linkInfoPnl.add(lables,c);
 			for(Connection cn:jn.getConnection()){
 				if(showFullJunc)linkInfoPnl.add(conToPnl(cn, connecting, incoming),c);
 				else {
@@ -259,5 +262,10 @@ public class LaneLinkPanel extends JPanel {
 			}
 		}
 		return null;
+	}
+
+	public void reset() {
+		cbSelectLink.removeAllItems();
+		linkInfoPnl.removeAll();
 	}
 }

@@ -32,6 +32,8 @@ public class AppFrame extends JFrame {
 	private RoadContext rdCxt;
 	private StatusPanel statusPnl;
 	private JunctionsPanel jp;
+	String prjName="cleaf";
+	RoadNetwork rn;
 	public RoadContext getrdCxt(){
 		return rdCxt;
 	}
@@ -49,23 +51,45 @@ public class AppFrame extends JFrame {
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-					new Thread(new Runnable() {
-						
-						@Override
-						public void run() {
-							String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\cloverleaf"};
-							try {
-								App.main(s);
-							} catch (URISyntaxException | IOException e) {
-								e.printStackTrace();
-							}
-						}
-					}).start();
+				try {
+					File f=FileUtils.chooseFile("xodr");
+					rn.reset();
+					OpenDriveReader.loadRoadNetwork(rn,f.getAbsolutePath());
+					jp.updateJunction();
+					prjName=f.getName().substring(0,f.getName().lastIndexOf("."));
+					revalidate();
+					repaint();
+				} catch (JAXBException e) {
+					e.printStackTrace();
+				} catch (SAXException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		mnFile.add(mntmOpen);
 		
+		JMenuItem mntmRun = new JMenuItem("Run");
+		mntmRun.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						Marshalling.writeToXml(rdCxt.getRn().getOdrNetwork(),new File("G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\"+prjName+".xodr"));
+						String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\"+prjName};
+						try {
+							App.main(s);
+						} catch (URISyntaxException | IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
+			}
+		});
+		mnFile.add(mntmRun);
+		
 		JMenuItem mntmSave = new JMenuItem("save");
+		mntmSave.setActionCommand("Save");
 		mnFile.add(mntmSave);
 		mntmSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -83,19 +107,20 @@ public class AppFrame extends JFrame {
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		
+		JMenuItem mntmChangeToastDelay = new JMenuItem("Change toast delay");
+		mnEdit.add(mntmChangeToastDelay);
+		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 		
+		JMenuItem mntmAbout = new JMenuItem("About");
+		mnHelp.add(mntmAbout);
+		
 		pack();
-		RoadNetwork rn=new RoadNetwork();
-		try {
-			OpenDriveReader.loadRoadNetwork(rn,"G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\polytest.xodr");
-		} catch (JAXBException | SAXException e1) {
-			e1.printStackTrace();
-		}
+		rn=new RoadNetwork();
 		rdCxt= new RoadContext(rn,this);
 		jp=new JunctionsPanel(rdCxt);
-		jp.updateJunction();
+		if(rdCxt!=null && rdCxt.getRn().getOdrNetwork()!=null && rdCxt.getRn().getOdrNetwork().getJunction()!=null)jp.updateJunction();
 		JPanel drawingPnl=new JPanel();
 		DrawingArea drawingArea = new DrawingArea(rdCxt);
 		rdCxt.setDrawingArea(drawingArea);
@@ -111,7 +136,7 @@ public class AppFrame extends JFrame {
 		getContentPane().add(jp.getSp(), BorderLayout.SOUTH);
 		ms.setStatusPnl(statusPnl);
 		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
-		add(new ToolBar(drawingArea),BorderLayout.NORTH);
+		getContentPane().add(new ToolBar(drawingArea),BorderLayout.NORTH);
 		GraphicsHelper.finalizeFrame(this);
 	}
 	public StatusPanel getStatusPnl() {

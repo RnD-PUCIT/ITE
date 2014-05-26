@@ -5,6 +5,7 @@ import javax.swing.SwingWorker;
 
 import org.movsim.input.network.OpenDriveHandlerJaxb;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
+import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.RoadSegment;
@@ -34,7 +35,9 @@ public class RoadNetworkUtils {
 		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			RoadMappingPoly rmp=(RoadMappingPoly)rdCxt.getSelectedRoad().roadMapping();
 			for(int i=1;i<rmp.getRoadMappings().size();i++){
-				rmp=(RoadMappingPoly)OpenDriveHandlerJaxb.createRoadMapping(rdCxt.getSelectedRoad().getOdrRoad());
+				RoadMapping rm=OpenDriveHandlerJaxb.createRoadMapping(rdCxt.getSelectedRoad().getOdrRoad());
+				if(rm instanceof RoadMappingPoly)rmp=(RoadMappingPoly)rm;
+				else continue;
 				Geometry gm=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i);
 				PosTheta preEnd=rmp.getRoadMappings().get(i-1).map(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(i-1).getLength());
 				gm.setHdg(preEnd.theta());

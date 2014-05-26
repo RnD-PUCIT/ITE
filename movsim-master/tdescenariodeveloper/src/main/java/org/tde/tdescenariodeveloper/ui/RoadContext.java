@@ -19,7 +19,7 @@ import org.tde.tdescenariodeveloper.eventhandling.GeometryPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
 
-public class RoadContext extends JPanel implements ActionListener{
+public class RoadContext extends JPanel {
 	/**
 	 * 
 	 */
@@ -46,8 +46,7 @@ public class RoadContext extends JPanel implements ActionListener{
 		sp.getViewport().add(this);
 		sp.setPreferredSize(new Dimension(260,700));
 		setBorder(new EmptyBorder(5, 5, 5, 5));
-		pin=new JToggleButton("Pin");
-		pin.addActionListener(this);
+		pin=new JToggleButton("Auto hide");
 		linkPanel=new LinkPanel(this);
 		
 		RoadFieldsPanelListener rfl=new RoadFieldsPanelListener(this);
@@ -74,12 +73,12 @@ public class RoadContext extends JPanel implements ActionListener{
 			add(linkPanel, gbc);
 		add(gmPnl,gbc);
 		add(lanesPnl,gbc);
-		sp.setVisible(false);
 	}
 	public void blockListeners(boolean b){
 		gpl.setBlocked(b);
 		rfpl.setBlocked(b);
 		lpl.setLocked(b);
+		drawingArea.getPopup().setBlockListener(b);
 	}
 	public void updateGraphics(){
 		drawingArea.revalidate();
@@ -128,7 +127,13 @@ public class RoadContext extends JPanel implements ActionListener{
 		if(update)updatePanel();
 	}
 	public void setSelectedRoadNull() {
+		blockListeners(true);
 		this.selectedRoad = null;
+		linkPanel.reset();
+		gmPnl.reset();
+		rdFldPnl.reset();
+		lanesPnl.reset();
+		blockListeners(false);
 	}
 	
 
@@ -150,14 +155,9 @@ public class RoadContext extends JPanel implements ActionListener{
 	public void setDrawingArea(DrawingArea drawingArea) {
 		this.drawingArea = drawingArea;
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		((JToggleButton)e.getSource()).setText(pin.isSelected()?"Pinned":"Pin");
-	}
 	@Override
 	public void setVisible(boolean b){
-		sp.setVisible(b || pin.isSelected());
+		sp.setVisible(b || !pin.isSelected());
 		((JPanel)drawingArea.getParent()).revalidate();
 		//super.setVisible(b || pin.isSelected());
 	}
@@ -198,6 +198,9 @@ public class RoadContext extends JPanel implements ActionListener{
 	}
 	public void setToastDurationMilis(int toastDurationMilis) {
 		this.toastDurationMilis = toastDurationMilis;
+	}
+	public JToggleButton getPin() {
+		return pin;
 	}
 	
 }

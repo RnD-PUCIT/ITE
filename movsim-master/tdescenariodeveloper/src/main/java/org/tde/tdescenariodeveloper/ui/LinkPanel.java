@@ -35,7 +35,7 @@ public class LinkPanel extends JPanel {
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Link", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		cbSelectLink = new JComboBox<>(new String[]{"Predecessor","Successor"});
+		cbSelectLink = new JComboBox<>();
 		cbSelectLink.setToolTipText("Predecessor/Sucsessor road");
 		cbSelectLink.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -75,7 +75,7 @@ public class LinkPanel extends JPanel {
 		add(cbElementId,gbc_tf);
 		JLabel lblType = new JLabel("Element type");
 		add(lblType,gbc_lbl);
-		cbElementType = new JComboBox<>(new String[]{"road","junction"});
+		cbElementType = new JComboBox<>();
 		cbElementType.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
@@ -84,7 +84,7 @@ public class LinkPanel extends JPanel {
 		add(cbElementType,gbc_tf);
 		JLabel lblContactPoint = new JLabel("Contact Point");
 		add(lblContactPoint,gbc_lbl);
-		cbContactPoint = new JComboBox<>(new String[]{"start","end"});
+		cbContactPoint = new JComboBox<>();
 		cbContactPoint.setToolTipText("Where the road should be attached");
 		cbContactPoint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -95,9 +95,20 @@ public class LinkPanel extends JPanel {
 
 	public void updateLinkPanel() {
 		if(selectedRoad==null){
-			JOptionPane.showMessageDialog(null, "Selected road is null");
 			return;
 		}
+		cbSelectLink.removeAllItems();
+		cbSelectLink.addItem("Predecessor");
+		cbSelectLink.addItem("Successor");
+		
+		
+		cbElementType.removeAllItems();
+		cbElementType.addItem("road");
+		cbElementType.addItem("junction");
+		
+		cbContactPoint.removeAllItems();
+		cbContactPoint.addItem("start");
+		cbContactPoint.addItem("end");
 		int curLinkSelected = cbSelectLink.getSelectedIndex();
 		if (rdCxt.getRn().isModified()) {
 			cbElementId.removeAllItems();
@@ -143,5 +154,12 @@ public class LinkPanel extends JPanel {
 		cbElementId.setSelectedItem(id);
 		cbElementType.setSelectedItem(type);
 		cbContactPoint.setSelectedItem(cntPnt);
+	}
+
+	public void reset() {
+		cbContactPoint.removeAllItems();
+		cbElementId.removeAllItems();
+		cbElementType.removeAllItems();
+		cbSelectLink.removeAllItems();
 	}
 }

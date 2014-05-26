@@ -67,6 +67,9 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener 
 	public void textChanged(DocumentEvent e){
 		Document doc=e.getDocument();
 		if(rdCxt.getRdFldPnl().getTfName().getDocument()==doc){
+			if(rdCxt.getRdFldPnl().getTfName().getText().equals("")){
+				return;
+			}
 			roadFieldsUpdater.updateRoadName();
 			rdCxt.updateGraphics();
 		}

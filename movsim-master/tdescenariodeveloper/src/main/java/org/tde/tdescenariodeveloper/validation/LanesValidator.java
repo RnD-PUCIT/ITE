@@ -1,5 +1,6 @@
 package org.tde.tdescenariodeveloper.validation;
 
+import org.tde.tdescenariodeveloper.exception.InvalidInputException;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 
 public class LanesValidator {
@@ -9,5 +10,12 @@ public class LanesValidator {
 	}
 	public boolean isValidRemove(){
 		return rdCxt.getLanesPnl().getOdrLanes().size()>1;
+	}
+	public boolean isValidWidth(){
+		double d=Double.parseDouble(rdCxt.getLanesPnl().getTfWidth().getText());
+		if(d>0 && d<=100){
+			return true;
+		}
+		else throw new InvalidInputException("Lane width should be within range of 1 to 100");
 	}
 }
