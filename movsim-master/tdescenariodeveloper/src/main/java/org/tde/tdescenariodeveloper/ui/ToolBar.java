@@ -18,6 +18,7 @@ public class ToolBar extends JToolBar implements ItemListener{
 	private static final long serialVersionUID = -4127064504014635395L;
 
 JCheckBox name,id,axis;
+private boolean blocked=true;
 
 DrawingArea drawingArea;
 	public ToolBar(DrawingArea drawingArea) {
@@ -42,6 +43,7 @@ DrawingArea drawingArea;
 	}
 	@Override
 	public void itemStateChanged(ItemEvent e) {
+		if(blocked)return;
 		JRadioButton rdsrc=null;
 		JCheckBox chsrc=null;
 		if(e.getSource() instanceof JRadioButton)rdsrc=(JRadioButton)e.getSource();
@@ -60,5 +62,11 @@ DrawingArea drawingArea;
 			drawingArea.setDrawAxis(axis.isSelected());
 		}
 		drawingArea.getRoadPrPnl().updateGraphics();
+	}
+	public boolean isBlocked() {
+		return blocked;
+	}
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
 	}
 }

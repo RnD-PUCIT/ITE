@@ -1,6 +1,7 @@
 package org.tde.tdescenariodeveloper.updation;
 
 import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.Lane.Speed;
 import org.movsim.network.autogen.opendrive.Lane.Width;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
@@ -10,7 +11,6 @@ public class LanesUpdater {
 	public LanesUpdater(RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 	}
-
 	public void addnewLane() {
 		Lane ln=new Lane();
 		ln.setId(-1*rdCxt.getSelectedRoad().getLaneSegments().length-1);
@@ -38,5 +38,18 @@ public class LanesUpdater {
 			ln.getWidth().add(w);
 		}
 		RoadNetworkUtils.refresh(rdCxt);
+	}
+	public void updateMaxSpeed(){
+		double d=Double.parseDouble(rdCxt.getLanesPnl().getMaxSpeed().getText());
+		rdCxt.getLanesPnl().getSelectedLane().getSpeed().clear();
+		Speed s=new Speed();
+		s.setMax(d);
+		s.setSOffset(0);
+		rdCxt.getLanesPnl().getSelectedLane().getSpeed().add(s);
+		RoadNetworkUtils.refresh(rdCxt);
+	}
+	public void updateLaneType() {
+		rdCxt.getLanesPnl().getSelectedLane().setType((String)rdCxt.getLanesPnl().getCbtype().getSelectedItem());
+		RoadNetworkUtils.refresh(rdCxt);		
 	}
 }

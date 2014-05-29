@@ -2,6 +2,7 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
@@ -25,12 +27,13 @@ public class LanesPanel extends JPanel{
 	 */
 	private static final long serialVersionUID = 8013762005282847367L;
 	JTextField tfwidth,maxSpeed;
-	JLabel level;
+	JLabel level,posLbl;
 	JComboBox<String>cbLanes,cbtype;
 	JButton add,remove;
 	LaneLinkPanel lnLinkPnl;
 	private int lnInd=0;
 	RoadContext rdCxt;
+	JSlider position;
 	public LanesPanel(RoadContext rpp,LanesPanelListener lpl) {
 		rdCxt=rpp;
 		lnLinkPnl=new LaneLinkPanel(rdCxt);
@@ -93,12 +96,20 @@ public class LanesPanel extends JPanel{
 		
 		maxSpeed=new JTextField(10);
 		maxSpeed.setHighlighter(null);
-		
 		maxSpeed.getDocument().addDocumentListener(lpl);
 		lbl=new JLabel("Max speed");
 		lbl.setLabelFor(maxSpeed);
 		add(lbl,gbc_lbl);
 		add(maxSpeed,gbc_tf);
+		
+		position=new JSlider();
+		posLbl=new JLabel("Max speed position");
+		posLbl.setLabelFor(position);
+		position.setToolTipText("Set position of speed limit sign");
+		position.addChangeListener(lpl);
+		position.setPreferredSize(new Dimension(100,30));
+		add(posLbl,gbc_lbl);
+		add(position,gbc_tf);
 	}
 	public void updatelanesPanel() {
 		if(rdCxt.getSelectedRoad()==null)return;
@@ -116,6 +127,16 @@ public class LanesPanel extends JPanel{
 		cbtype.addItem("mwyEntry");
 		cbtype.addItem("mwyExit");
 		remove.setEnabled(getOdrLanes().size()>1);
+		if(rdCxt.getLanesPnl().getSelectedLane().getSpeed()!=null && rdCxt.getLanesPnl().getSelectedLane().getSpeed().size()>0){
+			position.setMinimum(0);
+			position.setMaximum((int)rdCxt.getSelectedRoad().getOdrRoad().getLength());
+			position.setValue((int)rdCxt.getLanesPnl().getSelectedLane().getSpeed().get(0).getSOffset());
+			position.setVisible(true);
+			posLbl.setVisible(true);
+		} else{
+			position.setVisible(false);
+			posLbl.setVisible(false);
+		}
 		Lane ln=rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(lnInd);
 		cbtype.setSelectedItem(ln.getType()+"");
 		level.setText(ln.getLevel()+"");
@@ -131,8 +152,11 @@ public class LanesPanel extends JPanel{
 		}else{
 			if(isAdded(lnLinkPnl))remove(lnLinkPnl);
 		}
-		((RoadContext)getParent()).updateGraphics();
+		rdCxt.updateGraphics();
 		
+	}
+	public Lane getSelectedLane(){
+		return getOdrLanes().get(lnInd);
 	}
 	public List<Lane> getOdrLanes(){
 		return rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane();
@@ -199,5 +223,8 @@ public class LanesPanel extends JPanel{
 		level.setText("");
 		maxSpeed.setText("");
 		lnLinkPnl.reset();
+	}
+	public JSlider getPosition() {
+		return position;
 	}
 }

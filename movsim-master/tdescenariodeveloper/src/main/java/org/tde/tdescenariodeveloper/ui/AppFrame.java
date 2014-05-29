@@ -2,6 +2,7 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -9,22 +10,28 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.xml.bind.JAXBException;
 
+import org.movsim.input.network.OpenDriveHandlerJaxb;
 import org.movsim.input.network.OpenDriveReader;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.viewer.App;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
+import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
 import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
 import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 import org.xml.sax.SAXException;
 
 public class AppFrame extends JFrame {
@@ -32,8 +39,10 @@ public class AppFrame extends JFrame {
 	private RoadContext rdCxt;
 	private StatusPanel statusPnl;
 	private JunctionsPanel jp;
-	String prjName="cleaf";
-	RoadNetwork rn;
+	private String prjName="cleaf";
+	private RoadNetwork rn;
+	private ToolBar toolbar;
+	private JunctionsListener jl;
 	public RoadContext getrdCxt(){
 		return rdCxt;
 	}
@@ -55,8 +64,11 @@ public class AppFrame extends JFrame {
 					File f=FileUtils.chooseFile("xodr");
 					rn.reset();
 					OpenDriveReader.loadRoadNetwork(rn,f.getAbsolutePath());
+					jl.setBlocked(true);
 					jp.updateJunction();
+					jl.setBlocked(false);
 					prjName=f.getName().substring(0,f.getName().lastIndexOf("."));
+					rdCxt.updateGraphics();
 					revalidate();
 					repaint();
 				} catch (JAXBException e) {
@@ -116,11 +128,18 @@ public class AppFrame extends JFrame {
 		JMenuItem mntmAbout = new JMenuItem("About");
 		mnHelp.add(mntmAbout);
 		
-		pack();
+		JTabbedPane tabPane=new JTabbedPane();
+		ImageIcon icon=new ImageIcon(getClass().getClassLoader().getResource("road_icon.png"));
+		icon.setImage(icon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		ImageIcon icon2=new ImageIcon(getClass().getClassLoader().getResource("Junctions_tab_icon.png"));
+		icon2.setImage(icon2.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		rn=new RoadNetwork();
+		new OpenDriveHandlerJaxb().create("", RoadNetworkUtils.getNewOdr(), rn);
 		rdCxt= new RoadContext(rn,this);
-		jp=new JunctionsPanel(rdCxt);
-		if(rdCxt!=null && rdCxt.getRn().getOdrNetwork()!=null && rdCxt.getRn().getOdrNetwork().getJunction()!=null)jp.updateJunction();
+		jl=new JunctionsListener(rdCxt);
+		jp=new JunctionsPanel(rdCxt,jl);
+		if(rdCxt!=null && rdCxt.getRn().getOdrNetwork()!=null && rdCxt.getRn().getOdrNetwork().getJunction()!=null && rdCxt.getRn().getOdrNetwork().getJunction().size()>0)jp.updateJunction();
+		jl.setBlocked(false);
 		JPanel drawingPnl=new JPanel();
 		DrawingArea drawingArea = new DrawingArea(rdCxt);
 		rdCxt.setDrawingArea(drawingArea);
@@ -129,14 +148,17 @@ public class AppFrame extends JFrame {
 		drawingPnl.setBorder(BorderFactory.createLoweredBevelBorder());
 		rdCxt.setBorder(new TitledBorder(new EmptyBorder(5, 5, 5, 5), "Road Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		getContentPane().add(drawingPnl, BorderLayout.CENTER);
-		getContentPane().add(rdCxt.getSp(), BorderLayout.EAST);
+		
+		toolbar=new ToolBar(drawingArea);
+		tabPane.addTab("Road properties", icon, rdCxt.getSp(), "Editing panel for currently selected road");
+		tabPane.addTab("Junctions Editor", icon2,jp.getSp() , "Editiong panel for junctions");
+		getContentPane().add(tabPane, BorderLayout.EAST);
 		statusPnl=new StatusPanel();
 		statusPnl.setStatus("Status");
 //		getContentPane().add(statusPnl, BorderLayout.SOUTH);
-		getContentPane().add(jp.getSp(), BorderLayout.SOUTH);
 		ms.setStatusPnl(statusPnl);
 		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
-		getContentPane().add(new ToolBar(drawingArea),BorderLayout.NORTH);
+		getContentPane().add(toolbar,BorderLayout.NORTH);
 		GraphicsHelper.finalizeFrame(this);
 	}
 	public StatusPanel getStatusPnl() {
@@ -147,5 +169,11 @@ public class AppFrame extends JFrame {
 	}
 	public JunctionsPanel getJp() {
 		return jp;
+	}
+	public ToolBar getToolbar() {
+		return toolbar;
+	}
+	public JunctionsListener getJl() {
+		return jl;
 	}
 }

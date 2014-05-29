@@ -2,20 +2,22 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
@@ -24,9 +26,12 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
-import org.movsim.simulator.roadnetwork.RoadNetwork;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Predecessor;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-import org.tde.tdescenariodeveloper.exception.NotFoundException;
+import org.tde.tdescenariodeveloper.eventhandling.ConnectionListener;
+import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
+import org.tde.tdescenariodeveloper.eventhandling.LaneLinkListener;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class JunctionsPanel extends JPanel {
@@ -39,27 +44,30 @@ public class JunctionsPanel extends JPanel {
 	GridBagConstraints c,gbc_lbl,gbc_tf;
 	JPanel linkInfoPnl;
 	RoadContext rdCxt;
-	public JunctionsPanel(RoadContext rpp) {
+	String selectedJn="";
+	JButton add,remove,addCn;
+	ImageIcon rem,addIcon;
+	public JunctionsPanel(RoadContext rpp, JunctionsListener jl) {
 		rdCxt=rpp;
+		rem=new ImageIcon(getClass().getClassLoader().getResource("del.png"));
+		rem.setImage(rem.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH));
+		addIcon=new ImageIcon(getClass().getClassLoader().getResource("add.png"));
+		addIcon.setImage(addIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH));
+		add=new JButton("New junction");
+		remove=new JButton("Remove");
+		addCn=new JButton("New connection");
+		add.addActionListener(jl);
+		remove.addActionListener(jl);
+		addCn.addActionListener(jl);
+		
 		sp=new JScrollPane();
-		sp.setPreferredSize(new Dimension(500,150));
+		sp.setPreferredSize(new Dimension(300,700));
 		sp.getViewport().add(this);
 		linkInfoPnl=new JPanel(new GridBagLayout());
 		setLayout(new GridBagLayout());
-		setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Lane link", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
-		
+		setBorder(new TitledBorder(new CompoundBorder(new LineBorder(Color.BLACK, 1, false), new EmptyBorder(10, 5, 10, 5)) , "Junctions", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
 		cbSelectJunc = new JComboBox<>();
-		cbSelectJunc.setMaximumRowCount(4);
-		cbSelectJunc.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String slct=(String)cbSelectJunc.getSelectedItem();
-				try {
-					setPanel(slct);
-				} catch (NotFoundException e) {
-					GraphicsHelper.showToast(e.toString(), 3000);
-				}
-			}
-		});
+		cbSelectJunc.addActionListener(jl);
 		
 		c=new GridBagConstraints();
 		c.gridwidth=GridBagConstraints.REMAINDER;
@@ -76,124 +84,244 @@ public class JunctionsPanel extends JPanel {
 		gbc_tf = new GridBagConstraints();
 		gbc_tf.insets = ins;
 		gbc_tf.fill = GridBagConstraints.BOTH;
+		gbc_tf.anchor=GridBagConstraints.NORTHWEST;
 		gbc_tf.weightx=3;
 		gbc_tf.gridwidth=GridBagConstraints.REMAINDER;
 		
 		
 		
-		JLabel lbl = new JLabel("Select junction (id)");
+		JLabel lbl = new JLabel("Select junction");
 		lbl.setLabelFor(cbSelectJunc);
 		add(lbl,gbc_lbl);
 		add(cbSelectJunc,gbc_tf);
+		add(add,gbc_lbl);
+		add(remove,gbc_tf);
 		add(linkInfoPnl,c);
+		add(addCn,c);
+		c.gridheight=GridBagConstraints.REMAINDER;
+		c.weighty=1;
+		add(new JLabel(),c);
+		c.gridheight=1;
+		c.weighty=0.0;
+		remove.setEnabled(false);
+		addCn.setEnabled(false);
 		sp.revalidate();
 	
 	}
-	private void setPanel(String slct) throws NotFoundException {
-		boolean found=false;
-		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
-			if(j.getId().equals(slct)){
-				found=true;
-				updateJunctionPanel(j);
-				break;
+	public ArrayList<RoadSegment> getJunctionRoadSegments(String key){
+		if(rdCxt.getRn().getOdrNetwork().getJunction()==null)return null;
+		ArrayList<RoadSegment>rs=new ArrayList<RoadSegment>();
+		Junction j=getJunction(selectedJn);
+		for(Connection cn:j.getConnection()){
+			RoadSegment r;
+			if(key.equals("all") || key.equals("connecting")){
+				r=rdCxt.getRn().findByUserId(cn.getConnectingRoad());
+				if(r!=null)LaneLinkPanel.putOrReject(rs, r);
+			}
+			if(key.equals("all") || key.equals("incoming")){
+				r=rdCxt.getRn().findByUserId(cn.getIncomingRoad());
+				if(r!=null)LaneLinkPanel.putOrReject(rs, r);
 			}
 		}
-		if(!found){
-			throw new NotFoundException("Junction not found");
+		return rs;
+	}
+	public Junction getJunction(String id){
+		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
+			if(id.equals(j.getId()))return j;
 		}
+		return null;
 	}
 	public void updateJunction(){
 		cbSelectJunc.removeAll();
 		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
 			cbSelectJunc.addItem(j.getId());
 		}
+		if(rdCxt.getRn().getOdrNetwork().getJunction().size()<1){
+			remove.setEnabled(false);
+			addCn.setEnabled(false);
+		}
+		else{
+			remove.setEnabled(true);
+			addCn.setEnabled(true);
+		}
+		selectedJn=(String)cbSelectJunc.getSelectedItem();
+		updateJunctionPanel(getJunction(selectedJn));
 	}
-	private void updateJunctionPanel(Junction jn) {
+	public void updateJunctionPanel(Junction jn) {
+		//set tool tips
+		remove.setToolTipText("Remove junction: "+selectedJn);
+		
+		
+		
 		linkInfoPnl.removeAll();
-		ArrayList<String>conn=new ArrayList<>();
-		ArrayList<String>incom=new ArrayList<>();
-		for(Connection cn:jn.getConnection()){
-			LaneLinkPanel.putOrReject(conn, cn.getConnectingRoad());
-			LaneLinkPanel.putOrReject(incom, cn.getIncomingRoad());
+		ArrayList<RoadSegment>all=getJunctionRoadSegments("all");
+		String[]allRd=new String[all.size()];
+		for(int i=0;i<allRd.length;i++){
+			allRd[i]=all.get(i).userId();
 		}
-		String[]connecting=new String[conn.size()];
-		String[]incoming=new String[incom.size()];
-		for(int i=0;i<conn.size();i++){
-			connecting[i]=conn.get(i);
-		}
-		for(int i=0;i<incom.size();i++){
-			incoming[i]=incom.get(i);
-		}
-		JPanel lables=new JPanel(new GridLayout(1,4,2,2));
-		lables.add(new JLabel(" Id"));
-		lables.add(new JLabel(" Connecting road"));
-		lables.add(new JLabel(" Incoming road"));
-		lables.add(new JLabel(" Contact point"));
-		c.insets=new Insets(3,3,3,3);
-		linkInfoPnl.add(new JLabel("Junction: "+jn.getId()),c);
-		linkInfoPnl.add(lables,c);
+		
+//		JPanel lables=new JPanel(new GridBagLayout());
+//		JLabel lbl=new JLabel(" id");
+//		lbl.setToolTipText("id of the junction");
+//		lables.add(lbl,gbc_lbl);
+//		
+//
+//		lbl=new JLabel(" In. Rd");
+//		lbl.setToolTipText("Id of incoming road (Predecessor of connecting road)");
+//		lables.add(lbl,gbc_lbl);
+//
+//		lbl=new JLabel(" con. Rd");
+//		lbl.setToolTipText("Id of connecting road (Successor of incoming road)");
+//		lables.add(lbl,gbc_lbl);
+//		
+//		lbl=new JLabel(" Contact point");
+//		lables.add(lbl,gbc_tf);
+//		
+//		
+//		c.insets=new Insets(3,3,3,3);
+//		linkInfoPnl.add(lables,c);
 		for(Connection cn:jn.getConnection())
-			linkInfoPnl.add(conToPnl(cn, connecting, incoming),c);
-		sp.revalidate();
+			linkInfoPnl.add(conToPnl(cn,allRd),c);
+		revalidate();
 	}
 	
-	private JPanel conToPnl(Connection cn,String[]conn,String[]incom){
+	private JPanel conToPnl(Connection cn,String[]allRd){
 		JPanel p=new JPanel(new GridBagLayout());
-		p.setBorder(BorderFactory.createLineBorder(new Color(150,150,150)));
-		JTextField id=new JTextField(5);
-		id.setText(cn.getId());
+		p.setBorder(new CompoundBorder(new LineBorder(Color.GRAY,1,true),new EmptyBorder(new Insets(10, 8, 10, 8))));
+		JLabel id=new JLabel("Connection id: "+cn.getId());
+		id.setFont(new Font("Serif",Font.BOLD,12));
+		id.setToolTipText("Id of the connection");
 		
-		JComboBox<String>connecting=new JComboBox<String>(conn);
-		JComboBox<String>incoming=new JComboBox<String>(incom);
+		JComboBox<String>connecting=new JComboBox<String>(allRd);
+		JComboBox<String>incoming=new JComboBox<String>(allRd);
 		JComboBox<String>contactPnt=new JComboBox<String>(new String[]{"start","end"});
-		
 		connecting.setSelectedItem(cn.getConnectingRoad());
 		incoming.setSelectedItem(cn.getIncomingRoad());
 		contactPnt.setSelectedItem(cn.getContactPoint());
+
+		JButton removeCn=new JButton("Remove connection");
+		removeCn.setToolTipText("Remove connection: "+cn.getId());
+		JButton addlnlnk=new JButton("New lane link",addIcon);
+		ConnectionListener cl=new ConnectionListener(rdCxt,connecting,incoming,contactPnt,cn,removeCn,addlnlnk);
+		removeCn.addActionListener(cl);
+		addlnlnk.addActionListener(cl);
+		connecting.addActionListener(cl);
+		incoming.addActionListener(cl);
+		contactPnt.addActionListener(cl);
+		cl.setBlocked(false);
+		
+		
 		GridBagConstraints gbc_lbl=new GridBagConstraints();
 		gbc_lbl.weightx=1;
 		gbc_lbl.fill=GridBagConstraints.BOTH;
 		gbc_lbl.insets=new Insets(2, 2, 2, 2);
 		gbc_lbl.anchor=GridBagConstraints.NORTHWEST;
-		p.add(id,gbc_lbl);
+		
+		
+		p.add(id,c);
+		p.add(removeCn,c);
+		
+		JLabel lb=new JLabel("Con. Rd");
+		lb.setToolTipText("Connecting road");
+		lb.setLabelFor(connecting);
+		p.add(lb,gbc_lbl);
+		gbc_lbl.gridwidth=GridBagConstraints.REMAINDER;
 		p.add(connecting,gbc_lbl);
+		gbc_lbl.gridwidth=1;
+		
+		lb=new JLabel("In. Rd");
+		lb.setToolTipText("Incoming road");
+		lb.setLabelFor(incoming);
+		p.add(lb,gbc_lbl);
+		gbc_lbl.gridwidth=GridBagConstraints.REMAINDER;
 		p.add(incoming,gbc_lbl);
+		gbc_lbl.gridwidth=1;
+		
+		lb=new JLabel("Cont. point");
+		lb.setToolTipText("Contact point");
+		lb.setLabelFor(contactPnt);
+		p.add(lb,gbc_lbl);
 		gbc_lbl.gridwidth=GridBagConstraints.REMAINDER;
 		p.add(contactPnt,gbc_lbl);
-		Road toRoad=getRoad(Integer.parseInt(cn.getConnectingRoad()));
-		Road fromRoad=getRoad(Integer.parseInt(cn.getIncomingRoad()));
+		gbc_lbl.gridwidth=1;
+		
+		Road toRoad=rdCxt.getRn().findByUserId(cn.getConnectingRoad()).getOdrRoad();
+		Road fromRoad=rdCxt.getRn().findByUserId(cn.getIncomingRoad()).getOdrRoad();
+		if(toRoad==null || fromRoad==null){
+			GraphicsHelper.showMessage("Referenced connecting road "+cn.getConnectingRoad()+" or incoming road "+cn.getIncomingRoad()+" in connection "+cn.getId()+" are not configured properly");
+		}
+		boolean toRdPredJunc=isPredecessorJunction(toRoad);
+		JPanel p2=new JPanel(new GridBagLayout());
+		p2.add(new JLabel("From"),gbc_lbl);
+		p2.add(new JLabel("To"),gbc_lbl);
+		gbc_lbl.gridwidth=GridBagConstraints.REMAINDER;
+		p2.add(new JLabel(),gbc_lbl);
 		for(LaneLink ll:cn.getLaneLink()){
 			JComboBox<String>from=new JComboBox<String>();
 			JComboBox<String>to=new JComboBox<String>();
 			for(Lane ln:toRoad.getLanes().getLaneSection().get(0).getRight().getLane()){
-				to.addItem(ln.getId()+"");
+				if(toRdPredJunc)to.addItem(ln.getId()+"");
+				else from.addItem(ln.getId()+"");
+			}
+			for(Lane ln:fromRoad.getLanes().getLaneSection().get(0).getRight().getLane()){
+				if(toRdPredJunc)from.addItem(ln.getId()+"");
+				else to.addItem(ln.getId()+"");
 			}
 			to.setSelectedItem(ll.getTo()+"");
-			for(Lane ln:fromRoad.getLanes().getLaneSection().get(0).getRight().getLane()){
-				from.addItem(ln.getId()+"");
-			}
 			from.setSelectedItem(ll.getFrom()+"");
-			
+			JButton rmLnLnk=new JButton(rem);
+			LaneLinkListener lnLinkLis=new LaneLinkListener(rdCxt, from, to, ll,rmLnLnk,cn);
+			rmLnLnk.addActionListener(lnLinkLis);
+			to.addActionListener(lnLinkLis);
+			from.addActionListener(lnLinkLis);
+			lnLinkLis.setBlocked(false);
 			gbc_lbl.gridwidth=1;
-			p.add(new JLabel("From"),gbc_lbl);
-
-			p.add(from,gbc_lbl);
-			p.add(new JLabel("To"),gbc_lbl);
-			
+			p2.add(from,gbc_lbl);
+			p2.add(to,gbc_lbl);
 			gbc_lbl.gridwidth=GridBagConstraints.REMAINDER;
-			p.add(to,gbc_lbl);
+			p2.add(rmLnLnk,gbc_lbl);
 		}
+		p2.setBorder(new CompoundBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY),new EmptyBorder(new Insets(10, 8, 10, 8))));
+		p2.add(addlnlnk,c);
+		p.add(p2,c);
 		return p;
 	}
-	private Road getRoad(int id){
-		for(RoadSegment rs:rdCxt.getRn()){
-			if(id==Integer.parseInt(rs.getOdrRoad().getId())){
-				return rs.getOdrRoad();
-			}
+	public static boolean isPredecessorJunction(Road toRoad) throws IllegalArgumentException{
+		boolean predJun=false;
+		boolean sucJun=false;
+		Predecessor pr=null;
+		Successor sr=null;
+		if(toRoad.getLink().getPredecessor()!=null){
+			pr=toRoad.getLink().getPredecessor();
+			predJun=pr.getElementType().equals("junction");
 		}
-		return null;
+		if(toRoad.getLink().getSuccessor()!=null){
+			sr=toRoad.getLink().getSuccessor();
+			sucJun=sr.getElementType().equals("junction");
+		}
+		if(predJun && sucJun)throw new IllegalArgumentException("connecting road can't have both predecessor and successor junctions");
+		if(!predJun && !sucJun)throw new IllegalArgumentException(toRoad.getId()+" connecting road is not connected to any junction");
+		return predJun;
 	}
 	public JScrollPane getSp() {
 		return sp;
+	}
+	public String getSelectedJn() {
+		return selectedJn;
+	}
+	public void setSelectedJn(String selectedJn) {
+		this.selectedJn = selectedJn;
+	}
+	public JComboBox<String> getCbSelectJunc() {
+		return cbSelectJunc;
+	}
+	public JButton getAdd() {
+		return add;
+	}
+	public JButton getRemove() {
+		return remove;
+	}
+	public JButton getAddCn() {
+		return addCn;
 	}
 }

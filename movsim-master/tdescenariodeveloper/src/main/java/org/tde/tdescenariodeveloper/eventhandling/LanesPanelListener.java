@@ -5,6 +5,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
@@ -12,9 +15,10 @@ import javax.swing.text.Document;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.LanesUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 import org.tde.tdescenariodeveloper.validation.LanesValidator;
 
-public class LanesPanelListener implements DocumentListener, ActionListener {
+public class LanesPanelListener implements DocumentListener, ActionListener,ChangeListener {
 	boolean locked=true;
 	RoadContext rdCxt;
 	LanesValidator validator;
@@ -38,6 +42,11 @@ public class LanesPanelListener implements DocumentListener, ActionListener {
 			if(rdCxt.getLanesPnl().getCbLanes().getSelectedItem()==null)return;
 			rdCxt.getLanesPnl().setSelectedLane(rdCxt.getLanesPnl().getCbLanes().getSelectedIndex(),false);
 			rdCxt.getLanesPnl().laneChanged();
+		}else if(srcCb==rdCxt.getLanesPnl().getCbtype()){
+			if(rdCxt.getLanesPnl().getCbtype().getSelectedItem()==null || rdCxt.getLanesPnl().getCbtype().getSelectedItem().equals(""))
+				return;
+			updater.updateLaneType();
+			rdCxt.updateGraphics();
 		}
 		else if(srcBtn==rdCxt.getLanesPnl().getAdd()){
 			updater.addnewLane();
@@ -85,9 +94,36 @@ public class LanesPanelListener implements DocumentListener, ActionListener {
 				GraphicsHelper.showToast("Lane width is not valid: (1 - 100)", rdCxt.getToastDurationMilis());
 			}
 		}
+		else if(doc==rdCxt.getLanesPnl().getMaxSpeed().getDocument()){
+			if(rdCxt.getLanesPnl().getMaxSpeed().getText().equals("")){
+				return;
+			}
+			try{
+				if(validator.isValidMaxSpeed()){
+					updater.updateMaxSpeed();
+					rdCxt.updateGraphics();
+				}
+			}catch(NumberFormatException e2){
+				GraphicsHelper.showToast("Max speed is not valid", rdCxt.getToastDurationMilis());
+			}
+		}
 	}
 
 	public void setLocked(boolean locked) {
 		this.locked = locked;
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if(locked)return;
+		JSlider src=null;
+		if(e.getSource() instanceof JSlider)src=(JSlider)e.getSource();
+		if(!src.getValueIsAdjusting()){
+			if(src==rdCxt.getLanesPnl().getPosition()){
+				rdCxt.getLanesPnl().getSelectedLane().getSpeed().get(0).setSOffset(src.getValue());
+				RoadNetworkUtils.refresh(rdCxt);
+				rdCxt.updateGraphics();
+			}
+		}
 	}
 }

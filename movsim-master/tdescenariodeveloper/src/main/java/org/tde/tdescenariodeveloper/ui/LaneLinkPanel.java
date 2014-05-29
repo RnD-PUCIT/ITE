@@ -1,12 +1,10 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -24,7 +22,6 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
-import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 
 public class LaneLinkPanel extends JPanel {
@@ -193,9 +190,9 @@ public class LaneLinkPanel extends JPanel {
 		}
 		
 	}
-	public static void putOrReject(ArrayList<String>al,String key){
+	public static <T> void putOrReject(ArrayList<T>al,T key){
 		boolean exists=false;
-		for(String s:al){
+		for(T s:al){
 			if(s.equals(key)){
 				exists=true;
 				break;

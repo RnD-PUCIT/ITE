@@ -6,10 +6,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 
+import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -82,6 +84,26 @@ public class GraphicsHelper {
 		for(JTextField t:tf){
 			t.setForeground(Color.RED);
 		}
+	}
+	public static String[] valuesFromUser(String title,String...msgs) {
+		JPanel p=new JPanel(new GridLayout(msgs.length,2,7,7));
+		JTextField[]flds=new JTextField[msgs.length];
+		
+		for(int i=0;i<flds.length;i++){
+			p.add(new JLabel(msgs[i]));
+			flds[i]=new JTextField();
+			p.add(flds[i]);
+		}
+		String []s=new String[flds.length];
+		for(int i=0;i<s.length;i++){
+			s[i]="";
+		}
+		if(JOptionPane.showConfirmDialog(null, p, title,JOptionPane.OK_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE)==JOptionPane.OK_OPTION){
+			for(int i=0;i<flds.length;i++){
+				s[i]=flds[i].getText();
+			}
+		}
+		return s;
 	}
 }
 class ToastMessage extends JDialog {

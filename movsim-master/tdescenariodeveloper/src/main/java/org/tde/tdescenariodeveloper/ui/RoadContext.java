@@ -25,7 +25,7 @@ public class RoadContext extends JPanel {
 	 */
 	private static final long serialVersionUID = 1683090113017092656L;
 	private RoadSegment selectedRoad;
-	private JToggleButton pin;
+	
 	private LinkPanel linkPanel;
 	private GeometryPanel gmPnl;
 	private RoadFieldsPanel rdFldPnl;
@@ -44,9 +44,9 @@ public class RoadContext extends JPanel {
 		this.rn=rn;
 		sp=new JScrollPane();
 		sp.getViewport().add(this);
-		sp.setPreferredSize(new Dimension(260,700));
+		sp.setPreferredSize(new Dimension(300,700));
 		setBorder(new EmptyBorder(5, 5, 5, 5));
-		pin=new JToggleButton("Auto hide");
+		
 		linkPanel=new LinkPanel(this);
 		
 		RoadFieldsPanelListener rfl=new RoadFieldsPanelListener(this);
@@ -65,9 +65,9 @@ public class RoadContext extends JPanel {
 		gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.anchor = GridBagConstraints.NORTHWEST;
-		add(pin,gbc);
+		
 		gbc.fill = GridBagConstraints.BOTH;
-		gbc.insets=new Insets(5, 5, 5, 5);
+		gbc.insets=new Insets(10, 2, 10, 2);
 		add(rdFldPnl,gbc);
 		if(selectedRoad!=null && selectedRoad.getOdrRoad().getLink()!=null)
 			add(linkPanel, gbc);
@@ -79,6 +79,8 @@ public class RoadContext extends JPanel {
 		rfpl.setBlocked(b);
 		lpl.setLocked(b);
 		drawingArea.getPopup().setBlockListener(b);
+		appFrame.getToolbar().setBlocked(b);
+		appFrame.getJl().setBlocked(b);
 	}
 	public void updateGraphics(){
 		drawingArea.revalidate();
@@ -155,13 +157,6 @@ public class RoadContext extends JPanel {
 	public void setDrawingArea(DrawingArea drawingArea) {
 		this.drawingArea = drawingArea;
 	}
-	@Override
-	public void setVisible(boolean b){
-		sp.setVisible(b || !pin.isSelected());
-		((JPanel)drawingArea.getParent()).revalidate();
-		//super.setVisible(b || pin.isSelected());
-	}
-
 	public JScrollPane getSp() {
 		return sp;
 	}
@@ -198,9 +193,6 @@ public class RoadContext extends JPanel {
 	}
 	public void setToastDurationMilis(int toastDurationMilis) {
 		this.toastDurationMilis = toastDurationMilis;
-	}
-	public JToggleButton getPin() {
-		return pin;
 	}
 	
 }

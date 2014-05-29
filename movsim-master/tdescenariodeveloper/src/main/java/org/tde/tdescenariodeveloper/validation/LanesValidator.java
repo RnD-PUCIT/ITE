@@ -18,4 +18,8 @@ public class LanesValidator {
 		}
 		else throw new InvalidInputException("Lane width should be within range of 1 to 100");
 	}
+	public boolean isValidMaxSpeed() {
+		Double.parseDouble(rdCxt.getLanesPnl().getMaxSpeed().getText());//only checks if it is valid to be parsed if not throws exception
+		return true;
+	}
 }

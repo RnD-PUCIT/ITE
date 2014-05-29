@@ -24,6 +24,7 @@ public class DrawingAreaPopupListener implements ActionListener, ChangeListener 
 	}
 	@Override
 	public void stateChanged(ChangeEvent e) {
+		if(blocked)return;
 		JSlider src=null;
 		if(e.getSource() instanceof JSlider)src=(JSlider)e.getSource();
 		if(!src.getValueIsAdjusting()){
@@ -41,6 +42,7 @@ public class DrawingAreaPopupListener implements ActionListener, ChangeListener 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if(blocked)return;
 		JMenuItem src=null;
 		if(e.getSource() instanceof JMenuItem)src=(JMenuItem)e.getSource();
 		if(src==rdCxt.getDrawingArea().getPopup().getNewgeo()){

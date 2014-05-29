@@ -88,11 +88,9 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     	}
         if(!selected){
         	trafficCanvas.getRoadPrPnl().setSelectedRoadNull();
-        	if(trafficCanvas.getRoadPrPnl().getPin().isSelected())trafficCanvas.getRoadPrPnl().setVisible(false);
         	trafficCanvas.getRoadPrPnl().updateGraphics();
         }
         else {
-        	trafficCanvas.getRoadPrPnl().setVisible(true);
         	trafficCanvas.getRoadPrPnl().updateGraphics();
         	if(e.getButton()==MouseEvent.BUTTON3){
         		trafficCanvas.getPopup().show(trafficCanvas, e.getX(), e.getY());

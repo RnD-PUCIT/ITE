@@ -52,6 +52,7 @@ public class GeometryPanelListener implements DocumentListener,ActionListener {
 		inDocUpdate=false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent evt) {
 		if(blocked)return;

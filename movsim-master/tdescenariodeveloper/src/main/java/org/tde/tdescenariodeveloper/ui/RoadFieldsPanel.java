@@ -1,5 +1,6 @@
 package org.tde.tdescenariodeveloper.ui;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -32,6 +33,7 @@ public class RoadFieldsPanel extends JPanel {
 	RoadContext rdCxt;
 	public RoadFieldsPanel(RoadContext rpp,RoadFieldsPanelListener rfl) {
 		rdCxt=rpp;
+		setPreferredSize(new Dimension(250,100));
 		setLayout(new GridBagLayout());
 		Insets ins=new Insets(5,5,5,5);
 		JLabel lblId = new JLabel("Id");

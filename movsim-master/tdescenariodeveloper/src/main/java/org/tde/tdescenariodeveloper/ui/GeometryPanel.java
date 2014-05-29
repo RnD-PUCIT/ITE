@@ -3,6 +3,8 @@ package org.tde.tdescenariodeveloper.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -127,10 +129,17 @@ public class GeometryPanel extends JPanel{
 		geometryChanged();
 		gpl.setDocListLocked(false);
 	}
+//	@Override
+//	public void paintComponent(Graphics g){
+//		super.paintComponent(g);
+//		Graphics2D g2=(Graphics2D)g;
+//		g2.setPaint(Color.CYAN);
+//		g2.fillRect(0, 0, getWidth(), getHeight());
+//	}
 	public void geometryChanged(){
 		cbGmType.removeAllItems();
-		cbGmType.addItem("Line");
-		cbGmType.addItem("Arc");
+		cbGmType.addItem("line");
+		cbGmType.addItem("arc");
 		gpl.setDocListLocked(true);
 		makeBlackFont();
 		DecimalFormat df=new DecimalFormat("##.####");
@@ -145,7 +154,9 @@ public class GeometryPanel extends JPanel{
 			tfx.setEditable(false);
 			tfy.setEditable(false);
 			hdg.setEditable(false);
+			s.setEditable(true);
 		}else{
+			s.setEditable(false);
 			tfx.setEditable(true);
 			tfy.setEditable(true);
 			hdg.setEditable(true);
