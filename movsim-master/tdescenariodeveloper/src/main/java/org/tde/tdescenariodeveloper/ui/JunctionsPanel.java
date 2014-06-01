@@ -132,6 +132,7 @@ public class JunctionsPanel extends JPanel {
 		return null;
 	}
 	public void updateJunction(){
+		if(selectedJn.equals(""))return;
 		cbSelectJunc.removeAll();
 		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
 			cbSelectJunc.addItem(j.getId());

@@ -4,6 +4,13 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.bind.JAXBException;
+
+import org.movsim.input.network.OpenDriveReader;
+import org.movsim.xml.MovsimInputLoader;
+import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
+import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.xml.sax.SAXException;
 
 public class FileUtils {
 	public static File chooseFile(final String type){
@@ -24,8 +31,9 @@ public class FileUtils {
 			return fc.getSelectedFile();
 		return null;
 	}
+	
 	public static File saveFile(final String type){
-		JFileChooser fc=new JFileChooser(".");
+		JFileChooser fc=new JFileChooser("..");
 		fc.setFileFilter(new FileFilter() {
 			@Override
 			public String getDescription() {
@@ -38,9 +46,9 @@ public class FileUtils {
 			}
 		});
 		if(fc.showSaveDialog(null)==JFileChooser.APPROVE_OPTION){
-			if(fc.getSelectedFile().getName().endsWith(".xodr"))
+			if(fc.getSelectedFile().getName().endsWith("."+type))
 				return fc.getSelectedFile();
-			else return new File(fc.getSelectedFile().getAbsolutePath()+".xodr");
+			else return new File(fc.getSelectedFile().getAbsolutePath()+"."+type);
 		}
 		return null;
 	}

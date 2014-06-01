@@ -16,6 +16,14 @@ public class LanesUpdater {
 		ln.setId(-1*rdCxt.getSelectedRoad().getLaneSegments().length-1);
 		ln.setLevel("false");
 		ln.setType("driving");
+		double d=rdCxt.getLanesPnl().getOdrLanes().get(0).getWidth().get(0).getA();
+		Width w=new Width();
+		w.setA(d);
+		w.setB(0);
+		w.setC(0);
+		w.setD(0);
+		w.setSOffset(0);
+		ln.getWidth().add(w);
 		rdCxt.getLanesPnl().getOdrLanes().add(ln);
 		RoadNetworkUtils.updateLaneIds(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
@@ -41,10 +49,13 @@ public class LanesUpdater {
 	}
 	public void updateMaxSpeed(){
 		double d=Double.parseDouble(rdCxt.getLanesPnl().getMaxSpeed().getText());
+		double pos=0;
+		if(rdCxt.getLanesPnl().getSelectedLane().getSpeed().size()>0 && rdCxt.getLanesPnl().getSelectedLane().getSpeed().get(0).isSetSOffset())
+			pos=rdCxt.getLanesPnl().getSelectedLane().getSpeed().get(0).getSOffset();
 		rdCxt.getLanesPnl().getSelectedLane().getSpeed().clear();
 		Speed s=new Speed();
 		s.setMax(d);
-		s.setSOffset(0);
+		s.setSOffset(pos);
 		rdCxt.getLanesPnl().getSelectedLane().getSpeed().add(s);
 		RoadNetworkUtils.refresh(rdCxt);
 	}

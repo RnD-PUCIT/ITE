@@ -11,7 +11,6 @@ import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 
-import javax.swing.Box;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -20,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
 public class GraphicsHelper {

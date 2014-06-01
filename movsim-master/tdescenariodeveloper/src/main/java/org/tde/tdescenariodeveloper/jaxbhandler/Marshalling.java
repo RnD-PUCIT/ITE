@@ -5,9 +5,10 @@ import java.io.File;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 
+import org.movsim.autogen.Movsim;
 import org.movsim.network.autogen.opendrive.OpenDRIVE;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 
 public class Marshalling {
@@ -18,16 +19,18 @@ public class Marshalling {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.marshal(od, f);
 		} catch (JAXBException e) {
+			GraphicsHelper.showMessage("Error saving file: "+e.getMessage());
 		}
 	}
-	public static OpenDRIVE readFromXml(File f){
-		OpenDRIVE od=null;
+	public static void writeToXml(Movsim od,File f){
 		try {
-			JAXBContext cxt=JAXBContext.newInstance(OpenDRIVE.class);
-			Unmarshaller unmarshaller=cxt.createUnmarshaller();
-			od=(OpenDRIVE) unmarshaller.unmarshal(f);
+			JAXBContext cxt=JAXBContext.newInstance(Movsim.class);
+			Marshaller marshaller=cxt.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			od.getScenario().setNetworkFilename(f.getName().replace("xprj", "xodr"));
+			marshaller.marshal(od, f);
 		} catch (JAXBException e) {
+			GraphicsHelper.showMessage("Error saving file: "+e.getMessage());
 		}
-		return od;
 	}
 }

@@ -2,6 +2,7 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +17,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -26,11 +26,15 @@ import org.movsim.input.network.OpenDriveHandlerJaxb;
 import org.movsim.input.network.OpenDriveReader;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.viewer.App;
+import org.movsim.xml.MovsimInputLoader;
+import org.tde.tdescenariodeveloper.eventhandling.AppFrameListener;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
 import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
+import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 import org.xml.sax.SAXException;
 
@@ -39,10 +43,10 @@ public class AppFrame extends JFrame {
 	private RoadContext rdCxt;
 	private StatusPanel statusPnl;
 	private JunctionsPanel jp;
-	private String prjName="cleaf";
 	private RoadNetwork rn;
 	private ToolBar toolbar;
 	private JunctionsListener jl;
+	private MovsimConfigContext mvCxt;
 	public RoadContext getrdCxt(){
 		return rdCxt;
 	}
@@ -51,71 +55,22 @@ public class AppFrame extends JFrame {
 		setMinimumSize(new Dimension(700, 500));
 		setTitle("Vehicular Traffic  Flow Scenario Development Environment");
 		
+		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 		
-		JMenuItem mntmOpen = new JMenuItem("Open");
-		mntmOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					File f=FileUtils.chooseFile("xodr");
-					rn.reset();
-					OpenDriveReader.loadRoadNetwork(rn,f.getAbsolutePath());
-					jl.setBlocked(true);
-					jp.updateJunction();
-					jl.setBlocked(false);
-					prjName=f.getName().substring(0,f.getName().lastIndexOf("."));
-					rdCxt.updateGraphics();
-					revalidate();
-					repaint();
-				} catch (JAXBException e) {
-					e.printStackTrace();
-				} catch (SAXException e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		JMenuItem mntmOpen = new JMenuItem("Open",TDEResources.getResources().getOpen());
 		mnFile.add(mntmOpen);
 		
-		JMenuItem mntmRun = new JMenuItem("Run");
-		mntmRun.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new Thread(new Runnable() {
-					
-					@Override
-					public void run() {
-						Marshalling.writeToXml(rdCxt.getRn().getOdrNetwork(),new File("G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\"+prjName+".xodr"));
-						String[]s={"-f","G:\\Studies\\Eclipse\\movsim-master\\sim\\buildingBlocks\\"+prjName};
-						try {
-							App.main(s);
-						} catch (URISyntaxException | IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
-			}
-		});
+		JMenuItem mntmRun = new JMenuItem("Run",TDEResources.getResources().getRun());
 		mnFile.add(mntmRun);
 		
-		JMenuItem mntmSave = new JMenuItem("save");
-		mntmSave.setActionCommand("Save");
+		JMenuItem mntmSave = new JMenuItem("save",TDEResources.getResources().getSave());
 		mnFile.add(mntmSave);
-		mntmSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-					new Thread(new Runnable() {
-						
-						@Override
-						public void run() {
-							File f=null;
-							f=FileUtils.saveFile("xodr");
-							if(f!=null)Marshalling.writeToXml(rdCxt.getRn().getOdrNetwork(),f);
-						}
-					}).start();
-			}
-		});
+
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		
@@ -150,6 +105,7 @@ public class AppFrame extends JFrame {
 		getContentPane().add(drawingPnl, BorderLayout.CENTER);
 		
 		toolbar=new ToolBar(drawingArea);
+		toolbar.setBlocked(false);
 		tabPane.addTab("Road properties", icon, rdCxt.getSp(), "Editing panel for currently selected road");
 		tabPane.addTab("Junctions Editor", icon2,jp.getSp() , "Editiong panel for junctions");
 		getContentPane().add(tabPane, BorderLayout.EAST);
@@ -159,6 +115,22 @@ public class AppFrame extends JFrame {
 		ms.setStatusPnl(statusPnl);
 		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
 		getContentPane().add(toolbar,BorderLayout.NORTH);
+		
+		mvCxt=new MovsimConfigContext(MovsimScenario.getMovsim(),rdCxt);
+		rdCxt.setMvCxt(mvCxt);
+		
+		AppFrameListener appListener=new  AppFrameListener(mvCxt);
+		appListener.setOpen(mntmOpen);
+		appListener.setSave(mntmSave);
+		appListener.setRun(mntmRun);
+		mntmOpen.addActionListener(appListener);
+		mntmRun.addActionListener(appListener);
+		mntmSave.addActionListener(appListener);
+		
+		JPanel southPanel=new JPanel(new BorderLayout());
+		southPanel.add(mvCxt,BorderLayout.CENTER);
+		southPanel.add(statusPnl,BorderLayout.SOUTH);
+		getContentPane().add(southPanel,BorderLayout.SOUTH);
 		GraphicsHelper.finalizeFrame(this);
 	}
 	public StatusPanel getStatusPnl() {

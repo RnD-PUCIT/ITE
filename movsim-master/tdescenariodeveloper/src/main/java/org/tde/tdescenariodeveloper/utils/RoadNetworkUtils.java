@@ -40,7 +40,7 @@ public class RoadNetworkUtils {
 			r.setId(1+"");
 			r.setName("R1");
 		}
-		r.setLength(100);
+		r.setLength(700);
 		r.setJunction("-1");
 		r.setPlanView(getPlainView());
 		r.setLanes(getLanes());
@@ -86,11 +86,11 @@ public class RoadNetworkUtils {
 	}
 	private static Geometry getGeometry() {
 		Geometry g=new Geometry();
-		g.setLength(100);
+		g.setLength(700);
 		g.setLine(new Line());
 		g.setHdg(0.0);
 		g.setS(0.0);
-		g.setX(500);
+		g.setX(200);
 		g.setY(100);
 		return g;
 	}

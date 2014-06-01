@@ -60,7 +60,7 @@ public final class MovsimInputLoader {
         // testwise jaxb unmarshalling
         Movsim inputData = null;
         try {
-            System.out.println("try to open file = " + xmlFile.getName());
+//            System.out.println("try to open file = " + xmlFile.getName());
             inputData = MovsimInputLoader.validateAndLoadScenarioInput(xmlFile);
         } catch (JAXBException  | SAXException e){
             throw new IllegalArgumentException(e.toString());

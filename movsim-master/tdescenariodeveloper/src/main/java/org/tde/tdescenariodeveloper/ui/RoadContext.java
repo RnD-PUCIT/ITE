@@ -39,6 +39,7 @@ public class RoadContext extends JPanel {
 	private GeometryPanelListener gpl;
 	private LanesPanelListener lpl;
 	private int toastDurationMilis=4000;
+	private MovsimConfigContext mvCxt;
 	public RoadContext(RoadNetwork rn,AppFrame appfr) {
 		appFrame=appfr;
 		this.rn=rn;
@@ -193,6 +194,12 @@ public class RoadContext extends JPanel {
 	}
 	public void setToastDurationMilis(int toastDurationMilis) {
 		this.toastDurationMilis = toastDurationMilis;
+	}
+	public MovsimConfigContext getMvCxt() {
+		return mvCxt;
+	}
+	public void setMvCxt(MovsimConfigContext mvCxt) {
+		this.mvCxt = mvCxt;
 	}
 	
 }
