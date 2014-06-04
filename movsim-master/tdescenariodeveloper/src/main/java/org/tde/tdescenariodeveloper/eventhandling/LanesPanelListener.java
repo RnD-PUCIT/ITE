@@ -18,7 +18,7 @@ import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 import org.tde.tdescenariodeveloper.validation.LanesValidator;
 
-public class LanesPanelListener implements DocumentListener, ActionListener,ChangeListener {
+public class LanesPanelListener implements DocumentListener, ActionListener,ChangeListener,Blockable {
 	boolean locked=true;
 	RoadContext rdCxt;
 	LanesValidator validator;
@@ -109,7 +109,7 @@ public class LanesPanelListener implements DocumentListener, ActionListener,Chan
 		}
 	}
 
-	public void setLocked(boolean locked) {
+	public void setBlocked(boolean locked) {
 		this.locked = locked;
 	}
 
@@ -126,4 +126,5 @@ public class LanesPanelListener implements DocumentListener, ActionListener,Chan
 			}
 		}
 	}
+
 }

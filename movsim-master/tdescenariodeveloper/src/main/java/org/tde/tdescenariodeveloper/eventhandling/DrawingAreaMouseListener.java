@@ -354,4 +354,9 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 	public void setStatusPnl(StatusPanel statusPnl) {
 		this.statusPnl = statusPnl;
 	}
+
+
+	public void setSelected(boolean selected) {
+		this.selected = selected;
+	}
 }

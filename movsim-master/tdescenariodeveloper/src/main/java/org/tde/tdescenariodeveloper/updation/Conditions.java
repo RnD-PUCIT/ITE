@@ -21,4 +21,9 @@ public class Conditions {
 			if(r.getId().equals(id))return true;
 		return false;
 	}
+	public static boolean existsIdInRoadsCustomizations(String id,MovsimConfigContext mvCxt) {
+		for(org.movsim.autogen.Road r:mvCxt.getMovsim().getScenario().getSimulation().getRoad())
+			if(r.getId().equals(id))return true;
+		return false;
+	}
 }

@@ -15,7 +15,7 @@ import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
-public class PrototypesListener implements ActionListener, DocumentListener {
+public class PrototypesListener implements ActionListener, DocumentListener ,Blockable{
 	private boolean blocked=true;
 	private MovsimConfigContext mvCxt;
 	private JButton removePrototype=null;

@@ -21,7 +21,7 @@ import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 
-public class SimulationListener implements ItemListener, DocumentListener,ActionListener {
+public class SimulationListener implements ItemListener, DocumentListener,ActionListener,Blockable {
 	JTextField tmSt,dur,seed;
 	JCheckBox crEx,withSeed;
 	MovsimConfigContext mvCxt;

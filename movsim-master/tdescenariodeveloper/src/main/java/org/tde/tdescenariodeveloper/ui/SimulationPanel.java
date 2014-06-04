@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.movsim.autogen.Road;
 import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.eventhandling.SimulationListener;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
@@ -144,6 +145,23 @@ public class SimulationPanel extends JPanel {
 	public void updateTrafficCompostionLabel(String oldlbl, String newlbl) {
 		for(VehicleType vt:mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType())
 			if(vt.getLabel().equals(oldlbl))vt.setLabel(newlbl);
+		for(Road r:mvCxt.getMovsim().getScenario().getSimulation().getRoad()){
+			if(r.isSetTrafficComposition()){
+				for(VehicleType vt:r.getTrafficComposition().getVehicleType())
+					if(vt.getLabel().equals(oldlbl))vt.setLabel(newlbl);
+			}
+		}
+		updateSimPanel();
+	}
+	public void updateRoutesLabel(String oldlbl, String newlbl) {
+		for(VehicleType vt:mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType())
+			if(vt.getRouteLabel().equals(oldlbl))vt.setRouteLabel(newlbl);
+		for(Road r:mvCxt.getMovsim().getScenario().getSimulation().getRoad()){
+			if(r.isSetTrafficComposition()){
+				for(VehicleType vt:r.getTrafficComposition().getVehicleType())
+					if(vt.getRouteLabel().equals(oldlbl))vt.setRouteLabel(newlbl);
+			}
+		}
 		updateSimPanel();
 	}
 }

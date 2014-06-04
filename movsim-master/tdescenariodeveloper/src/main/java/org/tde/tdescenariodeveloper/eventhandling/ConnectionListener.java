@@ -12,7 +12,7 @@ import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
-public class ConnectionListener implements ActionListener {
+public class ConnectionListener implements ActionListener,Blockable {
 	RoadContext rdCxt;
 	JComboBox<String>connecting;
 	JComboBox<String>incoming;

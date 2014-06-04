@@ -13,7 +13,7 @@ import org.tde.tdescenariodeveloper.updation.RoadFieldsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.RoadFieldsValidator;
 
-public class RoadFieldsPanelListener implements DocumentListener,ActionListener {
+public class RoadFieldsPanelListener implements DocumentListener,ActionListener,Blockable {
 	RoadContext rdCxt;
 	RoadFieldsUpdater roadFieldsUpdater;
 	RoadFieldsValidator validator;
@@ -49,22 +49,20 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener 
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
-		if(blocked)return;
 		textChanged(e);
 	}
 
 	@Override
 	public void insertUpdate(DocumentEvent e) {
-		if(blocked)return;
 		textChanged(e);
 	}
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
-		if(blocked)return;
 		textChanged(e);
 	}
 	public void textChanged(DocumentEvent e){
+		if(blocked)return;
 		Document doc=e.getDocument();
 		if(rdCxt.getRdFldPnl().getTfName().getDocument()==doc){
 			if(rdCxt.getRdFldPnl().getTfName().getText().equals("")){
@@ -73,9 +71,6 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener 
 			roadFieldsUpdater.updateRoadName();
 			rdCxt.updateGraphics();
 		}
-	}
-	public boolean isBlocked() {
-		return blocked;
 	}
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;

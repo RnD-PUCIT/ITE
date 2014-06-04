@@ -11,7 +11,7 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLi
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
-public class LaneLinkListener implements ActionListener {
+public class LaneLinkListener implements ActionListener,Blockable {
 	boolean blocked=true;
 	RoadContext rdCxt;
 	JComboBox<String>from;

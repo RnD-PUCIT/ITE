@@ -8,10 +8,11 @@ import org.movsim.autogen.AccelerationModelType;
 import org.movsim.autogen.ModelParameterACC;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
-public class ModelParamTextFieldListener implements DocumentListener {
+public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 	JTextField tf;
 	AccelerationModelType accT;
 	int time;
+	boolean blocked=false;
 	public ModelParamTextFieldListener(JTextField tf,AccelerationModelType at) {
 		this.tf=tf;
 		accT=at;
@@ -32,6 +33,7 @@ public class ModelParamTextFieldListener implements DocumentListener {
 	}
 
 	private void textChanged(DocumentEvent e) {
+		if(blocked)return;
 		if(accT.isSetModelParameterACC()){
 			changeACC();
 		}
@@ -200,5 +202,9 @@ public class ModelParamTextFieldListener implements DocumentListener {
 		}catch(NumberFormatException e2){
 			GraphicsHelper.makeRed(tf);
 		}
+	}
+	@Override
+	public void setBlocked(boolean b) {
+		blocked=b;
 	}
 }

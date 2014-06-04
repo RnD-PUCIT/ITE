@@ -7,12 +7,23 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+
+import org.movsim.viewer.App;
+import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
+import org.tde.tdescenariodeveloper.utils.FileUtils;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 
 public class ToolBar extends JToolBar implements ItemListener,ActionListener{
 	/**
@@ -23,6 +34,7 @@ public class ToolBar extends JToolBar implements ItemListener,ActionListener{
 JCheckBox name,id,axis;
 JButton open,run,save;
 private boolean blocked=true;
+private MovsimConfigContext mvCxt;
 
 DrawingArea drawingArea;
 	public ToolBar(DrawingArea drawingArea) {
@@ -49,6 +61,10 @@ DrawingArea drawingArea;
 		open.setFocusable(false);
 		run.setFocusable(false);
 		save.setFocusable(false);
+		
+		open.addActionListener(this);
+		run.addActionListener(this);
+		save.addActionListener(this);
 		
 		add(open,gbc);
 		add(save,gbc);
@@ -90,8 +106,51 @@ DrawingArea drawingArea;
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
 	}
-	@Override
 	public void actionPerformed(ActionEvent e) {
-		
+		if(blocked)return;
+		JButton srcBtn=null;
+		if(e.getSource() instanceof JButton)srcBtn=(JButton)e.getSource();
+		if(srcBtn==open){
+			final File f=FileUtils.chooseFile("xprj");
+			if(f==null)return;
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					MovsimScenario.setScenario(f, mvCxt);
+				}
+			});
+		}
+		else if(srcBtn==save){
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					File f=null;
+					f=FileUtils.saveFile("xprj");
+					if(f!=null){
+						DataToViewerConverter.updateFractions(mvCxt);
+						MovsimScenario.saveScenario(f,mvCxt);
+					}
+				}
+			});
+		}
+		else if(srcBtn==run){
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					File f=new File(new File("").getAbsoluteFile()+"\\tmp.xprj");
+					DataToViewerConverter.updateFractions(mvCxt);
+					MovsimScenario.saveScenario(f, mvCxt);
+					String[]s={"-f",f.getAbsolutePath()};
+					try {
+						App.main(s);
+					} catch (URISyntaxException | IOException e) {
+						GraphicsHelper.showToast(e.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
+					}
+				}
+			}).start();
+		}
+	}
+	public void setMvCxt(MovsimConfigContext mvCxt) {
+		this.mvCxt = mvCxt;
 	}
 }

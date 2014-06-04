@@ -10,7 +10,7 @@ import org.movsim.autogen.LaneChangeModelType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
-public class LaneChangeModelListener implements DocumentListener {
+public class LaneChangeModelListener implements DocumentListener,Blockable {
 	private boolean blocked=true;
 	MovsimConfigContext mvCxt;
 	JTextField safeDec,minGap,thAc,rba,plt;

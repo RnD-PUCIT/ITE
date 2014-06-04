@@ -14,7 +14,7 @@ import org.tde.tdescenariodeveloper.updation.GeometryUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.GeometryValidator;
 
-public class GeometryPanelListener implements DocumentListener,ActionListener {
+public class GeometryPanelListener implements DocumentListener,ActionListener,Blockable {
 	RoadContext rdCxt;
 	GeometryValidator validator;
 	GeometryUpdater updater;

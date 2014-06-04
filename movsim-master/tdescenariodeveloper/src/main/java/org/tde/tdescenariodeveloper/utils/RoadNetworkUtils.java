@@ -1,5 +1,7 @@
 package org.tde.tdescenariodeveloper.utils;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.Date;
 
 import javax.swing.SwingUtilities;
@@ -21,6 +23,7 @@ import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 
 public class RoadNetworkUtils {
@@ -30,11 +33,12 @@ public class RoadNetworkUtils {
 		odr.getRoad().add(getRoad(odr));
 		return odr;
 	}
-	private static Road getRoad(OpenDRIVE odr) {
+	public static Road getRoad(OpenDRIVE odr) {
 		Road r=new Road();
-		if(odr.getRoad()!=null){
+		if(odr.getRoad().size()>0){
+			//TODO adjust ids
 			r.setId((odr.getRoad().size()+1)+"");
-			r.setName("R"+odr.getRoad().size()+1);
+			r.setName("R"+(odr.getRoad().size()+1));
 		}
 		else{
 			r.setId(1+"");
@@ -42,49 +46,49 @@ public class RoadNetworkUtils {
 		}
 		r.setLength(700);
 		r.setJunction("-1");
-		r.setPlanView(getPlainView());
-		r.setLanes(getLanes());
+		r.setPlanView(getPlainView(odr));
+		r.setLanes(getLanes(odr));
 		return r;
 	}
-	private static Lanes getLanes() {
+	public static Lanes getLanes(OpenDRIVE odr) {
 		Lanes l=new Lanes();
-		l.getLaneSection().add(getLaneSection());
+		l.getLaneSection().add(getLaneSection(odr));
 		return l;
 	}
-	private static LaneSection getLaneSection() {
+	public static LaneSection getLaneSection(OpenDRIVE odr) {
 		LaneSection s=new LaneSection();
-		s.setRight(getRight());
+		s.setRight(getRight(odr));
 		s.setS(0.0);
 		return s;
 	}
-	private static Right getRight() {
+	public static Right getRight(OpenDRIVE odr) {
 		Right r=new Right();
-		r.getLane().add(getLane());
+		r.getLane().add(getLane(odr));
 		return r;
 	}
-	private static Lane getLane() {
+	public static Lane getLane(OpenDRIVE odr) {
 		Lane ln=new Lane();
 		ln.setId(-1);
 		ln.setLevel("false");
 		ln.setType("driving");
-		ln.getWidth().add(getLaneWidth());
+		ln.getWidth().add(getLaneWidth(odr));
 		return ln;
 	}
-	private static Width getLaneWidth() {
+	public static Width getLaneWidth(OpenDRIVE odr) {
 		Width w=new Width();
-		w.setA(10.0);
+		w.setA(10);
 		w.setB(0.0);
 		w.setC(0.0);
 		w.setD(0.0);
 		w.setSOffset(0.0);
 		return w;
 	}
-	private static PlanView getPlainView() {
+	public static PlanView getPlainView(OpenDRIVE odr) {
 		PlanView pv=new PlanView();
 		pv.getGeometry().add(getGeometry());
 		return pv;
 	}
-	private static Geometry getGeometry() {
+	public static Geometry getGeometry() {
 		Geometry g=new Geometry();
 		g.setLength(700);
 		g.setLine(new Line());
@@ -94,7 +98,7 @@ public class RoadNetworkUtils {
 		g.setY(100);
 		return g;
 	}
-	private static Header getHeader() {
+	public static Header getHeader() {
 		Header h=new Header();
 		h.setDate(new Date().toString());
 		h.setRevMajor(1);
@@ -119,6 +123,26 @@ public class RoadNetworkUtils {
 		}
 		return true;
 	}
+	public static Road getUnderLyingRoad(Point p,MovsimConfigContext mvCxt){
+		Road r=null;
+		for(int i=mvCxt.getRdCxt().getRn().getRoadSegments().size()-1;i>=0;i++){
+			RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(i).roadMapping();
+			if(rm instanceof RoadMappingPoly){
+				RoadMappingPoly rmp=(RoadMappingPoly)rm;
+				if(rmp.getBounds().contains(p.getX(),p.getY())){
+					r=mvCxt.getRdCxt().getRn().getRoadSegments().get(i).getOdrRoad();
+					return r; 
+				}
+			}
+			else{
+				if(rm.getBounds().contains(p.getX(),p.getY())){
+					r=mvCxt.getRdCxt().getRn().getRoadSegments().get(i).getOdrRoad();
+					return r;
+				}
+			}
+		}
+		return r;
+	}
 	public static void updateLaneIds(RoadContext rdCxt){
 		if(!areValidLaneIds(rdCxt)){
 			for(int i=0;i<rdCxt.getLanesPnl().getOdrLanes().size();i++){
@@ -141,6 +165,27 @@ public class RoadNetworkUtils {
 			}
 		}
 	}
+	public static RoadSegment getUnderLyingRoadSegment(Point2D p,
+			MovsimConfigContext mvCxt) {
+		RoadSegment r=null;
+		for(int i=mvCxt.getRdCxt().getRn().getRoadSegments().size()-1;i>=0;i--){
+			RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(i).roadMapping();
+			if(rm instanceof RoadMappingPoly){
+				RoadMappingPoly rmp=(RoadMappingPoly)rm;
+				if(rmp.getBounds().contains(p)){
+					r=mvCxt.getRdCxt().getRn().getRoadSegments().get(i);
+					return r; 
+				}
+			}
+			else{
+				if(rm.getBounds().contains(p)){
+					r=mvCxt.getRdCxt().getRn().getRoadSegments().get(i);
+					return r;
+				}
+			}
+		}
+		return r;
+	}
 }
 class Refresher extends SwingWorker<Object, String>{
 	RoadContext rdCxt;
@@ -150,21 +195,31 @@ class Refresher extends SwingWorker<Object, String>{
 
 	@Override
 	protected Object doInBackground() throws Exception {
-		int gmInd=rdCxt.getGmPnl().getSelectedIndex();
-		int lnInd=rdCxt.getLanesPnl().getSelectedIndex();
-		int ind=rdCxt.getRn().getOdrNetwork().getRoad().indexOf(rdCxt.getSelectedRoad().getOdrRoad());
-		if(ind<0)ind=0;
-		if(gmInd<0)gmInd=0;
-		if(lnInd<0)lnInd=0;
-		rdCxt.getRn().reset();
-		new OpenDriveHandlerJaxb().create("", rdCxt.getRn().getOdrNetwork(), rdCxt.getRn());
-		if(rdCxt.getRn().getRoadSegments().size()-1<ind)ind=rdCxt.getRn().getRoadSegments().size()-1;
-		RoadSegment rs=rdCxt.getRn().getRoadSegments().get(ind);
-		if(rs.getOdrRoad().getPlanView().getGeometry().size()-1<gmInd)gmInd=rs.getOdrRoad().getPlanView().getGeometry().size()-1;
-		if(rs.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()-1<lnInd)lnInd=rs.getOdrRoad().getPlanView().getGeometry().size()-1;
-		rdCxt.getGmPnl().setSelectedGeometry(gmInd,false);
-		rdCxt.getLanesPnl().setSelectedLane(lnInd, false);
-		rdCxt.setSelectedRoad(rs);
+		boolean selected=rdCxt.getSelectedRoad()!=null;
+		boolean roadExists=rdCxt.getRn().getRoadSegments().size()>0;
+		if(selected && roadExists){
+			int gmInd=rdCxt.getGmPnl().getSelectedIndex();
+			int lnInd=rdCxt.getLanesPnl().getSelectedIndex();
+			int ind=rdCxt.getRn().getOdrNetwork().getRoad().indexOf(rdCxt.getSelectedRoad().getOdrRoad());
+			if(ind<0)ind=0;
+			if(gmInd<0)gmInd=0;
+			if(lnInd<0)lnInd=0;
+			rdCxt.setSelectedRoadNull();
+			rdCxt.getRn().reset();
+			new OpenDriveHandlerJaxb().create("", rdCxt.getRn().getOdrNetwork(), rdCxt.getRn());
+			if(rdCxt.getRn().getRoadSegments().size()-1<ind)ind=rdCxt.getRn().getRoadSegments().size()-1;
+			RoadSegment rs=rdCxt.getRn().getRoadSegments().get(ind);
+			if(rs.getOdrRoad().getPlanView().getGeometry().size()-1<gmInd)gmInd=rs.getOdrRoad().getPlanView().getGeometry().size()-1;
+			if(rs.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()-1<lnInd)lnInd=rs.getOdrRoad().getPlanView().getGeometry().size()-1;
+			rdCxt.getGmPnl().setSelectedGeometry(gmInd,false);
+			rdCxt.getLanesPnl().setSelectedLane(lnInd, false);
+			rdCxt.setSelectedRoad(rs);
+		}else{
+			rdCxt.setSelectedRoadNull();
+			rdCxt.getRn().reset();
+			new OpenDriveHandlerJaxb().create("", rdCxt.getRn().getOdrNetwork(), rdCxt.getRn());
+		}
+		rdCxt.getDrawingArea().paint(rdCxt.getDrawingArea().getGraphics());
 		return null;
 	}
 	

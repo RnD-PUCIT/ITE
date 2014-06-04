@@ -2,13 +2,7 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -20,23 +14,15 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.xml.bind.JAXBException;
 
 import org.movsim.input.network.OpenDriveHandlerJaxb;
-import org.movsim.input.network.OpenDriveReader;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
-import org.movsim.viewer.App;
-import org.movsim.xml.MovsimInputLoader;
 import org.tde.tdescenariodeveloper.eventhandling.AppFrameListener;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
-import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
-import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
-import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-import org.xml.sax.SAXException;
 
 public class AppFrame extends JFrame {
 	private static final long serialVersionUID = 14320973455L;
@@ -47,6 +33,7 @@ public class AppFrame extends JFrame {
 	private ToolBar toolbar;
 	private JunctionsListener jl;
 	private MovsimConfigContext mvCxt;
+	JMenuBar menuBar;
 	public RoadContext getrdCxt(){
 		return rdCxt;
 	}
@@ -56,7 +43,7 @@ public class AppFrame extends JFrame {
 		setTitle("Vehicular Traffic  Flow Scenario Development Environment");
 		
 		
-		JMenuBar menuBar = new JMenuBar();
+		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
 		JMenu mnFile = new JMenu("File");
@@ -70,6 +57,9 @@ public class AppFrame extends JFrame {
 		
 		JMenuItem mntmSave = new JMenuItem("save",TDEResources.getResources().getSave());
 		mnFile.add(mntmSave);
+		
+		JMenuItem mntmReset = new JMenuItem("Reset",TDEResources.getResources().getReset());
+		mnFile.add(mntmReset);
 
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
@@ -95,14 +85,11 @@ public class AppFrame extends JFrame {
 		jp=new JunctionsPanel(rdCxt,jl);
 		if(rdCxt!=null && rdCxt.getRn().getOdrNetwork()!=null && rdCxt.getRn().getOdrNetwork().getJunction()!=null && rdCxt.getRn().getOdrNetwork().getJunction().size()>0)jp.updateJunction();
 		jl.setBlocked(false);
-		JPanel drawingPnl=new JPanel();
 		DrawingArea drawingArea = new DrawingArea(rdCxt);
 		rdCxt.setDrawingArea(drawingArea);
 		DrawingAreaMouseListener ms=(DrawingAreaMouseListener)drawingArea.getMouseMotionListeners()[0];
-		drawingPnl.add(drawingArea);
-		drawingPnl.setBorder(BorderFactory.createLoweredBevelBorder());
 		rdCxt.setBorder(new TitledBorder(new EmptyBorder(5, 5, 5, 5), "Road Properties", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		getContentPane().add(drawingPnl, BorderLayout.CENTER);
+		getContentPane().add(drawingArea, BorderLayout.CENTER);
 		
 		toolbar=new ToolBar(drawingArea);
 		toolbar.setBlocked(false);
@@ -113,24 +100,28 @@ public class AppFrame extends JFrame {
 		statusPnl.setStatus("Status");
 //		getContentPane().add(statusPnl, BorderLayout.SOUTH);
 		ms.setStatusPnl(statusPnl);
-		getContentPane().add(new ToolsPanel(), BorderLayout.WEST);
 		getContentPane().add(toolbar,BorderLayout.NORTH);
 		
 		mvCxt=new MovsimConfigContext(MovsimScenario.getMovsim(),rdCxt);
 		rdCxt.setMvCxt(mvCxt);
-		
+		toolbar.setMvCxt(mvCxt);
+		mvCxt.setUpdateCanvas(true);
 		AppFrameListener appListener=new  AppFrameListener(mvCxt);
 		appListener.setOpen(mntmOpen);
 		appListener.setSave(mntmSave);
+		appListener.setReset(mntmReset);
 		appListener.setRun(mntmRun);
 		mntmOpen.addActionListener(appListener);
 		mntmRun.addActionListener(appListener);
 		mntmSave.addActionListener(appListener);
+		mntmReset.addActionListener(appListener);
 		
+		getContentPane().add(new ToolsPanel(mvCxt), BorderLayout.WEST);
 		JPanel southPanel=new JPanel(new BorderLayout());
 		southPanel.add(mvCxt,BorderLayout.CENTER);
 		southPanel.add(statusPnl,BorderLayout.SOUTH);
 		getContentPane().add(southPanel,BorderLayout.SOUTH);
+		appListener.setBlocked(false);
 		GraphicsHelper.finalizeFrame(this);
 	}
 	public StatusPanel getStatusPnl() {
@@ -147,5 +138,8 @@ public class AppFrame extends JFrame {
 	}
 	public JunctionsListener getJl() {
 		return jl;
+	}
+	public JMenuBar getMenuBar2() {
+		return menuBar;
 	}
 }

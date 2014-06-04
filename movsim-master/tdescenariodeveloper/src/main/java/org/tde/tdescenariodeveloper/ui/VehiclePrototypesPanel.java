@@ -30,6 +30,7 @@ import org.tde.tdescenariodeveloper.eventhandling.ModelParamTextFieldListener;
 import org.tde.tdescenariodeveloper.eventhandling.ModelSelectorListener;
 import org.tde.tdescenariodeveloper.eventhandling.PrototypesListener;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 
 public class VehiclePrototypesPanel extends JPanel {

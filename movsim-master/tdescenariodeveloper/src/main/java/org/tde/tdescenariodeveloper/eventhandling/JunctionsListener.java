@@ -17,7 +17,7 @@ import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.JunctionsValidator;
 
 public class JunctionsListener implements ActionListener, ChangeListener,
-		DocumentListener {
+		DocumentListener,Blockable {
 	RoadContext rdCxt;
 	JunctionsUpdater updater;
 	JunctionsValidator validator;

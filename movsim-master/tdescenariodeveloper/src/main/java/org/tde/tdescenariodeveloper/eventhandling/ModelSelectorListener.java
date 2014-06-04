@@ -9,7 +9,7 @@ import org.movsim.autogen.AccelerationModelType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 
-public class ModelSelectorListener implements ActionListener {
+public class ModelSelectorListener implements ActionListener,Blockable {
 	MovsimConfigContext mvCxt;
 	JComboBox<String>src;
 	AccelerationModelType accelerationModelType;

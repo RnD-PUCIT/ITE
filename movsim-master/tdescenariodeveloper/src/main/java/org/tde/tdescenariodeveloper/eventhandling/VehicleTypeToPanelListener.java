@@ -18,7 +18,7 @@ import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
-public class VehicleTypeToPanelListener implements ActionListener,DocumentListener{
+public class VehicleTypeToPanelListener implements ActionListener,DocumentListener,Blockable{
 	private boolean blocked=true;
 	private VehicleType vt;
 	private MovsimConfigContext mvCxt;
@@ -69,11 +69,16 @@ public class VehicleTypeToPanelListener implements ActionListener,DocumentListen
 		}else if(src==distType){
 			if(!s.equals("Default")){
 				vt.setV0DistributionType(s.equals("gaussian")?DistributionTypeEnum.GAUSSIAN:DistributionTypeEnum.UNIFORM);
+			}else{
+				vt.setV0DistributionType(null);
 			}
 		}else if(src==routeLabel){
 			if(!s.equals("None")){
 				if(Conditions.existsLabelInRoutes(s, mvCxt))vt.setRouteLabel(s);
 				else GraphicsHelper.showToast(s+" doesn't exist", mvCxt.getRdCxt().getToastDurationMilis());
+			}
+			else{
+				vt.setRouteLabel(null);
 			}
 		}else if(srcBtn==remove){
 			tc.getVehicleType().remove(vt);

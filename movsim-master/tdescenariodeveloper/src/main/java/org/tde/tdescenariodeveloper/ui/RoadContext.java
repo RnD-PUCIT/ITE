@@ -5,16 +5,14 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
 import javax.swing.border.EmptyBorder;
 
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.eventhandling.GeometryPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
@@ -78,7 +76,7 @@ public class RoadContext extends JPanel {
 	public void blockListeners(boolean b){
 		gpl.setBlocked(b);
 		rfpl.setBlocked(b);
-		lpl.setLocked(b);
+		lpl.setBlocked(b);
 		drawingArea.getPopup().setBlockListener(b);
 		appFrame.getToolbar().setBlocked(b);
 		appFrame.getJl().setBlocked(b);
@@ -130,6 +128,8 @@ public class RoadContext extends JPanel {
 		if(update)updatePanel();
 	}
 	public void setSelectedRoadNull() {
+		DrawingAreaMouseListener dl=(DrawingAreaMouseListener)drawingArea.getMouseListeners()[0];
+		dl.setSelected(false);
 		blockListeners(true);
 		this.selectedRoad = null;
 		linkPanel.reset();

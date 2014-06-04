@@ -22,8 +22,7 @@ import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 
-public class RoadToPanelListener implements ActionListener, ItemListener,
-		DocumentListener {
+public class RoadToPanelListener implements ActionListener, ItemListener,Blockable{
 	boolean blocked=true;
 	private MovsimConfigContext mvCxt;
 	JComboBox<String>id;
@@ -41,18 +40,6 @@ public class RoadToPanelListener implements ActionListener, ItemListener,
 		this.mvCxt=mvCxt2;
 		road=r;
 		this.rdList=rdList;
-	}
-	@Override
-	public void changedUpdate(DocumentEvent e) {
-		textChanged(e);
-	}
-	@Override
-	public void insertUpdate(DocumentEvent e) {
-		textChanged(e);
-	}
-	@Override
-	public void removeUpdate(DocumentEvent e) {
-		textChanged(e);
 	}
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -129,9 +116,6 @@ public class RoadToPanelListener implements ActionListener, ItemListener,
 	
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
-	}
-	public void textChanged(DocumentEvent e){
-		if(blocked)return;
 	}
 	public void setId(JComboBox<String> id) {
 		this.id = id;

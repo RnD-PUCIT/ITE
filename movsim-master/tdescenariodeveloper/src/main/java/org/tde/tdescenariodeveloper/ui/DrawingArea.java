@@ -15,10 +15,11 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
+import org.movsim.autogen.Road;
 import org.movsim.autogen.TrafficLightStatus;
+import org.movsim.autogen.TrafficSource;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
-import org.movsim.simulator.roadnetwork.AbstractTrafficSource;
 import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.Lanes;
 import org.movsim.simulator.roadnetwork.RoadSegment;
@@ -50,8 +51,8 @@ public class DrawingArea extends Canvas {
     protected Color roadColor=new Color(150,150,150);
     protected Color roadEdgeColor=new Color(63,63,63);
     protected Color roadLineColor=new Color(200,200,200);
-    protected Color sourceColor=Color.RED;
-    protected Color sinkColor=Color.YELLOW;
+    protected Color sourceColor=Color.WHITE;
+    protected Color sinkColor=Color.BLACK;
     
     protected boolean drawRoadId=true;
     protected boolean drawSources=true;
@@ -510,12 +511,15 @@ public class DrawingArea extends Canvas {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             assert roadMapping != null;
             final int radius = (int) ((roadMapping.laneCount() + 2) * roadMapping.laneWidth());
-            final RoadMapping.PosTheta posTheta;
-            final AbstractTrafficSource trafficSource = roadSegment.trafficSource();
-            if (trafficSource != null) {
-                g.setColor(sourceColor);
-                posTheta = roadMapping.startPos();
-                g.fillOval((int) posTheta.x - radius / 2, (int) posTheta.y - radius / 2, radius, radius);
+            RoadMapping.PosTheta posTheta;
+            if(roadPrPnl.getMvCxt()!=null){
+            	for(Road r:roadPrPnl.getMvCxt().getMovsim().getScenario().getSimulation().getRoad()){
+            		if(r.getId().equals(roadSegment.userId()) && r.isSetTrafficSource()){
+            			g.setColor(sourceColor);
+            			posTheta = roadMapping.startPos();
+            			g.fillOval((int) posTheta.x - radius / 2, (int) posTheta.y - radius / 2, radius, radius);
+            		}
+            	}
             }
         }
     }

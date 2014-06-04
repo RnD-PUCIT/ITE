@@ -17,23 +17,30 @@ import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 
-public class AppFrameListener implements ActionListener {
+public class AppFrameListener implements ActionListener,Blockable {
 
 	MovsimConfigContext mvCxt;
-	JMenuItem open,save,run;
+	JMenuItem open,save,run,reset;
+	boolean blocked=true;
 	public AppFrameListener(MovsimConfigContext mvCxt) {
 		this.mvCxt = mvCxt;
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if(blocked)return;
 		JButton srcBtn=null;
 		JMenuItem mi=null;
 		if(e.getSource() instanceof JButton)srcBtn=(JButton)e.getSource();
 		if(e.getSource() instanceof JMenuItem)mi=(JMenuItem)e.getSource();
 		if(mi==open){
-			File f=FileUtils.chooseFile("xprj");
+			final File f=FileUtils.chooseFile("xprj");
 			if(f==null)return;
-			MovsimScenario.setScenario(f, mvCxt);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					MovsimScenario.setScenario(f, mvCxt);
+				}
+			});
 		}
 		else if(mi==save){
 			SwingUtilities.invokeLater(new Runnable() {
@@ -45,6 +52,14 @@ public class AppFrameListener implements ActionListener {
 						DataToViewerConverter.updateFractions(mvCxt);
 						MovsimScenario.saveScenario(f,mvCxt);
 					}
+				}
+			});
+		}
+		else if(mi==reset){
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					MovsimScenario.resetScenario(mvCxt);
 				}
 			});
 		}
@@ -71,8 +86,14 @@ public class AppFrameListener implements ActionListener {
 	public void setSave(JMenuItem save) {
 		this.save = save;
 	}
+	public void setReset(JMenuItem reset) {
+		this.reset = reset;
+	}
 	public void setRun(JMenuItem run) {
 		this.run = run;
+	}
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
 	}
 
 }

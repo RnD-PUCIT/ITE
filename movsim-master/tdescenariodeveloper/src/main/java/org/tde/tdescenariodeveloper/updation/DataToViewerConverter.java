@@ -1,6 +1,7 @@
 package org.tde.tdescenariodeveloper.updation;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -68,7 +69,7 @@ public class DataToViewerConverter {
 		
 		JPanel trfCompPnl=new JPanel(new GridBagLayout());
 		if(r.isSetTrafficComposition()){
-			trfCompPnl.setBorder(new TitledBorder(new LineBorder(TDEResources.TRAFFIC_COMP_BORDER_COLOR, 1, true),"Traffic composition for road "+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.TRAFFIC_COMP_BORDER_FONT_COLOR));
+			trfCompPnl.setBorder(new TitledBorder(new LineBorder(TDEResources.TRAFFIC_COMP_BORDER_COLOR, 3, true),"Traffic composition for road "+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.TRAFFIC_COMP_BORDER_FONT_COLOR));
 			fillTrafficCompositionPnl(mvCxt2, trfCompPnl, r.getTrafficComposition());
 			
 			JButton newType=new JButton("New type",TDEResources.getResources().getAddIcon());
@@ -89,7 +90,7 @@ public class DataToViewerConverter {
 		main.add(trfCompPnl,gbc);
 		JPanel trfSrc=new JPanel(new GridBagLayout());
 		if(r.isSetTrafficSource()){
-			trfSrc.setBorder(new TitledBorder(new LineBorder(TDEResources.TRAFFIC_SRC_BORDER_COLOR, 1, true),"Traffic source for road "+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.TRAFFIC_SRC_BORDER_FONT_COLOR));
+			trfSrc.setBorder(new TitledBorder(new LineBorder(TDEResources.TRAFFIC_SRC_BORDER_COLOR, 3, true),"Traffic source for road "+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.TRAFFIC_SRC_BORDER_FONT_COLOR));
 			fillTrafficSourcePanel(mvCxt2, trfSrc, r.getTrafficSource());
 			
 			JButton addInflow=new JButton("New inflow",TDEResources.getResources().getAddIcon());
@@ -194,11 +195,11 @@ public class DataToViewerConverter {
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 		
 		JPanel p=VehTypeToPnl(mvCxt,tc.getVehicleType().get(0),tc,false);
-		p.setBorder(new TitledBorder(new LineBorder(TDEResources.VEHICLE_TYPE_BORDER_COLOR, 1, true),"Type-1" , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.VEHICLE_TYPE_BORDER_FONT_COLOR));
+		p.setBorder(new TitledBorder(new LineBorder(TDEResources.VEHICLE_TYPE_BORDER_COLOR, 2, true),"Type-1" , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.VEHICLE_TYPE_BORDER_FONT_COLOR));
 		trafficCompositionPnl.add(p,gbc);
 		for(int i=1;i<tc.getVehicleType().size();i++){
 			p=VehTypeToPnl(mvCxt,tc.getVehicleType().get(i),tc,true);
-			p.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Type-"+(i+1) , TitledBorder.LEADING, TitledBorder.TOP, null, Color.DARK_GRAY));
+			p.setBorder(new TitledBorder(new LineBorder(TDEResources.VEHICLE_TYPE_BORDER_COLOR, 2, true),"Type-"+(i+1) , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.VEHICLE_TYPE_BORDER_FONT_COLOR));
 			trafficCompositionPnl.add(p,gbc);
 		}
 	}
@@ -253,6 +254,20 @@ public class DataToViewerConverter {
 		}
 		return s;
 	}
+	public static String getNotUsedRoadRouteId(MovsimConfigContext mvCxt2,Route r){
+		String s=null;
+		List<org.movsim.network.autogen.opendrive.OpenDRIVE.Road>odrRdList=mvCxt2.getRdCxt().getRn().getOdrNetwork().getRoad();
+		if(r.getRoad().size()<odrRdList.size()){
+			ArrayList<String>used=getusedRoadCustomizations(r.getRoad());
+			for(org.movsim.network.autogen.opendrive.OpenDRIVE.Road odrRd:odrRdList){
+				if(!used.contains(odrRd.getId())){
+					s=odrRd.getId();
+					break;
+				}
+			}
+		}
+		return s;
+	}
 	public static ArrayList<String> getUsedPrototypes(List<VehicleType>vtList) {
 		ArrayList<String>usedPrototypes=new ArrayList<>();
 		for(VehicleType vt:vtList)
@@ -276,9 +291,9 @@ public class DataToViewerConverter {
 		ArrayList<String>prototypesNames=new ArrayList<>();
 		ArrayList<String>routeNames=new ArrayList<>();
 		String[]DistEnum={"Default","uniform","gaussian"};
+		routeNames.add("None");
 		for(VehiclePrototypeConfiguration v:mvCxt.getMovsim().getVehiclePrototypes().getVehiclePrototypeConfiguration())
 			prototypesNames.add(v.getLabel());
-		routeNames.add("None");
 		if(mvCxt.getMovsim().getScenario().isSetRoutes()){
 			for(Route v:mvCxt.getMovsim().getScenario().getRoutes().getRoute())
 				routeNames.add(v.getLabel());
@@ -316,7 +331,7 @@ public class DataToViewerConverter {
 		main.add(distType,gbc);
 		
 		gbc.gridwidth=1;
-		main.add(new JLabel("Route label"),gbc);
+		main.add(new JLabel("Select route"),gbc);
 		JComboBox<String>routeLabel=new JComboBox<String>(routeNames.toArray(new String[routeNames.size()]));
 		routeLabel.addActionListener(vtl);
 		vtl.setRouteLabel(routeLabel);
@@ -353,17 +368,17 @@ public class DataToViewerConverter {
 		gbc.insets=new Insets(2, 10, 2, 10);
 		gbc.weightx=1;
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
-		
+		Font f=new Font(Font.SANS_SERIF,Font.BOLD,14);
 		for(Road r:roads){
 			JPanel p=roadToPanel(mvCxt2,r,roads);
-			p.setBorder(new TitledBorder(new LineBorder(TDEResources.ROAD_BORDER_COLOR, 1, true),"Road-"+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.ROAD_BORDER_FONT_COLOR));
+			p.setBorder(new TitledBorder(new LineBorder(TDEResources.ROAD_BORDER_COLOR, 3, true),"Road-"+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, f, TDEResources.ROAD_BORDER_FONT_COLOR));
 			roadsPnl2.add(p,gbc);
 		}
 	}
 	public static String getUniquePrototypeLabel(MovsimConfigContext mvCxt){
 		String s="Label";
 		while(Conditions.existsLabelInVPC(s,mvCxt));
-			s="Label"+((int)(Math.random()*1000));
+			s="Label"+((int)(Math.random()*10));
 		return s;
 	}
 }

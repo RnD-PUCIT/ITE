@@ -34,8 +34,32 @@ public class MovsimScenario {
 	public static void setScenario(File f,MovsimConfigContext mvCxt){
 		try {
 			mvCxt.setMovsim(MovsimInputLoader.getInputData(f));
+			mvCxt.getRdCxt().setSelectedRoadNull();
 			mvCxt.getRdCxt().getRn().reset();
 			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath().replace(".xprj", ".xodr"));
+			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(true);
+			if(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().size()>0)mvCxt.getRdCxt().getAppFrame().getJp().setSelectedJn(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().get(0).getId());
+			mvCxt.getRdCxt().getAppFrame().getJp().updateJunction();
+			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(false);
+			mvCxt.updatePanels();
+			mvCxt.getRdCxt().updateGraphics();
+			mvCxt.getRdCxt().getAppFrame().revalidate();
+			mvCxt.getRdCxt().getAppFrame().repaint();
+			mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getGraphics());
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		}
+	}
+	public static void resetScenario(MovsimConfigContext mvCxt){
+		try {
+			mvCxt.setMovsim(getMovsim());
+			mvCxt.getRdCxt().setSelectedRoadNull();
+			mvCxt.getRdCxt().getRn().reset();
+			File f=new File("\\tmp.xodr");
+			Marshalling.writeToXml(RoadNetworkUtils.getNewOdr(), f);
+			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath());
 			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(true);
 			mvCxt.getRdCxt().getAppFrame().getJp().updateJunction();
 			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(false);
@@ -43,6 +67,7 @@ public class MovsimScenario {
 			mvCxt.getRdCxt().updateGraphics();
 			mvCxt.getRdCxt().getAppFrame().revalidate();
 			mvCxt.getRdCxt().getAppFrame().repaint();
+			mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getGraphics());
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {

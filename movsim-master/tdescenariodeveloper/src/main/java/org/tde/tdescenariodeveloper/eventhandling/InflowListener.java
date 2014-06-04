@@ -14,7 +14,7 @@ import org.movsim.autogen.TrafficSource;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
-public class InflowListener implements DocumentListener ,ActionListener{
+public class InflowListener implements DocumentListener ,ActionListener,Blockable{
 	boolean blocked=true;
 	MovsimConfigContext mvCxt;
 	Inflow inflow;
