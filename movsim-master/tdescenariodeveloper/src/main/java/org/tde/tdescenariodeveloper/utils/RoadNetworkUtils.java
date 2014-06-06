@@ -1,6 +1,7 @@
 package org.tde.tdescenariodeveloper.utils;
 
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 import java.util.Date;
 
@@ -37,8 +38,9 @@ public class RoadNetworkUtils {
 		Road r=new Road();
 		if(odr.getRoad().size()>0){
 			//TODO adjust ids
-			r.setId((odr.getRoad().size()+1)+"");
-			r.setName("R"+(odr.getRoad().size()+1));
+			int id=Integer.parseInt(odr.getRoad().get(odr.getRoad().size()-1).getId())+1;
+			r.setId(id+"");
+			r.setName("R"+id);
 		}
 		else{
 			r.setId(1+"");
@@ -180,6 +182,27 @@ public class RoadNetworkUtils {
 			else{
 				if(rm.getBounds().contains(p)){
 					r=mvCxt.getRdCxt().getRn().getRoadSegments().get(i);
+					return r;
+				}
+			}
+		}
+		return r;
+	}
+	public static Shape getUnderLyingRoadShape(Point2D p,
+			MovsimConfigContext mvCxt) {
+		Shape r=null;
+		for(int i=mvCxt.getRdCxt().getRn().getRoadSegments().size()-1;i>=0;i--){
+			RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(i).roadMapping();
+			if(rm instanceof RoadMappingPoly){
+				RoadMappingPoly rmp=(RoadMappingPoly)rm;
+				if(rmp.getBounds().contains(p)){
+					r=rmp.getBounds();
+					return r; 
+				}
+			}
+			else{
+				if(rm.getBounds().contains(p)){
+					r=rm.getBounds();
 					return r;
 				}
 			}

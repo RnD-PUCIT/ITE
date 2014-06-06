@@ -1,18 +1,25 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.dnd.DragSource;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.border.Border;
 
 import org.movsim.network.autogen.opendrive.Lane;
@@ -33,11 +40,13 @@ import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class ToolsPanel extends JPanel {
-	final ToolsPanel tb;
-	Border defaultBorder;
+	private final ToolsPanel tb;
+	private Border defaultBorder;
 	private static final long serialVersionUID = -1452084837775482733L;
-	JButton straightRoad,arcRoad,addTrafficSource;
-	MovsimConfigContext mvCxt;
+	private AbstractButton straightRoad,arcRoad,addTrafficSource,junctionEditor;
+	private MovsimConfigContext mvCxt;
+	private Set<RoadSegment> selectedRoads=Collections.synchronizedSet(new HashSet<RoadSegment>());
+	
 	public ToolsPanel(MovsimConfigContext mvCxt) {
 		tb=this;
 		this.mvCxt=mvCxt;
@@ -48,34 +57,41 @@ public class ToolsPanel extends JPanel {
 		straightRoad=new JButton(TDEResources.getResources().getStraightRoad());
 		arcRoad=new JButton(TDEResources.getResources().getArcRoad());
 		addTrafficSource=new JButton(TDEResources.getResources().getTrafficSource());
+		junctionEditor=new JToggleButton(TDEResources.getResources().getJunctions());
 		Insets in=new Insets(3, 3, 3, 3);
 		straightRoad.setMargin(in);
 		arcRoad.setMargin(in);
 		addTrafficSource.setMargin(in);
+		junctionEditor.setMargin(in);
 		straightRoad.setToolTipText("Straight road");
 		arcRoad.setToolTipText("Arc raod");
 		addTrafficSource.setToolTipText("Traffic Source");
+		junctionEditor.setToolTipText("Junctions editor");
 		addListener(straightRoad);
 		addListener(arcRoad);
 		addListener(addTrafficSource);
+		addListener(junctionEditor);
 		p.add(straightRoad);
 		p.add(arcRoad);
 		p.add(addTrafficSource);
+		p.add(junctionEditor);
 		defaultBorder=arcRoad.getBorder();
 	}
-	private void addListener(final JButton btn) {
-		btn.addMouseListener(new MouseAdapter() {
+	private void addListener(final AbstractButton straightRoad2) {
+		straightRoad2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e){
-				btn.setBorder(BorderFactory.createLoweredBevelBorder());
+				straightRoad2.setBorder(BorderFactory.createLoweredBevelBorder());
+				straightRoad2.setCursor(DragSource.DefaultMoveDrop);
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				straightRoad2.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 				Point2D p=new Point2D.Double();
-				JButton src=null;
-				btn.setBorder(defaultBorder);
-				if(e.getSource() instanceof JButton)src=(JButton)e.getSource();
-				Insets in=defaultBorder.getBorderInsets(btn);
+				AbstractButton src=null;
+				straightRoad2.setBorder(defaultBorder);
+				if(e.getSource() instanceof AbstractButton)src=(AbstractButton)e.getSource();
+				Insets in=defaultBorder.getBorderInsets(straightRoad2);
 				if(src==straightRoad){
 					try {
 						mvCxt.getRdCxt().getDrawingArea().transform.inverseTransform(new Point(e.getX()-tb.getWidth(),e.getY()), p);
@@ -162,7 +178,7 @@ public class ToolsPanel extends JPanel {
 				}else if(src==arcRoad){
 
 					try {
-						mvCxt.getRdCxt().getDrawingArea().transform.inverseTransform(new Point(e.getX()-tb.getWidth()+btn.getWidth()+in.left+in.right,e.getY()), p);
+						mvCxt.getRdCxt().getDrawingArea().transform.inverseTransform(new Point(e.getX()-tb.getWidth()+straightRoad2.getWidth()+in.left+in.right,e.getY()), p);
 						Road r=RoadNetworkUtils.getRoad(mvCxt.getRdCxt().getRn().getOdrNetwork());
 						Geometry g=r.getPlanView().getGeometry().get(0);
 						g.setLine(null);
@@ -251,7 +267,7 @@ public class ToolsPanel extends JPanel {
 				}else if(src==addTrafficSource){
 
 					try {
-						mvCxt.getRdCxt().getDrawingArea().transform.inverseTransform(new Point(e.getX()-tb.getWidth(),e.getY()+btn.getHeight()), p);
+						mvCxt.getRdCxt().getDrawingArea().transform.inverseTransform(new Point(e.getX()-tb.getWidth(),e.getY()+straightRoad2.getHeight()), p);
 						RoadSegment undr=RoadNetworkUtils.getUnderLyingRoadSegment(p, mvCxt);
 						if(undr!=null){
 							if(!Conditions.existsIdInRoadsCustomizations(undr.userId(), mvCxt)){
@@ -285,7 +301,44 @@ public class ToolsPanel extends JPanel {
 						GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 					}
 				}
+				else if(src==junctionEditor){
+					JToggleButton jtb=(JToggleButton)junctionEditor;
+					selectedRoads.clear();
+					if(jtb.isSelected()){
+						mvCxt.getRdCxt().getDrawingArea().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+						mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getDrawingArea().getGraphics());
+					}
+					else{
+						mvCxt.getRdCxt().getDrawingArea().setCursor(new Cursor(Cursor.HAND_CURSOR));
+						mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getDrawingArea().getGraphics());
+					}
+				}
 			}
 		});
+	}
+	public Set<RoadSegment> getSelectedRoads() {
+		return selectedRoads;
+	}
+	public void setSelectedRoads(Set<RoadSegment> selectedRoads) {
+		this.selectedRoads = selectedRoads;
+	}
+	public boolean addRoadSelection(RoadSegment s){
+		return selectedRoads.add(s);
+	}
+	public boolean removeRoadSelection(RoadSegment s){
+		RoadSegment rs=null;
+		for(RoadSegment rs2:selectedRoads){
+			if(rs2.userId().equals(s.userId())){
+				rs=rs2;
+				break;
+			}
+		}
+		return selectedRoads.remove(rs);
+	}
+	public void clearRoadSelections(){
+		selectedRoads.clear();
+	}
+	public JToggleButton getJunctionEditor() {
+		return (JToggleButton)junctionEditor;
 	}
 }

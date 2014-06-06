@@ -155,11 +155,9 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 	public void setBlockListener(boolean b){
 		popupListener.setBlocked(b);
 	}
-
 	public JMenuItem getRemoveLane() {
 		return removeLane;
 	}
-
 	public JMenuItem getRemovegeo() {
 		return removegeo;
 	}

@@ -57,13 +57,15 @@ public class JunctionsListener implements ActionListener, ChangeListener,
 		if(e.getSource() instanceof JComboBox<?>)src=(JComboBox<String>)e.getSource();
 		if(e.getSource() instanceof JButton)srcBtn=(JButton)e.getSource();
 		if(srcBtn==rdCxt.getAppFrame().getJp().getAdd()){
-			if(validator.exists(rdCxt.getAppFrame().getJp().getSelectedJn())){
-				updater.addNewJunc();
-				actionPerformed(new ActionEvent(rdCxt.getAppFrame().getJp().getCbSelectJunc(), 234, ""));
-				rdCxt.updateGraphics();
-			}else{
-				GraphicsHelper.showToast("Junction "+rdCxt.getAppFrame().getJp().getSelectedJn()+" doesn't exist.", rdCxt.getToastDurationMilis());
-			}
+			String id=updater.addNewJunc().getId();
+			rdCxt.getAppFrame().getJp().setSelectedJn(id+"");
+			rdCxt.getAppFrame().getJp().getCbSelectJunc().addItem(id+"");
+			
+			rdCxt.getAppFrame().getJp().setSelectedJn(id);
+			rdCxt.getAppFrame().getJp().getCbSelectJunc().setSelectedItem(id);
+			rdCxt.getAppFrame().getJp().getAddCn().setEnabled(true);
+			rdCxt.getAppFrame().getJp().getRemove().setEnabled(true);
+			rdCxt.updateGraphics();
 		}
 		if(rdCxt.getAppFrame().getJp().getSelectedJn()==null || rdCxt.getAppFrame().getJp().getSelectedJn().equals("")){
 			GraphicsHelper.showToast("No junction found", rdCxt.getToastDurationMilis());

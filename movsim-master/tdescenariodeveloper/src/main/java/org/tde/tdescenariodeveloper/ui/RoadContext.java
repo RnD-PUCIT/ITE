@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -12,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.Blockable;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.eventhandling.GeometryPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
@@ -80,6 +82,7 @@ public class RoadContext extends JPanel {
 		drawingArea.getPopup().setBlockListener(b);
 		appFrame.getToolbar().setBlocked(b);
 		appFrame.getJl().setBlocked(b);
+		linkPanel.getListener().setBlocked(b);
 	}
 	public void updateGraphics(){
 		drawingArea.revalidate();
@@ -97,7 +100,6 @@ public class RoadContext extends JPanel {
 	private void updateLinkPanel() {
 		boolean linkAdded = isAdded(linkPanel);
 		if (selectedRoad.getOdrRoad().getLink() != null) {
-			linkPanel.setSelectedRoad(selectedRoad);
 			if (!linkAdded) {
 				gbc = new GridBagConstraints();
 				gbc.gridwidth = GridBagConstraints.REMAINDER;

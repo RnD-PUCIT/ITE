@@ -112,15 +112,17 @@ public class JunctionsPanel extends JPanel {
 		if(rdCxt.getRn().getOdrNetwork().getJunction()==null)return null;
 		ArrayList<RoadSegment>rs=new ArrayList<RoadSegment>();
 		Junction j=getJunction(selectedJn);
-		for(Connection cn:j.getConnection()){
-			RoadSegment r;
-			if(key.equals("all") || key.equals("connecting")){
-				r=rdCxt.getRn().findByUserId(cn.getConnectingRoad());
-				if(r!=null)LaneLinkPanel.putOrReject(rs, r);
-			}
-			if(key.equals("all") || key.equals("incoming")){
-				r=rdCxt.getRn().findByUserId(cn.getIncomingRoad());
-				if(r!=null)LaneLinkPanel.putOrReject(rs, r);
+		if(j.getConnection().size()>0){
+			for(Connection cn:j.getConnection()){
+				RoadSegment r;
+				if(key.equals("all") || key.equals("connecting")){
+					r=rdCxt.getRn().findByUserId(cn.getConnectingRoad());
+					if(r!=null)LaneLinkPanel.putOrReject(rs, r);
+				}
+				if(key.equals("all") || key.equals("incoming")){
+					r=rdCxt.getRn().findByUserId(cn.getIncomingRoad());
+					if(r!=null)LaneLinkPanel.putOrReject(rs, r);
+				}
 			}
 		}
 		return rs;
@@ -292,6 +294,9 @@ public class JunctionsPanel extends JPanel {
 		boolean sucJun=false;
 		Predecessor pr=null;
 		Successor sr=null;
+		if(toRoad.getLink()==null || toRoad.getLink().getPredecessor()==null){
+			return false;
+		}
 		if(toRoad.getLink().getPredecessor()!=null){
 			pr=toRoad.getLink().getPredecessor();
 			predJun=pr.getElementType().equals("junction");
@@ -301,7 +306,7 @@ public class JunctionsPanel extends JPanel {
 			sucJun=sr.getElementType().equals("junction");
 		}
 		if(predJun && sucJun)throw new IllegalArgumentException("connecting road can't have both predecessor and successor junctions");
-		if(!predJun && !sucJun)throw new IllegalArgumentException(toRoad.getId()+" connecting road is not connected to any junction");
+		if((!predJun && pr!=null) && (!sucJun && sr!=null))throw new IllegalArgumentException(toRoad.getId()+" connecting road is not connected to any junction");
 		return predJun;
 	}
 	public JScrollPane getSp() {

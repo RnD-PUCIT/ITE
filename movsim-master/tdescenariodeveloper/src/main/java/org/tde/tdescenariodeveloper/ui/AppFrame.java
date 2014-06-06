@@ -34,6 +34,7 @@ public class AppFrame extends JFrame {
 	private JunctionsListener jl;
 	private MovsimConfigContext mvCxt;
 	JMenuBar menuBar;
+	ToolsPanel tpnl;
 	public RoadContext getrdCxt(){
 		return rdCxt;
 	}
@@ -115,8 +116,8 @@ public class AppFrame extends JFrame {
 		mntmRun.addActionListener(appListener);
 		mntmSave.addActionListener(appListener);
 		mntmReset.addActionListener(appListener);
-		
-		getContentPane().add(new ToolsPanel(mvCxt), BorderLayout.WEST);
+		tpnl=new ToolsPanel(mvCxt);
+		getContentPane().add(tpnl, BorderLayout.WEST);
 		JPanel southPanel=new JPanel(new BorderLayout());
 		southPanel.add(mvCxt,BorderLayout.CENTER);
 		southPanel.add(statusPnl,BorderLayout.SOUTH);
@@ -141,5 +142,8 @@ public class AppFrame extends JFrame {
 	}
 	public JMenuBar getMenuBar2() {
 		return menuBar;
+	}
+	public ToolsPanel getTpnl() {
+		return tpnl;
 	}
 }

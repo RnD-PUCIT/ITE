@@ -190,7 +190,7 @@ public class LaneLinkPanel extends JPanel {
 		}
 		
 	}
-	public static <T> void putOrReject(ArrayList<T>al,T key){
+	public static <T> boolean putOrReject(ArrayList<T>al,T key){
 		boolean exists=false;
 		for(T s:al){
 			if(s.equals(key)){
@@ -199,6 +199,7 @@ public class LaneLinkPanel extends JPanel {
 			}
 		}
 		if(!exists)al.add(key);
+		return exists;
 	}
 	public void setLanePanel(LanesPanel lanesPanel) {
 		lnPnl=lanesPanel;

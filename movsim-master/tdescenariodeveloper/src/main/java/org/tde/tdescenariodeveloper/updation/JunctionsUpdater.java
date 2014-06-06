@@ -19,24 +19,14 @@ public class JunctionsUpdater {
 		this.rdCxt=rd;
 		validator=new JunctionsValidator(rd);
 	}
-	public int getNextJuncId() {
-		Junction j=Collections.max(rdCxt.getRn().getOdrNetwork().getJunction(), new Comparator<Junction>() {
-
-			@Override
-			public int compare(Junction j1, Junction j2) {
-				return Integer.parseInt(j1.getId())-Integer.parseInt(j2.getId());
-			}
-		});
-		return Integer.parseInt(j.getId());
-	}
-	public void addNewJunc() {
-		int id=getNextJuncId()+1;
+	public Junction addNewJunc() {
+		int id=getNextId(rdCxt);
 		Junction j=new Junction();
 		j.setId(id+"");
-		j.setName("J"+id);
+		j.setName("");
 		rdCxt.getRn().getOdrNetwork().getJunction().add(j);
-		rdCxt.getAppFrame().getJp().getCbSelectJunc().addItem(id+"");
 		RoadNetworkUtils.refresh(rdCxt);
+		return j;
 	}
 	public void removeJunc() {
 		String id=rdCxt.getAppFrame().getJp().getSelectedJn();
@@ -80,5 +70,19 @@ public class JunctionsUpdater {
 		}catch(IllegalArgumentException e2){
 			GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 		}
+	}
+	public static int getNextId(RoadContext rdCxt){
+		int id=1001;
+		if(rdCxt.getRn().getOdrNetwork().getJunction().size()>0){
+			Junction max=Collections.max(rdCxt.getRn().getOdrNetwork().getJunction(),new Comparator<Junction>() {
+				@Override
+				public int compare(Junction o1, Junction o2) {
+					return Integer.parseInt(o1.getId())-Integer.parseInt(o2.getId());
+				}
+			});
+			int id2=Integer.parseInt(max.getId())+1;
+			if(id<=id2)id=id2;
+		}
+		return id;
 	}
 }

@@ -14,10 +14,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Set;
 
 import org.movsim.autogen.Road;
 import org.movsim.autogen.TrafficLightStatus;
-import org.movsim.autogen.TrafficSource;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.LaneSegment;
@@ -69,10 +69,12 @@ public class DrawingArea extends Canvas {
 	private boolean drawSelectedLane=true;
 	private boolean drawSelectedGeometry=true;
     private DrawingAreaPopupMenu popup;
+	private DrawingAreaPopupMenu2 popup2;
     
 	public DrawingArea(RoadContext rdPrPnl) {
 		this.roadPrPnl=rdPrPnl;
 		popup=new DrawingAreaPopupMenu(roadPrPnl);
+		popup2=new DrawingAreaPopupMenu2(roadPrPnl);
 		setSize(new Dimension(bufferWidth,bufferHeight));
 		keyListener=new DrawingAreaKeyListener(this);
 		addKeyListener(keyListener);
@@ -124,6 +126,20 @@ public class DrawingArea extends Canvas {
 		}else{
 			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
 //			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds().getBounds2D());
+		}
+	}
+	private void drawSelectedJunctionBounds(Graphics2D g){
+		Set<RoadSegment>rdShapes =getRoadPrPnl().getAppFrame().getTpnl().getSelectedRoads();
+		if(rdShapes.size()>0){
+			g.setColor(Color.RED);
+			for(RoadSegment s:rdShapes){
+				RoadMapping rm=s.roadMapping();
+				if(rm instanceof RoadMappingPoly){
+					g.draw(((RoadMappingPoly)rm).getBounds());
+				}else{
+					g.draw(rm.getBounds());
+				}
+			}
 		}
 	}
     private void drawSelectedLane(Graphics2D g) {
@@ -181,6 +197,7 @@ public class DrawingArea extends Canvas {
         backgroundGraphics.setTransform(transform);
         drawBackground(backgroundGraphics);
         drawSelected(backgroundGraphics);
+        if(getRoadPrPnl().getAppFrame().getTpnl()!=null)drawSelectedJunctionBounds(backgroundGraphics);
         g.drawImage(backgroundBuffer, 0, 0, null);
     }
     protected void clearBackground(Graphics2D g) {
@@ -552,5 +569,8 @@ public class DrawingArea extends Canvas {
 	}
 	public DrawingAreaPopupMenu getPopup() {
 		return popup;
+	}
+	public DrawingAreaPopupMenu2 getPopup2() {
+		return popup2;
 	}
 }

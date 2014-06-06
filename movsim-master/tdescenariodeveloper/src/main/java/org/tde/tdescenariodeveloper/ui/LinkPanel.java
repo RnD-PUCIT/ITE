@@ -9,27 +9,25 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
-import org.movsim.simulator.roadnetwork.RoadNetwork;
-import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
+import org.tde.tdescenariodeveloper.eventhandling.LinkPanelListener;
 
 public class LinkPanel extends JPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 76435681L;
-	RoadSegment selectedRoad;
 	private JComboBox<String> cbElementType;
-	private JComboBox<String> cbElementId;
-	private JComboBox<String> cbContactPoint;
+	private JLabel cbElementId;
+	private JLabel cbContactPoint;
 	private JComboBox<String> cbSelectLink;
 	GridBagConstraints c,gbc_lbl,gbc_tf;
 	RoadContext rdCxt;
+	LinkPanelListener lpl;
 	public LinkPanel(RoadContext rpp) {
 		rdCxt=rpp;
 		setLayout(new GridBagLayout());
@@ -59,42 +57,34 @@ public class LinkPanel extends JPanel {
 		gbc_tf.weightx=3;
 		gbc_tf.gridwidth=GridBagConstraints.REMAINDER;
 		
+		LinkPanelListener lp=new LinkPanelListener(rpp, this);
+		lpl=lp;
 		
 		add(cbSelectLink,c);
 		JLabel lblElementId = new JLabel("Element id");
 		add(lblElementId,gbc_lbl);
-		cbElementId = new JComboBox<>();
+		cbElementId = new JLabel("Id");
 		lblElementId.setLabelFor(cbElementId);
 		cbElementId.setToolTipText("Id of predecessor/successor road");
 		cbElementId.setRequestFocusEnabled(false);
 		cbElementId.setFocusable(false);
-		cbElementId.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		add(cbElementId,gbc_tf);
 		JLabel lblType = new JLabel("Element type");
 		add(lblType,gbc_lbl);
 		cbElementType = new JComboBox<>();
-		cbElementType.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
+		cbElementType.addActionListener(lp);
 		lblType.setLabelFor(cbElementType);
 		add(cbElementType,gbc_tf);
 		JLabel lblContactPoint = new JLabel("Contact Point");
 		add(lblContactPoint,gbc_lbl);
-		cbContactPoint = new JComboBox<>();
+		cbContactPoint = new JLabel();
 		cbContactPoint.setToolTipText("Where the road should be attached");
-		cbContactPoint.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		add(cbContactPoint,gbc_tf);
+		lp.setBlocked(false);
 	}
 
 	public void updateLinkPanel() {
-		if(selectedRoad==null){
+		if(rdCxt.getSelectedRoad()==null){
 			return;
 		}
 		cbSelectLink.removeAllItems();
@@ -106,60 +96,55 @@ public class LinkPanel extends JPanel {
 		cbElementType.addItem("road");
 		cbElementType.addItem("junction");
 		
-		cbContactPoint.removeAllItems();
-		cbContactPoint.addItem("start");
-		cbContactPoint.addItem("end");
 		int curLinkSelected = cbSelectLink.getSelectedIndex();
-		if (rdCxt.getRn().isModified()) {
-			cbElementId.removeAllItems();
-			for (RoadSegment rs : rdCxt.getRn())
-				cbElementId.addItem(rs.getOdrRoad().getId() + "");
-			for (Junction jc : rdCxt.getRn().getOdrNetwork().getJunction())
-				cbElementId.addItem(jc.getId() + "");
-		}
 		switch (curLinkSelected) {
 		case 0:
-			if (selectedRoad.getOdrRoad().getLink().getPredecessor()!=null) {
+			if (rdCxt.getSelectedRoad().getOdrRoad().getLink().getPredecessor()!=null) {
 				setLinkFields("Predecessor");
 				break;
 			}
 		case 1:
-			if (selectedRoad.getOdrRoad().getLink().getSuccessor()!=null) {
+			if (rdCxt.getSelectedRoad().getOdrRoad().getLink().getSuccessor()!=null) {
 				setLinkFields("Successor");
 				break;
 			}
 		default:
-			if (selectedRoad.getOdrRoad().getLink().getPredecessor()!=null)
+			if (rdCxt.getSelectedRoad().getOdrRoad().getLink().getPredecessor()!=null)
 				setLinkFields("Predecessor");
 			else
 				setLinkFields("Successor");
 		}
 	}
-	public void setSelectedRoad(RoadSegment rs){
-		this.selectedRoad=rs;
-	}
 	private void setLinkFields(String linkType) {
 		cbSelectLink.setSelectedItem(linkType);
 		String id="",type="",cntPnt="";
 		if(linkType.equals("Predecessor")){
-			id=selectedRoad.getOdrRoad().getLink().getPredecessor().getElementId();
-			type=selectedRoad.getOdrRoad().getLink().getPredecessor().getElementType();
-			cntPnt=selectedRoad.getOdrRoad().getLink().getPredecessor().getContactPoint();
+			id=rdCxt.getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementId();
+			type=rdCxt.getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementType();
+			cntPnt=rdCxt.getSelectedRoad().getOdrRoad().getLink().getPredecessor().getContactPoint();
 		}
 		else{
-			id=selectedRoad.getOdrRoad().getLink().getSuccessor().getElementId();
-			type=selectedRoad.getOdrRoad().getLink().getSuccessor().getElementType();
-			cntPnt=selectedRoad.getOdrRoad().getLink().getSuccessor().getContactPoint();
+			id=rdCxt.getSelectedRoad().getOdrRoad().getLink().getSuccessor().getElementId();
+			type=rdCxt.getSelectedRoad().getOdrRoad().getLink().getSuccessor().getElementType();
+			cntPnt=rdCxt.getSelectedRoad().getOdrRoad().getLink().getSuccessor().getContactPoint();
 		}
-		cbElementId.setSelectedItem(id);
+		cbElementId.setText(id);
 		cbElementType.setSelectedItem(type);
-		cbContactPoint.setSelectedItem(cntPnt);
+		cbContactPoint.setText(cntPnt);
 	}
-
 	public void reset() {
-		cbContactPoint.removeAllItems();
-		cbElementId.removeAllItems();
+		cbElementId.setText("");
+		cbContactPoint.setText("");
 		cbElementType.removeAllItems();
 		cbSelectLink.removeAllItems();
+	}
+	public JComboBox<String> getCbSelectLink() {
+		return cbSelectLink;
+	}
+	public JComboBox<String> getCbElementType() {
+		return cbElementType;
+	}
+	public LinkPanelListener getListener() {
+		return lpl;
 	}
 }
