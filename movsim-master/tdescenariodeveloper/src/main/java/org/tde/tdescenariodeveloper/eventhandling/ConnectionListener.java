@@ -9,6 +9,7 @@ import javax.swing.JComboBox;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.tde.tdescenariodeveloper.updation.JunctionsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
@@ -51,7 +52,9 @@ public class ConnectionListener implements ActionListener,Blockable {
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.updateGraphics();
 		}else if(srcBtn==remove){
-			rdCxt.getAppFrame().getJp().getJunction(rdCxt.getAppFrame().getJp().getSelectedJn()).getConnection().remove(cn);
+			rdCxt.getAppFrame().getJp();
+			rdCxt.getAppFrame().getJp();
+			JunctionsUpdater.getJunction(rdCxt.getAppFrame().getJp().getSelectedJn(), rdCxt).getConnection().remove(cn);
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.getAppFrame().getJl().actionPerformed(new ActionEvent(rdCxt.getAppFrame().getJp().getCbSelectJunc(), 234, ""));
 		}else if(srcBtn==addLn){

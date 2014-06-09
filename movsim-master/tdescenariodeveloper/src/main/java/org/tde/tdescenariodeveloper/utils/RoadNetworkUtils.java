@@ -23,6 +23,7 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry.Lin
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
+import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
@@ -33,6 +34,86 @@ public class RoadNetworkUtils {
 		odr.setHeader(getHeader());
 		odr.getRoad().add(getRoad(odr));
 		return odr;
+	}
+	public static Point2D getStart(RoadSegment rs,int lane){
+//		LaneSegment ls=rs.getLaneSegments()[lane-1];
+		Point2D.Double p=new Point2D.Double();
+		PosTheta pt;
+		RoadMapping first=null;
+		double rw=0;
+		if(!(rs.roadMapping() instanceof RoadMappingPoly)){
+			first=rs.roadMapping();
+			rw=first.roadWidth()/2.0;
+		}
+		else{
+			RoadMappingPoly rmp=(RoadMappingPoly)rs.roadMapping();
+			first=rmp.getRoadMappings().get(0);
+			rw=rmp.roadWidth()/2.0;
+		}
+		if(first.roadLength()/2>=5){
+			pt=first.map(5, (lane*rs.roadMapping().laneWidth())-(first.laneWidth()/2.0));
+		}else {
+			pt=first.map(2,(lane*rs.roadMapping().laneWidth())-(first.laneWidth()/2.0));
+		}
+		p.setLocation(pt.x-rw*pt.sinTheta, pt.y-rw*pt.cosTheta);
+//		if(!ls.getBounds().contains(p))throw new IllegalArgumentException("Get start not found");
+		return p;
+	}
+	public static Point2D getEnd(RoadSegment rs,int lane){
+		Point2D.Double p=new Point2D.Double();
+		PosTheta pt;
+		RoadMapping end=null;
+		double rw=0;
+		if(!(rs.roadMapping() instanceof RoadMappingPoly)){
+			end=rs.roadMapping();
+			rw=end.roadWidth()/2.0;
+		}
+		else{
+			RoadMappingPoly rmp=(RoadMappingPoly)rs.roadMapping();
+			end=rmp.getRoadMappings().get(rmp.getRoadMappings().size()-1);
+			rw=rmp.roadWidth()/2.0;
+		}
+		if(end.roadLength()/2>=5){
+			pt=end.map(end.roadLength()-5, (lane*rs.roadMapping().laneWidth())-(end.laneWidth()/2.0));
+		}else {
+			pt=end.map(end.roadLength()-2,(lane*rs.roadMapping().laneWidth())-(end.laneWidth()/2.0));
+		}
+		p.setLocation(pt.x-rw*pt.sinTheta, pt.y-rw*pt.cosTheta);
+		return p;
+	}
+	public static Point2D getStartMidRoad(RoadSegment rs){
+		Point2D.Double p=new Point2D.Double();
+		PosTheta pt;
+		RoadMapping first=null;
+		if(!(rs.roadMapping() instanceof RoadMappingPoly))first=rs.roadMapping();
+		else{
+			RoadMappingPoly rmp=(RoadMappingPoly)rs.roadMapping();
+			first=rmp.getRoadMappings().get(0);
+		}
+		if(first.roadLength()/2>=5){
+			pt=first.map(5,0);
+		}else {
+			pt=first.map(2,0);
+		}
+		p.setLocation(pt.x,pt.y);
+		return p;
+	}
+	public static Point2D getEndMidRoad(RoadSegment rs){
+		Point2D.Double p=new Point2D.Double();
+		PosTheta pt;
+		RoadMapping end=null;
+		if(!(rs.roadMapping() instanceof RoadMappingPoly))end=rs.roadMapping();
+		else{
+			RoadMappingPoly rmp=(RoadMappingPoly)rs.roadMapping();
+			end=rmp.getRoadMappings().get(rmp.getRoadMappings().size()-1);
+		}
+		if(end.roadLength()/2>=5){
+			pt=end.map(end.roadLength()-5,0);
+		}else {
+			pt=end.map(end.roadLength()-2,0);
+		}
+		p.setLocation(pt.x, pt.y);
+		return p;
 	}
 	public static Road getRoad(OpenDRIVE odr) {
 		Road r=new Road();
@@ -187,6 +268,31 @@ public class RoadNetworkUtils {
 			}
 		}
 		return r;
+	}
+	public static LaneSegment getUnderLyingLaneSegment(Point2D p,
+			MovsimConfigContext mvCxt) {
+		LaneSegment r=null;
+		for(int i=mvCxt.getRdCxt().getRn().getRoadSegments().size()-1;i>=0;i--){
+			RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(i).roadMapping();
+			if(rm instanceof RoadMappingPoly){
+				RoadMappingPoly rmp=(RoadMappingPoly)rm;
+				if(rmp.getBounds().contains(p)){
+					return getUnderLyingLaneSegment(p, mvCxt.getRdCxt().getRn().getRoadSegments().get(i));
+				}
+			}
+			else{
+				if(rm.getBounds().contains(p)){
+					return getUnderLyingLaneSegment(p, mvCxt.getRdCxt().getRn().getRoadSegments().get(i));
+				}
+			}
+		}
+		return r;
+	}
+	public static LaneSegment getUnderLyingLaneSegment(Point2D p,RoadSegment rr){
+		for(LaneSegment ls:rr.getLaneSegments()){
+			if(ls.getBounds().contains(p))return ls;
+		}
+		return null;
 	}
 	public static Shape getUnderLyingRoadShape(Point2D p,
 			MovsimConfigContext mvCxt) {

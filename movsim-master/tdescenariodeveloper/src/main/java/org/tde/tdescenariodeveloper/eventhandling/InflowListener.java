@@ -12,6 +12,7 @@ import javax.swing.text.Document;
 import org.movsim.autogen.Inflow;
 import org.movsim.autogen.TrafficSource;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
+import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class InflowListener implements DocumentListener ,ActionListener,Blockable{
@@ -48,6 +49,8 @@ public class InflowListener implements DocumentListener ,ActionListener,Blockabl
 		if(blocked)return;
 		Document doc=e.getDocument();
 		if(doc==t.getDocument()){
+			if(!Conditions.isValid(t,inflow.getT()))
+				return;
 			try{
 				double d2=Double.parseDouble(t.getText());
 				GraphicsHelper.makeBlack(t);
@@ -56,6 +59,8 @@ public class InflowListener implements DocumentListener ,ActionListener,Blockabl
 				GraphicsHelper.makeRed(t);
 			}
 		}else if(doc==v.getDocument()){
+			if(!Conditions.isValid(v,inflow.getV()))
+				return;
 			try{
 				double d2=Double.parseDouble(v.getText());
 				GraphicsHelper.makeBlack(v);
@@ -64,6 +69,8 @@ public class InflowListener implements DocumentListener ,ActionListener,Blockabl
 				GraphicsHelper.makeRed(v);
 			}
 		}else if(doc==qPerH.getDocument()){
+			if(!Conditions.isValid(qPerH,inflow.getQPerHour()))
+				return;
 			try{
 				double d2=Double.parseDouble(qPerH.getText());
 				GraphicsHelper.makeBlack(qPerH);

@@ -1,10 +1,12 @@
 package org.tde.tdescenariodeveloper.updation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
+import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.exception.InvalidInputException;
 import org.tde.tdescenariodeveloper.ui.JunctionsPanel;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
@@ -30,28 +32,24 @@ public class JunctionsUpdater {
 	}
 	public void removeJunc() {
 		String id=rdCxt.getAppFrame().getJp().getSelectedJn();
-		Junction j=rdCxt.getAppFrame().getJp().getJunction(id);
+		rdCxt.getAppFrame().getJp();
+		rdCxt.getAppFrame().getJp();
+		Junction j=getJunction(id, rdCxt);
 		if(rdCxt.getRn().getOdrNetwork().getJunction().remove(j)){
 			rdCxt.getAppFrame().getJp().getCbSelectJunc().removeItem(id+"");
 			RoadNetworkUtils.refresh(rdCxt);
 		}
+		if(rdCxt.getRn().getOdrNetwork().getJunction()==null || rdCxt.getRn().getOdrNetwork().getJunction().size()<1){
+			rdCxt.getAppFrame().getJp().getCbSelectJunc().removeAllItems();
+		}
 	}
 	public void addNewConn() {
 		String id=rdCxt.getAppFrame().getJp().getSelectedJn();
-		Junction j=rdCxt.getAppFrame().getJp().getJunction(id);
-		Connection max=null;
-		int cnid=0;
-		if(j.getConnection().size()>0){
-			max=Collections.max(j.getConnection(),new Comparator<Connection>() {
-				@Override
-				public int compare(Connection o1, Connection o2) {
-					return Integer.parseInt(o1.getId())-Integer.parseInt(o2.getId());
-				}
-			});
-			cnid=Integer.parseInt(max.getId())+1;
-		}
+		rdCxt.getAppFrame().getJp();
+		Junction j=getJunction(id, rdCxt);
+		
 		Connection cn=new Connection();
-		cn.setId(cnid+"");
+		cn.setId(getNextId(j)+"");
 		String[]vls=GraphicsHelper.valuesFromUser("Enter values for new connection","Connecting road id","Incoming road id");
 		if(vls[0].equals("") && vls[1].equals(""))return;
 		try{
@@ -71,6 +69,20 @@ public class JunctionsUpdater {
 			GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 		}
 	}
+	public static int getNextId(Junction j){
+		Connection max=null;
+		int cnid=0;
+		if(j.getConnection().size()>0){
+			max=Collections.max(j.getConnection(),new Comparator<Connection>() {
+				@Override
+				public int compare(Connection o1, Connection o2) {
+					return Integer.parseInt(o1.getId())-Integer.parseInt(o2.getId());
+				}
+			});
+			cnid=Integer.parseInt(max.getId())+1;
+		}
+		return cnid;
+	}
 	public static int getNextId(RoadContext rdCxt){
 		int id=1001;
 		if(rdCxt.getRn().getOdrNetwork().getJunction().size()>0){
@@ -84,5 +96,55 @@ public class JunctionsUpdater {
 			if(id<=id2)id=id2;
 		}
 		return id;
+	}
+	public static void clearJunction(RoadSegment rd,RoadContext rdCxt){//rd is connecting road, adjusts related succ,pred
+		if(!rd.getOdrRoad().getJunction().equals("-1")){
+			Junction j=getJunction(rd.getOdrRoad().getJunction(), rdCxt);
+			if(j!=null){
+				if(j.getConnection()!=null || j.getConnection().size()>0){
+					ArrayList<RoadSegment>incomingRds=JunctionsPanel.getJunctionRoadSegments("incoming", rdCxt, j);
+					for(RoadSegment rs:incomingRds){
+						if (rs.getOdrRoad().getLink() != null
+								&& rs.getOdrRoad().getLink().isSetPredecessor()
+								&& rs.getOdrRoad().getLink().getPredecessor()
+										.getElementType().equals("junction")
+								&& rs.getOdrRoad().getLink().getPredecessor()
+										.getElementId().equals(j.getId()))
+							rs.getOdrRoad().getLink().setPredecessor(null);
+						if (rs.getOdrRoad().getLink() != null
+								&& rs.getOdrRoad().getLink().isSetSuccessor()
+								&& rs.getOdrRoad().getLink().getSuccessor()
+										.getElementType().equals("junction")
+								&& rs.getOdrRoad().getLink().getSuccessor()
+										.getElementId().equals(j.getId()))
+							rs.getOdrRoad().getLink().setSuccessor(null);
+					}
+				}
+				if(!rdCxt.getRn().getOdrNetwork().getJunction().remove(j)){
+					GraphicsHelper.showToast("Junction "+j.getId()+" couldn't be removed", rdCxt.getToastDurationMilis());
+				}else
+					rd.getOdrRoad().setJunction("-1");
+			}else{
+				GraphicsHelper.showToast("Junction "+rd.getOdrRoad().getJunction()+" referred in road "+rd.userId()+" not found!", rdCxt.getToastDurationMilis());
+			}
+		}
+	}
+	public static Connection getConnection(String connecting, String incoming,
+			Junction prJn) {
+		Connection cn=null;
+		for(Connection c:prJn.getConnection()){
+			if(c.isSetConnectingRoad() && c.isSetConnectingRoad() && c.getIncomingRoad().equals(incoming) && c.getConnectingRoad().equals(connecting))return c;
+		}
+		return cn;
+	}
+	public static Junction getJunction(String id,RoadContext rdCxt) {
+		try{
+			for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
+				if(id.equals(j.getId()))return j;
+			}
+		}catch(NullPointerException e){
+			return null;
+		}
+		return null;
 	}
 }

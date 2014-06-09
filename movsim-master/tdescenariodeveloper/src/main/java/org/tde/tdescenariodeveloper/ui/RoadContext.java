@@ -45,8 +45,6 @@ public class RoadContext extends JPanel {
 		this.rn=rn;
 		sp=new JScrollPane();
 		sp.getViewport().add(this);
-		sp.setPreferredSize(new Dimension(300,700));
-		setBorder(new EmptyBorder(5, 5, 5, 5));
 		
 		linkPanel=new LinkPanel(this);
 		
@@ -90,7 +88,7 @@ public class RoadContext extends JPanel {
 	}
 	public void updatePanel(){
 		blockListeners(true);
-		rdFldPnl.updateFields(selectedRoad);
+		rdFldPnl.updateFields();
 		updateLinkPanel();
 		gmPnl.updateGeomPanel();
 		lanesPnl.updatelanesPanel();

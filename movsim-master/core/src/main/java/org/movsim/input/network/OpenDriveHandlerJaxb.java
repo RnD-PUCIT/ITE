@@ -93,6 +93,7 @@ public class OpenDriveHandlerJaxb {
                                 * roadSegmentRight.roadMapping().laneWidth() / 2.0);
 
                         roadSegmentRight.setOdrRoad(road);
+                        setOdrLanes(roadSegmentRight, road);
                         roadNetwork.add(roadSegmentRight);
                     } else {
                         tmpRs = null;
@@ -108,6 +109,13 @@ public class OpenDriveHandlerJaxb {
         return true;
     }
 
+    private static void setOdrLanes(RoadSegment roadSegmentRight, Road road) {
+        for (int i = 0; i < roadSegmentRight.getLaneSegments().length; i++) {
+            roadSegmentRight.getLaneSegments()[i].setOdrLane(road.getLanes().getLaneSection().get(0).getRight()
+                    .getLane().get(i));
+        }
+    }
+
     private void setBounds(RoadMapping roadMapping, double width) {
         if (!(roadMapping instanceof RoadMappingPoly)) {
             double roadLength = roadMapping.roadLength();
@@ -118,43 +126,43 @@ public class OpenDriveHandlerJaxb {
             for (int c = 0; c < lanesEdges.length; c++) {
                 lanesEdges[c] = new GeneralPath();
             }
-            double wd = width;
+            double wd = -width;
             for (int i = 0; i < lanesEdges.length; i += 2) {
                 p = roadMapping.map(0, wd);
                 lanesEdges[i].moveTo(p.x, p.y);
-                wd -= roadMapping.laneWidth() * 2;
+                wd += roadMapping.laneWidth() * 2;
             }
-            wd = width - roadMapping.laneWidth();
+            wd = -width + roadMapping.laneWidth();
             for (int i = 1; i < lanesEdges.length; i += 2) {
                 p = roadMapping.map(roadLength, wd);
                 lanesEdges[i].moveTo(p.x, p.y);
-                wd -= roadMapping.laneWidth() * 2;
+                wd += roadMapping.laneWidth() * 2;
             }
-            p = roadMapping.map(0, width);
+            p = roadMapping.map(0, -width);
             leftEdge.moveTo(p.x, p.y);
-            p = roadMapping.map(roadLength, -width);
+            p = roadMapping.map(roadLength, width);
             LastLaneEdge.moveTo(p.x, p.y);
             double s = 0.0 + pathStep;
             while (s <= roadLength) {
-                p = roadMapping.map(s, width);
+                p = roadMapping.map(s, -width);
                 leftEdge.lineTo(p.x, p.y);
-                wd = width;
+                wd = -width;
                 for (int i = 0; i < lanesEdges.length; i += 2) {
                     p = roadMapping.map(s, wd);
                     lanesEdges[i].lineTo(p.x, p.y);
-                    wd -= roadMapping.laneWidth() * 2;
+                    wd += roadMapping.laneWidth() * 2;
                 }
                 s += pathStep;
             }
             s -= pathStep;
             while (s >= 0) {
-                p = roadMapping.map(s, -width);
+                p = roadMapping.map(s, width);
                 LastLaneEdge.lineTo(p.x, p.y);
-                wd = width - roadMapping.laneWidth();
+                wd = -width + roadMapping.laneWidth();
                 for (int i = 1; i < lanesEdges.length; i += 2) {
                     p = roadMapping.map(s, wd);
                     lanesEdges[i].lineTo(p.x, p.y);
-                    wd -= roadMapping.laneWidth() * 2;
+                    wd += roadMapping.laneWidth() * 2;
                 }
                 s -= pathStep;
             }
@@ -439,7 +447,7 @@ public class OpenDriveHandlerJaxb {
         }
     }
 
-    private static void addLaneLinkage(RoadSegment roadSegment, RoadSegment sinkRoadSegment, List<Lane> lanes) {
+    public static void addLaneLinkage(RoadSegment roadSegment, RoadSegment sinkRoadSegment, List<Lane> lanes) {
         for (Lane lane : lanes) {
             if (lane.isSetLink() && lane.getLink().isSetSuccessor()) {
                 int fromLane = OpenDriveHandlerUtils.laneIdToLaneIndex(roadSegment, lane.getId());
@@ -450,22 +458,22 @@ public class OpenDriveHandlerJaxb {
         }
     }
 
-    private static RoadSegment getRoadSuccessor(RoadNetwork roadNetwork, Road road) {
+    public static RoadSegment getRoadSuccessor(RoadNetwork roadNetwork, Road road) {
         return Preconditions.checkNotNull(roadNetwork.findByUserId(road.getLink().getSuccessor().getElementId()),
                 "Cannot find successor link:" + road.getLink().getSuccessor());
     }
 
-    private static boolean hasRoadSuccessor(Road road) {
+    public static boolean hasRoadSuccessor(Road road) {
         return road.getLink().isSetSuccessor()
                 && road.getLink().getSuccessor().getElementType().equals(RoadLinkElementType.ROAD.xodrIdentifier());
     }
 
-    private static RoadSegment getSourceRoadSegment(RoadNetwork roadNetwork, Road road) {
+    public static RoadSegment getSourceRoadSegment(RoadNetwork roadNetwork, Road road) {
         return Preconditions.checkNotNull(roadNetwork.findByUserId(road.getLink().getPredecessor().getElementId()),
                 "Cannot find predecessor link:" + road.getLink().getPredecessor());
     }
 
-    private static boolean hasRoadPredecessor(Road road) {
+    public static boolean hasRoadPredecessor(Road road) {
         return road.getLink().isSetPredecessor()
                 && road.getLink().getPredecessor().getElementType().equals(RoadLinkElementType.ROAD.xodrIdentifier());
     }

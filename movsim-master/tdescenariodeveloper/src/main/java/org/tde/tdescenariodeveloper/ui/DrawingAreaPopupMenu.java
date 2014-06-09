@@ -19,7 +19,7 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 	 */
 	private static final long serialVersionUID = -7710136231966863266L;
 	RoadContext rdCxt;
-	JMenuItem newlane,removeLane,removegeo,newgeo,toggleRotation;
+	JMenuItem newlane,removeLane,removegeo,newgeo,toggleRotation,delete;
 	JSlider lnWidth,sOffset,hdg,curv;
 	DrawingAreaPopupListener popupListener;
 	JLabel lnWidthLbl,gmsOffsetLbl,hdgLbl,curvLbl;
@@ -49,6 +49,7 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 		setLayout(new GridBagLayout());
 		add(newgeo,fullRow);
 		add(toggleRotation,fullRow);
+		add(delete,fullRow);
 		
 		add(removegeo,fullRow);
 		add(new Separator(),fullRow);
@@ -87,6 +88,7 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 		sOffset.addChangeListener(listener);
 		newgeo.addActionListener(listener);
 		toggleRotation.addActionListener(listener);
+		delete.addActionListener(listener);
 		newlane.addActionListener(listener);
 		removegeo.addActionListener(listener);
 		removeLane.addActionListener(listener);
@@ -101,6 +103,7 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 		removegeo=new JMenuItem("Remove road segment");
 		newgeo=new JMenuItem("Append new road segment");
 		toggleRotation=new JMenuItem("Clockwise/Counter-Clockwise");
+		delete=new JMenuItem("Delete road");
 		
 		newlane=new JMenuItem("Add new lane");
 		removeLane=new JMenuItem("Remove lane");
@@ -164,6 +167,9 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 
 	public JMenuItem getToggleRotation() {
 		return toggleRotation;
+	}
+	public JMenuItem getDelete() {
+		return delete;
 	}
 
 	public JSlider getHdg() {

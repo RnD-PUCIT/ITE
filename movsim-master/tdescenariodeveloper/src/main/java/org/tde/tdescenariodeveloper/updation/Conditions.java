@@ -1,5 +1,7 @@
 package org.tde.tdescenariodeveloper.updation;
 
+import javax.swing.JTextField;
+
 import org.movsim.autogen.Route;
 import org.movsim.autogen.VehiclePrototypeConfiguration;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
@@ -25,5 +27,34 @@ public class Conditions {
 		for(org.movsim.autogen.Road r:mvCxt.getMovsim().getScenario().getSimulation().getRoad())
 			if(r.getId().equals(id))return true;
 		return false;
+	}
+	public static boolean isValid(JTextField tf,String old){
+		if(tf==null || old==null)return false;
+		else if(tf.getText().equals(""))return false;
+		else if(tf.getText().charAt(tf.getText().length()-1)=='.')return false;
+		else if(old.equals(tf.getText()))return false;
+		return true;
+	}
+	public static boolean isValid(JTextField tf,double old){
+		if(tf==null)return false;
+		try{
+			if(tf.getText().equals(""))return false;
+			else if(tf.getText().charAt(tf.getText().length()-1)=='.')return false;
+			else if(old==Double.parseDouble(tf.getText()))return false;
+		}catch(NumberFormatException e){
+			return true;
+		}
+		return true;
+	}
+	public static boolean isValid(JTextField tf,int old){
+		if(tf==null)return false;
+		try{
+			if(tf.getText().equals(""))return false;
+			else if(tf.getText().charAt(tf.getText().length()-1)=='.')return false;
+			else if(old==Integer.parseInt(tf.getText()))return false;
+		}catch(NumberFormatException e){
+			return true;
+		}
+		return true;
 	}
 }

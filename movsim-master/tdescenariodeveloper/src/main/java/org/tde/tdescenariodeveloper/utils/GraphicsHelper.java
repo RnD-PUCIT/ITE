@@ -11,6 +11,8 @@ import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -86,12 +88,16 @@ public class GraphicsHelper {
 		}
 	}
 	public static String[] valuesFromUser(String title,String...msgs) {
-		JPanel p=new JPanel(new GridLayout(msgs.length,2,7,7));
+		return valuesFromUser(title, new JPanel(), msgs);
+	}
+	public static String[] valuesFromUser(String title,JPanel p,String...msgs) {
+		p.setLayout((new GridLayout(msgs.length,2,7,7)));
 		JTextField[]flds=new JTextField[msgs.length];
 		
 		for(int i=0;i<flds.length;i++){
 			p.add(new JLabel(msgs[i]));
 			flds[i]=new JTextField();
+			flds[i].setOpaque(false);
 			p.add(flds[i]);
 		}
 		String []s=new String[flds.length];
@@ -104,6 +110,15 @@ public class GraphicsHelper {
 			}
 		}
 		return s;
+	}
+	public static String selectionFromUser(String title,JPanel p,String...msgs) {
+		JComboBox<String>cb=new JComboBox<String>(msgs);
+		p.add(new JLabel("Select main road"));
+		p.add(cb);
+		if(JOptionPane.showConfirmDialog(null, p, title,JOptionPane.OK_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE)!=JOptionPane.OK_OPTION){
+			return null;
+		}
+		return (String)cb.getSelectedItem();
 	}
 }
 class ToastMessage extends JDialog {

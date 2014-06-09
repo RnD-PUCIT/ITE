@@ -9,15 +9,23 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Set;
 
 import org.movsim.autogen.Road;
 import org.movsim.autogen.TrafficLightStatus;
+import org.movsim.input.network.OpenDriveHandlerJaxb;
+import org.movsim.input.network.OpenDriveHandlerUtils;
+import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Lanes.LaneSection;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.LaneSegment;
@@ -31,6 +39,7 @@ import org.movsim.simulator.trafficlights.TrafficLightLocation;
 import org.movsim.viewer.roadmapping.PaintRoadMapping;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaKeyListener;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
+import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class DrawingArea extends Canvas {
 	private static final long serialVersionUID = 1653L;
@@ -68,9 +77,26 @@ public class DrawingArea extends Canvas {
 	private boolean drawLaneBounds=false;
 	private boolean drawSelectedLane=true;
 	private boolean drawSelectedGeometry=true;
+	private boolean drawLaneLinks=true;
     private DrawingAreaPopupMenu popup;
 	private DrawingAreaPopupMenu2 popup2;
-    
+	
+	GeneralPath arrow=new GeneralPath();
+	private boolean drawSelectedRoad=true;
+	private void drawArrowHead(Graphics2D g,Line2D line,Color c) {
+		g.setColor(c);
+		double angle=Math.atan2(line.getY2()-line.getY1(), line.getX2()-line.getX1());
+		arrow.reset();
+		arrow.moveTo(line.getX2()+4*Math.cos(angle), line.getY2()+4*Math.sin(angle));
+		arrow.lineTo(line.getX2()+2*Math.sin(angle), line.getY2()-2*Math.cos(angle));
+		arrow.lineTo(line.getX2()-2*Math.sin(angle), line.getY2()+2*Math.cos(angle));
+		arrow.closePath();
+	    g.draw(line);
+	    g.fill(arrow);
+	    
+	    
+//	    g.fillOval((int)line.getX2()-3, (int)line.getY2()-3, 6, 6);
+	}
 	public DrawingArea(RoadContext rdPrPnl) {
 		this.roadPrPnl=rdPrPnl;
 		popup=new DrawingAreaPopupMenu(roadPrPnl);
@@ -89,14 +115,14 @@ public class DrawingArea extends Canvas {
 		Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
 		g.setStroke(dashed);
 		g.setColor(Color.WHITE.darker());
-		drawSelectedRoad(g);
-    	if(drawSelectedLane){
+		if(drawSelectedRoad && !mouseListener.roadInDrag)drawSelectedRoad(g);
+    	if(drawSelectedLane && !mouseListener.roadInDrag){
     		Stroke lnStroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{1.5f}, 0);
 	    	g.setStroke(lnStroke);
 	    	g.setColor(Color.BLUE);
 	    	drawSelectedLane(g);
     	}
-    	if(drawSelectedGeometry){
+    	if(drawSelectedGeometry && !mouseListener.roadInDrag){
         	Stroke gmStroke = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{1f}, 0);
         	g.setStroke(gmStroke);
         	g.setColor(Color.YELLOW);
@@ -122,10 +148,8 @@ public class DrawingArea extends Canvas {
 		if(roadPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			RoadMappingPoly rmp=(RoadMappingPoly)roadPrPnl.getSelectedRoad().roadMapping();
 			g.draw(rmp.getBounds());
-//			g.draw(rmp.getBounds().getBounds2D());
 		}else{
 			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
-//			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds().getBounds2D());
 		}
 	}
 	private void drawSelectedJunctionBounds(Graphics2D g){
@@ -142,7 +166,88 @@ public class DrawingArea extends Canvas {
 			}
 		}
 	}
-    private void drawSelectedLane(Graphics2D g) {
+	private void drawLinks(Graphics2D g){
+		 for (org.movsim.network.autogen.opendrive.OpenDRIVE.Road road : getRoadPrPnl().getRn().getOdrNetwork().getRoad()) {
+	            RoadSegment roadSegment = getRoadPrPnl().getRn().findByUserId(road.getId());
+	            if (roadSegment == null) {
+	            	continue;
+//	                throw new IllegalArgumentException("cannot find roadSegment in network for road: " + road.getId());
+	            }
+
+	            if (!road.isSetLink()) {
+	                continue;
+	            }
+	            boolean hasPr=false;
+	            try{
+	            	hasPr=OpenDriveHandlerJaxb.hasRoadPredecessor(road);
+	            }catch(NullPointerException e){
+	            	continue;
+	            }
+	            if (hasPr) {
+	            	RoadSegment sourceRoadSegment;
+	            	try{
+	            		sourceRoadSegment = OpenDriveHandlerJaxb.getSourceRoadSegment(getRoadPrPnl().getRn(), road);
+	            	}catch(NullPointerException e){
+	            		continue;
+	            	}
+	                for (LaneSection laneSection : road.getLanes().getLaneSection()) {
+	                    if (laneSection.isSetCenter()) {
+	                        // LOG.warn("cannot handle center lane");
+	                        continue;
+	                    }
+	                    List<org.movsim.network.autogen.opendrive.Lane> lanes = laneSection.isSetLeft() ? laneSection
+	                            .getLeft().getLane() : laneSection.getRight().getLane();
+	                    for (Lane lane : lanes) {
+	                        if (lane.isSetLink() && lane.getLink().isSetPredecessor()) {
+	                            int fromLane = OpenDriveHandlerUtils.laneIdToLaneIndex(sourceRoadSegment, lane.getLink()
+	                                    .getPredecessor().getId());
+	                            int toLane = OpenDriveHandlerUtils.laneIdToLaneIndex(roadSegment, lane.getId());
+	                            Point2D p1=RoadNetworkUtils.getEnd(sourceRoadSegment, fromLane);
+	                            Point2D p2=RoadNetworkUtils.getStart(roadSegment, toLane);
+	                            drawArrow(g, p1, p2,Color.BLACK);
+	                            
+	                        }
+	                    }
+	                }
+	            }
+	            boolean hasSc=false;
+	            try{
+	            	hasSc=OpenDriveHandlerJaxb.hasRoadSuccessor(road);
+	            }catch(NullPointerException e){
+	            	continue;
+	            }
+	            if (hasSc) {
+	            	RoadSegment sinkRoadSegment;
+	                try{
+	                	sinkRoadSegment = OpenDriveHandlerJaxb.getRoadSuccessor(getRoadPrPnl().getRn(), road);
+	                }catch(NullPointerException e){
+	                	continue;
+	                }
+	                for (LaneSection laneSection : road.getLanes().getLaneSection()) {
+	                    if (laneSection.isSetCenter()) {
+	                        continue;
+	                    }
+	                    List<Lane> lanes = laneSection.isSetLeft() ? laneSection.getLeft().getLane() : laneSection
+	                            .getRight().getLane();
+	                    for (Lane lane : lanes) {
+	                        if (lane.isSetLink() && lane.getLink().isSetSuccessor()) {
+	                            int fromLane = OpenDriveHandlerUtils.laneIdToLaneIndex(roadSegment, lane.getId());
+	                            int toLane = OpenDriveHandlerUtils.laneIdToLaneIndex(sinkRoadSegment, lane.getLink().getSuccessor()
+	                                    .getId());
+	                            Point2D p1=RoadNetworkUtils.getEnd(roadSegment, fromLane);
+	                            Point2D p2=RoadNetworkUtils.getStart(sinkRoadSegment, toLane);
+	                            drawArrow(g, p1, p2,Color.WHITE);
+	                        }
+	                    }
+	                }
+	            }
+	        }
+	}
+    private void drawArrow(Graphics2D g, Point2D p1, Point2D p2,Color c) {
+		Line2D line=new Line2D.Double(p1,p2);
+		drawArrowHead(g, line,c);
+	}
+	private void drawSelectedLane(Graphics2D g) {
     	g.setColor(Color.BLUE);
     	g.draw(roadPrPnl.getSelectedRoad().getLaneSegments()[roadPrPnl.getLanesPnl().getSelectedIndex()].getBounds());
 	}
@@ -280,8 +385,17 @@ public class DrawingArea extends Canvas {
         	g.setColor(Color.BLUE);
         	drawLaneBounds(g);
         }
+        if(drawLaneLinks)drawLinks(g);
+        if(mouseListener.getLinkPoints().size()==1)drawLinkerLine(g);
     }
 
+	private void drawLinkerLine(Graphics2D g) {
+		g.setColor(Color.RED.darker());
+		RoadSegment roadSegment=mouseListener.getLinkPoints().get(0).getRs();
+		int ls=mouseListener.getLinkPoints().get(0).getLaneId();
+		Point2D p=RoadNetworkUtils.getEnd(roadSegment, ls);
+		g.drawLine((int)p.getX(), (int)p.getY(), (int)mouseListener.getMousePoint().getX(),(int) mouseListener.getMousePoint().getY());
+	}
 	private void drawLaneBounds(Graphics2D g) {
     	for(RoadSegment rs:roadPrPnl.getRn()){
     		for(LaneSegment ls:rs.getLaneSegments()){
@@ -518,9 +632,9 @@ public class DrawingArea extends Canvas {
             final int fontHeight = 12;
             final Font font = new Font("SansSerif", Font.PLAIN, fontHeight); //$NON-NLS-1$
             g.setFont(font);
-            g.setColor(Color.BLACK);
-            if(drawRoadNames)g.drawString(roadSegment.getRoadName(), (int) (posTheta.x), (int) (posTheta.y)); //$NON-NLS-1$
-            else g.drawString(roadSegment.userId(), (int) (posTheta.x), (int) (posTheta.y)); //$NON-NLS-1$
+            g.setColor(Color.DARK_GRAY);
+            if(drawRoadNames)g.drawString(roadSegment.getRoadName(), (int) (posTheta.x+20*posTheta.cosTheta), (int) (posTheta.y-20*posTheta.sinTheta)); //$NON-NLS-1$
+            else g.drawString(roadSegment.userId(), (int) (posTheta.x+20*posTheta.cosTheta), (int) (posTheta.y-20*posTheta.sinTheta)); //$NON-NLS-1$//$NON-NLS-1$
         }
     }
     private void drawSources(Graphics2D g) {

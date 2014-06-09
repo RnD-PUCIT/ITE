@@ -68,6 +68,8 @@ public class RouteListener implements DocumentListener, ActionListener ,Blockabl
 		if(blocked)return;
 		Document doc=e.getDocument();
 		if(doc==routeLabel.getDocument()){
+			if(!Conditions.isValid(routeLabel, rt.getLabel()))
+				return;
 			final String newlbl=routeLabel.getText();
 			if(!Conditions.existsLabelInRoutes(newlbl, mvCxt)){
 				String oldlbl=rt.getLabel();

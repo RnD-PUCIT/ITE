@@ -64,7 +64,7 @@ public class LanesPanel extends JPanel{
 		JPanel tmp=new JPanel(new GridBagLayout());
 		tmp.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		tfwidth=new JTextField(10);
-		tfwidth.setHighlighter(null);
+//		tfwidth.setHighlighter(null);
 		tfwidth.getDocument().addDocumentListener(lpl);
 		JLabel lbl=new JLabel("Lane width");
 		lbl.setLabelFor(tfwidth);
@@ -95,7 +95,7 @@ public class LanesPanel extends JPanel{
 
 		
 		maxSpeed=new JTextField(10);
-		maxSpeed.setHighlighter(null);
+//		maxSpeed.setHighlighter(null);
 		maxSpeed.getDocument().addDocumentListener(lpl);
 		lbl=new JLabel("Max speed");
 		lbl.setLabelFor(maxSpeed);

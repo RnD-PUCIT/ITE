@@ -1,17 +1,38 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-
-import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class TDEResources {
 	private static TDEResources ir=null;
+	private Cursor linkCursor;
+	final public Cursor DEFAULT_CURSOR=new Cursor(Cursor.DEFAULT_CURSOR);
+	final public Cursor DEFAULT_RED_CURSOR;
+	final public Cursor STRAIGHT_ROAD_CURSOR;
+	final public Cursor ARC_ROAD_CURSOR;
+	final public Cursor TRAFFIC_SOURCE_CURSOR;
+	final public Cursor LINK_CURSOR;
+	final public Image JUNCTION_DEMO;
+	final public Cursor HAND_CURSOR=new Cursor(Cursor.HAND_CURSOR);
 	private TDEResources(){
+		Dimension d=Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
+		Point p=new Point();
+		p.setLocation(d.width/2.0, d.height/2.0);
+		Point p2=new Point();
+		p2.setLocation(d.width/2.0, d.height-1);
+		LINK_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("linker_icon2.png")), p2, "linkCursor");
+		DEFAULT_RED_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("defaultred_cursor.png")), p, "defaultRedCusor");
+		STRAIGHT_ROAD_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("straight_road2.png")), p, "straightRoadCursor");
+		ARC_ROAD_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("arc_road2.png")), p, "arcRoadCursor");
+		TRAFFIC_SOURCE_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("traffic_source2.png")), p, "trafficSourceCursor");
+		
 		rem=new ImageIcon(getClass().getClassLoader().getResource("del.png"));
 		addIcon=new ImageIcon(getClass().getClassLoader().getResource("add.png"));
 		run=new ImageIcon(getClass().getClassLoader().getResource("run.png"));
@@ -23,6 +44,8 @@ public class TDEResources {
 		arcRoad=new ImageIcon(getClass().getClassLoader().getResource("arc_road.png"));
 		trafficSource=new ImageIcon(getClass().getClassLoader().getResource("traffic_source.png"));
 		junctions=new ImageIcon(getClass().getClassLoader().getResource("junctions_tab_icon.png"));
+		linker=new ImageIcon(getClass().getClassLoader().getResource("linker.png"));
+		JUNCTION_DEMO=Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("junction_demo.png"));
 		
 		run.setImage(run.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		output.setImage(output.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
@@ -35,6 +58,7 @@ public class TDEResources {
 		arcRoad.setImage(arcRoad.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		trafficSource.setImage(trafficSource.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		junctions.setImage(junctions.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		linker.setImage(linker.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 	}
 	public static TDEResources getResources(){
 		if(ir==null)ir=new TDEResources();
@@ -75,6 +99,7 @@ public class TDEResources {
 	private static ImageIcon arcRoad;
 	private static ImageIcon trafficSource;
 	private static ImageIcon junctions;
+	private static ImageIcon linker;
 	public static ImageIcon getRem() {
 		return rem;
 	}
@@ -107,5 +132,11 @@ public class TDEResources {
 	}
 	public static ImageIcon getJunctions() {
 		return junctions;
+	}
+	public Icon getLinker() {
+		return linker;
+	}
+	public Cursor getLinkCursor() {
+		return linkCursor;
 	}
 }

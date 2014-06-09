@@ -6,6 +6,7 @@ import javax.swing.event.DocumentListener;
 
 import org.movsim.autogen.AccelerationModelType;
 import org.movsim.autogen.ModelParameterACC;
+import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class ModelParamTextFieldListener implements DocumentListener,Blockable {
@@ -34,6 +35,7 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 
 	private void textChanged(DocumentEvent e) {
 		if(blocked)return;
+		if(!Conditions.isValid(tf, ""))return;
 		if(accT.isSetModelParameterACC()){
 			changeACC();
 		}

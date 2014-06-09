@@ -89,6 +89,8 @@ public class VehicleTypeToPanelListener implements ActionListener,DocumentListen
 		if(blocked)return;
 		Document doc=e.getDocument();
 		if(doc==fraction.getDocument()){
+			if(!Conditions.isValid(fraction, vt.getFraction()))
+				return;
 			try{
 				double d2=Double.parseDouble(fraction.getText());
 				GraphicsHelper.makeBlack(fraction);
@@ -97,6 +99,8 @@ public class VehicleTypeToPanelListener implements ActionListener,DocumentListen
 				GraphicsHelper.makeRed(fraction);
 			}
 		}else if(doc==relV0Rand.getDocument()){
+			if(!Conditions.isValid(relV0Rand, vt.getRelativeV0Randomization()))
+				return;
 			try{
 				double d2=Double.parseDouble(relV0Rand.getText());
 				GraphicsHelper.makeBlack(relV0Rand);

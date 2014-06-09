@@ -80,6 +80,8 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 		if(blocked)return;
 		Document src=e.getDocument();
 		if(src==label.getDocument()){
+			if(!Conditions.isValid(label, vpc.getLabel()))
+				return;
 			final String newlbl=label.getText();
 			if(!Conditions.existsLabelInVPC(newlbl,mvCxt)){
 				String oldlbl=vpc.getLabel();
@@ -95,6 +97,8 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 				});
 		}
 		else if(src==lengthTf.getDocument()){
+			if(!Conditions.isValid(lengthTf, vpc.getLength()))
+				return;
 			try{
 				double d=Double.parseDouble(lengthTf.getText());
 				GraphicsHelper.makeBlack(lengthTf);
@@ -103,6 +107,8 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 				GraphicsHelper.makeRed(lengthTf);
 			}
 		}else if(src==widthTf.getDocument()){
+			if(!Conditions.isValid(widthTf, vpc.getWidth()))
+				return;
 			try{
 				double d=Double.parseDouble(widthTf.getText());
 				GraphicsHelper.makeBlack(widthTf);
@@ -111,6 +117,8 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 				GraphicsHelper.makeRed(widthTf);
 			}
 		}else if(src==maxDec.getDocument()){
+			if(!Conditions.isValid(maxDec, vpc.getMaximumDeceleration()))
+				return;
 			try{
 				double d=Double.parseDouble(maxDec.getText());
 				GraphicsHelper.makeBlack(maxDec);

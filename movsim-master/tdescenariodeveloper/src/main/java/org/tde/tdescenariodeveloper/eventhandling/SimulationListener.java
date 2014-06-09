@@ -17,6 +17,7 @@ import org.movsim.autogen.Road;
 import org.movsim.autogen.TrafficComposition;
 import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
+import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
@@ -66,6 +67,8 @@ public class SimulationListener implements ItemListener, DocumentListener,Action
 		if(blocked)return;
 		Document d=e.getDocument();
 		if(d==tmSt.getDocument()){
+			if(!Conditions.isValid(tmSt, mvCxt.getMovsim().getScenario().getSimulation().getTimestep()))
+				return;
 			try{
 				double d2=Double.parseDouble(tmSt.getText());
 				GraphicsHelper.makeBlack(tmSt);
@@ -74,6 +77,8 @@ public class SimulationListener implements ItemListener, DocumentListener,Action
 				GraphicsHelper.makeRed(tmSt);
 			}
 		}else if(d==dur.getDocument()){
+			if(!Conditions.isValid(dur, mvCxt.getMovsim().getScenario().getSimulation().getDuration()))
+				return;
 			try{
 				double d2=Double.parseDouble(dur.getText());
 				GraphicsHelper.makeBlack(dur);
@@ -82,6 +87,8 @@ public class SimulationListener implements ItemListener, DocumentListener,Action
 				GraphicsHelper.makeRed(dur);
 			}
 		}else if(d==seed.getDocument()){
+			if(!Conditions.isValid(seed, mvCxt.getMovsim().getScenario().getSimulation().getSeed()))
+				return;
 			try{
 				int d2=Integer.parseInt(seed.getText());
 				GraphicsHelper.makeBlack(seed);

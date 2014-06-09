@@ -11,6 +11,7 @@ public class LanesUpdater {
 	public LanesUpdater(RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 	}
+	
 	public void addnewLane() {
 		Lane ln=new Lane();
 		ln.setId(-1*rdCxt.getSelectedRoad().getLaneSegments().length-1);
@@ -28,6 +29,7 @@ public class LanesUpdater {
 		RoadNetworkUtils.updateLaneIds(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
 	}
+	
 	public void removeLastLane() {
 		rdCxt.getLanesPnl().getOdrLanes().remove(rdCxt.getLanesPnl().getOdrLanes().size()-1);
 		RoadNetworkUtils.updateLaneIds(rdCxt);
@@ -63,4 +65,5 @@ public class LanesUpdater {
 		rdCxt.getLanesPnl().getSelectedLane().setType((String)rdCxt.getLanesPnl().getCbtype().getSelectedItem());
 		RoadNetworkUtils.refresh(rdCxt);		
 	}
+	
 }

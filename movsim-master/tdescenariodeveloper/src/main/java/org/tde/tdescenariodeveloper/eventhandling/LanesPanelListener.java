@@ -13,6 +13,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.LanesUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
@@ -83,9 +84,8 @@ public class LanesPanelListener implements DocumentListener, ActionListener,Chan
 		if(locked)return;
 		Document doc=e.getDocument();
 		if(doc==rdCxt.getLanesPnl().getTfWidth().getDocument()){
-			if(rdCxt.getLanesPnl().getTfWidth().getText().equals("")){
+			if(!Conditions.isValid(rdCxt.getLanesPnl().getTfWidth(),rdCxt.getLanesPnl().getSelectedLane().getWidth().get(0).getA()))
 				return;
-			}
 			try{
 				if(validator.isValidWidth()){
 					updater.updateWidth();
@@ -95,9 +95,8 @@ public class LanesPanelListener implements DocumentListener, ActionListener,Chan
 			}
 		}
 		else if(doc==rdCxt.getLanesPnl().getMaxSpeed().getDocument()){
-			if(rdCxt.getLanesPnl().getMaxSpeed().getText().equals("")){
+			if(!Conditions.isValid(rdCxt.getLanesPnl().getMaxSpeed(),-44))
 				return;
-			}
 			try{
 				if(validator.isValidMaxSpeed()){
 					updater.updateMaxSpeed();

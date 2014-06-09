@@ -2,7 +2,6 @@ package org.tde.tdescenariodeveloper.eventhandling;
 
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -12,22 +11,25 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import javax.naming.ldap.Rdn;
 import javax.swing.JOptionPane;
 
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
+import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.ui.DrawingArea;
 import org.tde.tdescenariodeveloper.ui.StatusPanel;
+import org.tde.tdescenariodeveloper.ui.TDEResources;
+import org.tde.tdescenariodeveloper.updation.LinkUpdater;
+import org.tde.tdescenariodeveloper.updation.RoadLaneSegmentPair;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class DrawingAreaMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
-
     private final DrawingArea trafficCanvas;
     public final DrawingAreaController controller;
-    private boolean inDrag,selected;
+    public boolean inDrag,selected,roadInDrag=false;
     private int startDragX;
     private int startDragY;
     private int xOffsetSave;
@@ -35,8 +37,9 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     private RoadMapping rm;
     private StatusPanel statusPnl;
     Point2D.Double startTransformed=new Point2D.Double(),endTransformed=new Point2D.Double();
-    private ArrayList<Double> X0=new ArrayList<>(),Y0=new ArrayList<>(); 
-
+    private ArrayList<Double> X0=new ArrayList<>(),Y0=new ArrayList<>();
+	private Point2D mousePoint;
+    final private ArrayList<RoadLaneSegmentPair>linkPoints=new ArrayList<>();
     /**
      * @param trafficCanvas
      */
@@ -58,9 +61,9 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         try {
 			trafficCanvas.transform.inverseTransform(new Point2D.Float(point.x, point.y), transformedPoint);
 		} catch (NoninvertibleTransformException e1) {
-			JOptionPane.showMessageDialog(null, e1.getMessage());
+			GraphicsHelper.showMessage("Error: "+e1.getMessage());
 		}
-    	if(trafficCanvas.getCursor().getType()==Cursor.HAND_CURSOR){
+    	if(trafficCanvas.getCursor()==TDEResources.getResources().HAND_CURSOR){
     		RoadSegment sp=RoadNetworkUtils.getUnderLyingRoadSegment(transformedPoint,trafficCanvas.getRoadPrPnl().getMvCxt());
     		if(sp!=null){
     			if(e.getButton()==MouseEvent.BUTTON1){
@@ -83,52 +86,91 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         		trafficCanvas.paint(trafficCanvas.getGraphics());
         		return;
     		}
-    	}
-        selected=false;
-        for(int i=trafficCanvas.getRoadPrPnl().getRn().size()-1;i>=0 && !selected;i--){
-        	RoadSegment rs=trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().get(i);
-        	if(!(rs.roadMapping() instanceof RoadMappingPoly)){
-	    		if(rs.roadMapping().contains(transformedPoint.getX(), transformedPoint.getY())){
-	    			trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(0,false);
-	    			for(int lnInd=0;lnInd<rs.getLaneSegments().length;lnInd++){
-	    				if(rs.getLaneSegments()[lnInd].getBounds().contains(transformedPoint))trafficCanvas.getRoadPrPnl().getLanesPnl().setSelectedLane(lnInd, false);
-	    			}
-	    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
-	    			selected=true;
-	    		}
-        	}else{
-        		RoadMappingPoly rmp=((RoadMappingPoly)rs.roadMapping());
-        		for(int ind=rmp.getRoadMappings().size()-1;ind>=0 && !selected;ind--){
-        			rm=rmp.getRoadMappings().get(ind);
-        			if(rm.contains(transformedPoint.getX(), transformedPoint.getY())){
-        				trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(ind,false);
-        				for(int lnInd=0;lnInd<rs.getLaneSegments().length;lnInd++){
-    	    				if(rs.getLaneSegments()[lnInd].getBounds().contains(transformedPoint))trafficCanvas.getRoadPrPnl().getLanesPnl().setSelectedLane(lnInd, false);
-    	    			}
-    	    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
-    	    			selected=true;
-    	    		}
+    		if(e.getButton()==MouseEvent.BUTTON3){
+    			trafficCanvas.getPopup2().show(trafficCanvas, e.getX(), e.getY());
+    		}
+    	}else if(trafficCanvas.getCursor()==TDEResources.getResources().LINK_CURSOR){
+    		if(e.getButton()==MouseEvent.BUTTON1){
+    			RoadSegment sp=RoadNetworkUtils.getUnderLyingRoadSegment(transformedPoint,trafficCanvas.getRoadPrPnl().getMvCxt());
+        		if(sp!=null){
+        			LaneSegment ls=RoadNetworkUtils.getUnderLyingLaneSegment(transformedPoint, sp);
+        			switch(linkPoints.size()){
+        			case 0:
+            			linkPoints.add(new RoadLaneSegmentPair(sp, ls, sp.userId(), ls.lane()));
+        				break;
+        			case 1:
+        				if(linkPoints.get(0).getRoadId().equals(sp.userId())){
+        					linkPoints.clear();
+        					return;
+        				}
+        				linkPoints.add(new RoadLaneSegmentPair(sp, ls, sp.userId(), ls.lane()));
+        				LinkUpdater.linkSelectedLanes(linkPoints, trafficCanvas.getRoadPrPnl());
+        				trafficCanvas.getRoadPrPnl().updateGraphics();
+        				break;
+        			default:
+        				linkPoints.clear();
+        			}
         		}
-        	}
-    	}
-        if(!selected){
-        	trafficCanvas.getRoadPrPnl().setSelectedRoadNull();
-        	trafficCanvas.getRoadPrPnl().updateGraphics();
-        }
-        else {
-        	trafficCanvas.getRoadPrPnl().updateGraphics();
-        	if(e.getButton()==MouseEvent.BUTTON3){
-        		if(trafficCanvas.getRoadPrPnl().getAppFrame().getTpnl().getJunctionEditor().isSelected()){
-        			trafficCanvas.getPopup2().show(trafficCanvas, e.getX(), e.getY());
-        			
-        		}else{
-        			trafficCanvas.getPopup().show(trafficCanvas, e.getX(), e.getY());
+        		else{
+        			if(linkPoints.size()>0)linkPoints.clear();
         		}
-        	}
-        }
+    		}
+    	}else if(trafficCanvas.getCursor()==TDEResources.getResources().TRAFFIC_SOURCE_CURSOR){
+    		if(e.getButton()==MouseEvent.BUTTON1)trafficCanvas.getRoadPrPnl().getAppFrame().getTpnl().trafficSourceClicked(e);
+    	}else if(trafficCanvas.getCursor()==TDEResources.getResources().STRAIGHT_ROAD_CURSOR){
+    		if(e.getButton()==MouseEvent.BUTTON1)trafficCanvas.getRoadPrPnl().getAppFrame().getTpnl().straightRoadClicked(e);
+    	}else if(trafficCanvas.getCursor()==TDEResources.getResources().ARC_ROAD_CURSOR){
+    		if(e.getButton()==MouseEvent.BUTTON1)trafficCanvas.getRoadPrPnl().getAppFrame().getTpnl().arcRoadClicked(e);
+	    }else if(trafficCanvas.getCursor().getType()==Cursor.DEFAULT_CURSOR){
+	        selected=false;
+	        for(int i=trafficCanvas.getRoadPrPnl().getRn().size()-1;i>=0 && !selected;i--){
+	        	RoadSegment rs=trafficCanvas.getRoadPrPnl().getRn().getRoadSegments().get(i);
+	        	if(!(rs.roadMapping() instanceof RoadMappingPoly)){
+		    		if(rs.roadMapping().contains(transformedPoint.getX(), transformedPoint.getY())){
+		    			trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(0,false);
+		    			for(int lnInd=0;lnInd<rs.getLaneSegments().length;lnInd++){
+		    				if(rs.getLaneSegments()[lnInd].getBounds().contains(transformedPoint)){
+		    					trafficCanvas.getRoadPrPnl().getLanesPnl().setSelectedLane(lnInd, false);
+		    					break;
+		    				}
+		    			}
+		    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
+		    			selected=true;
+		    		}
+	        	}else{
+	        		RoadMappingPoly rmp=((RoadMappingPoly)rs.roadMapping());
+	        		for(int ind=rmp.getRoadMappings().size()-1;ind>=0 && !selected;ind--){
+	        			rm=rmp.getRoadMappings().get(ind);
+	        			if(rm.contains(transformedPoint.getX(), transformedPoint.getY())){
+	        				trafficCanvas.getRoadPrPnl().getGmPnl().setSelectedGeometry(ind,false);
+	        				for(int lnInd=0;lnInd<rs.getLaneSegments().length;lnInd++){
+	    	    				if(rs.getLaneSegments()[lnInd].getBounds().contains(transformedPoint)){
+	    	    					trafficCanvas.getRoadPrPnl().getLanesPnl().setSelectedLane(lnInd, false);
+	    	    					break;
+	    	    				}
+	    	    			}
+	    	    			trafficCanvas.getRoadPrPnl().setSelectedRoad(rs);
+	    	    			selected=true;
+	    	    		}
+	        		}
+	        	}
+	    	}
+	        if(!selected){
+	        	trafficCanvas.getRoadPrPnl().setSelectedRoadNull();
+	        	trafficCanvas.getRoadPrPnl().updateGraphics();
+	        }
+	        else {
+	        	trafficCanvas.getRoadPrPnl().updateGraphics();
+	        	if(e.getButton()==MouseEvent.BUTTON3){
+	        		trafficCanvas.getPopup().show(trafficCanvas, e.getX(), e.getY());
+	        	}
+	        }
+    	}
     }
+   
 
-    /*
+
+	/*
      * (non-Javadoc)
      * 
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
@@ -145,6 +187,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         		trafficCanvas.transform.inverseTransform(new Point2D.Float(startDragX, startDragY), startTransformed);
         		if(!(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly)){
         			if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
+        				roadInDrag=true;
         				X0.add(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().getX0());
         				Y0.add(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().getY0());
         			}
@@ -152,6 +195,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         			RoadMappingPoly rmp=(RoadMappingPoly) trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping();
         			if(rmp.contains(startTransformed)){
     					for(int ii=0;ii<rmp.getRoadMappings().size();ii++){
+    						roadInDrag=true;
     						X0.add(rmp.getRoadMappings().get(ii).getX0());
     						Y0.add(rmp.getRoadMappings().get(ii).getY0());
     					}
@@ -163,7 +207,6 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 		}
         inDrag = true;
     }
-
 
 	/*
      * (non-Javadoc)
@@ -180,6 +223,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 				trafficCanvas.transform.inverseTransform(new Point2D.Float(p.x, p.y), endTransformed);
 				if(!isPoly){
 					if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().contains(startTransformed)){
+						roadInDrag=false;
 						trafficCanvas.getRoadPrPnl().getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setX(X0.get(0)+endTransformed.getX()-startTransformed.getX());
 						trafficCanvas.getRoadPrPnl().getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setY(Y0.get(0)+endTransformed.getY()-startTransformed.getY());
 						RoadNetworkUtils.refresh(trafficCanvas.getRoadPrPnl());
@@ -188,6 +232,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 	    		 else{
 	    			 
 	    			 if(((RoadMappingPoly)trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping()).contains(startTransformed)){
+	    				 roadInDrag=false;
 						for (int ii=0;ii<X0.size();ii++) {
 							Geometry rm=trafficCanvas.getRoadPrPnl().getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(ii);
 							rm.setX(X0.get(ii) + endTransformed.getX() - startTransformed.getX());
@@ -218,7 +263,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     	trafficCanvas.paint(trafficCanvas.getGraphics());
         inDrag = false;
     }
-    final int PROX_DIST = 3;
+
     /*
      * (non-Javadoc)
      * 
@@ -287,25 +332,9 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 			trafficCanvas.transform.inverseTransform(e.getPoint(), p);
 		} catch (NoninvertibleTransformException e1) {
 		}
-    	if(trafficCanvas.getRoadPrPnl().getAppFrame().getTpnl().getJunctionEditor().isSelected()){
-    		trafficCanvas.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    	}
-    	else if(selected){
-    		if(trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
-    			if(((RoadMappingPoly)trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping()).contains(p)){
-    				trafficCanvas.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-    			}
-    			else trafficCanvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    		}
-    		else{
-    			if((trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping()).contains(p)){
-    				trafficCanvas.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-    			}
-    			else trafficCanvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    		}    		
-    	}
-    	else{
-    		trafficCanvas.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    	if(linkPoints.size()==1){
+    		mousePoint=p;
+    		trafficCanvas.paint(trafficCanvas.getGraphics());
     	}
     	statusPnl.setStatus((int)p.getX()+", "+(int)p.getY());
     }
@@ -319,68 +348,6 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         }
         trafficCanvas.paint(trafficCanvas.getGraphics());
     }
-/*    private void setCursor(Point2D p){
-    	
-    	Rectangle2D r = trafficCanvas.getRoadPrPnl().getSelectedRoad().roadMapping().getBounds().getBounds2D();
-    	int outcode = r.outcode(p);
-        switch(outcode) {
-        case Rectangle.OUT_TOP:
-            if(Math.abs(p.getY() - r.getY()) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.N_RESIZE_CURSOR));
-            }
-            break;
-        case Rectangle.OUT_TOP + Rectangle.OUT_LEFT:
-            if(Math.abs(p.getY() - r.getY()) < PROX_DIST &&
-               Math.abs(p.getX() - r.getX()) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.NW_RESIZE_CURSOR));
-            }
-            break;
-        case Rectangle.OUT_LEFT:
-            if(Math.abs(p.getX() - r.getX()) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.W_RESIZE_CURSOR));
-            }
-            break;
-        case Rectangle.OUT_LEFT + Rectangle.OUT_BOTTOM:
-            if(Math.abs(p.getX() - r.getX()) < PROX_DIST &&
-               Math.abs(p.getY() - (r.getY()+r.getHeight())) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.SW_RESIZE_CURSOR));
-            }
-            break;
-        case Rectangle.OUT_BOTTOM:
-            if(Math.abs(p.getY() - (r.getY()+r.getHeight())) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.S_RESIZE_CURSOR));
-            }
-            break;
-        case Rectangle.OUT_BOTTOM + Rectangle.OUT_RIGHT:
-            if(Math.abs(p.getX() - (r.getX()+r.getWidth())) < PROX_DIST &&
-               Math.abs(p.getY() - (r.getY()+r.getHeight())) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.SE_RESIZE_CURSOR));
-            }
-            break;
-        case Rectangle.OUT_RIGHT:
-            if(Math.abs(p.getX() - (r.getX()+r.getWidth())) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.E_RESIZE_CURSOR));
-            }
-            break;
-        case Rectangle.OUT_RIGHT + Rectangle.OUT_TOP:
-            if(Math.abs(p.getX() - (r.getX()+r.getWidth())) < PROX_DIST &&
-               Math.abs(p.getY() - r.getY()) < PROX_DIST) {
-                trafficCanvas.setCursor(Cursor.getPredefinedCursor(
-                                    Cursor.NE_RESIZE_CURSOR));
-            }
-            break;
-        default:    // center
-            trafficCanvas.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-        }
-    }
-*/
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		
@@ -394,5 +361,15 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+
+	public ArrayList<RoadLaneSegmentPair> getLinkPoints() {
+		return linkPoints;
+	}
+
+
+	public Point2D getMousePoint() {
+		return mousePoint;
 	}
 }

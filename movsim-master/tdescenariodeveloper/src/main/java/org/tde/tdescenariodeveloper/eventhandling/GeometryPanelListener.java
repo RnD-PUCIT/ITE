@@ -10,6 +10,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.GeometryUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.GeometryValidator;
@@ -93,7 +94,7 @@ public class GeometryPanelListener implements DocumentListener,ActionListener,Bl
 		if(docListLocked || rdCxt.getSelectedRoad()==null)return;
 		Document doc=e.getDocument();
 		if(doc==rdCxt.getGmPnl().getS().getDocument()){
-			if(rdCxt.getGmPnl().getS().getText().equals(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getS()) || rdCxt.getGmPnl().getS().getText().equals(""))
+			if(!Conditions.isValid(rdCxt.getGmPnl().getS(), rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getS()))
 				return;
 			try{
 				if(validator.isValidS()){
@@ -109,7 +110,12 @@ public class GeometryPanelListener implements DocumentListener,ActionListener,Bl
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getTfX().getDocument() || doc==rdCxt.getGmPnl().getTfY().getDocument()){
-			if(rdCxt.getGmPnl().getTfY().getText().equals("") || rdCxt.getGmPnl().getTfX().getText().equals("")){
+			if (!(Conditions.isValid(rdCxt.getGmPnl().getTfX(), rdCxt
+					.getSelectedRoad().getOdrRoad().getPlanView().getGeometry()
+					.get(rdCxt.getGmPnl().getSelectedIndex()).getX()) || 
+					Conditions.isValid(rdCxt.getGmPnl().getTfY(), rdCxt
+					.getSelectedRoad().getOdrRoad().getPlanView().getGeometry()
+					.get(rdCxt.getGmPnl().getSelectedIndex()).getY()))) {
 				return;
 			}
 			try{
@@ -126,9 +132,8 @@ public class GeometryPanelListener implements DocumentListener,ActionListener,Bl
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getL().getDocument()){
-			if(rdCxt.getGmPnl().getL().getText().equals("")){
+			if(!Conditions.isValid(rdCxt.getGmPnl().getL(), rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getLength()))
 				return;
-			}
 			try{
 				if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getLength()==Double.parseDouble(rdCxt.getGmPnl().getL().getText())|| rdCxt.getGmPnl().getS().getText().equals(""))
 					return;
@@ -141,9 +146,8 @@ public class GeometryPanelListener implements DocumentListener,ActionListener,Bl
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getCurvature().getDocument()){
-			if(rdCxt.getGmPnl().getCurvature().getText().equals("")){
+			if(!Conditions.isValid(rdCxt.getGmPnl().getCurvature(), -44))
 				return;
-			}
 			try{
 				if(validator.isValidCurv()){
 					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getCurvature());
@@ -155,9 +159,8 @@ public class GeometryPanelListener implements DocumentListener,ActionListener,Bl
 			}
 		}
 		else if(doc==rdCxt.getGmPnl().getHdg().getDocument()){
-			if(rdCxt.getGmPnl().getHdg().getText().equals("")){
+			if(!Conditions.isValid(rdCxt.getGmPnl().getHdg(), rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getHdg()))
 				return;
-			}
 			try{
 				if(validator.isValidHdg()){
 					GraphicsHelper.makeBlack(rdCxt.getGmPnl().getHdg());

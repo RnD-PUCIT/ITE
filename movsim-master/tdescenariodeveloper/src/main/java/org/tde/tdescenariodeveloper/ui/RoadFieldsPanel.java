@@ -1,31 +1,24 @@
 package org.tde.tdescenariodeveloper.ui;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
-import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
-import org.movsim.simulator.roadnetwork.RoadSegment;
-import org.omg.PortableServer.ID_ASSIGNMENT_POLICY_ID;
 import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
-import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class RoadFieldsPanel extends JPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5593310264102814959L;
-	RoadSegment selectedRoad;
+	private JButton addRoad,removeRoad;
 	private JLabel tfId;
 	private JTextField tfName;
 	private JLabel tfLength;
@@ -33,15 +26,23 @@ public class RoadFieldsPanel extends JPanel {
 	RoadContext rdCxt;
 	public RoadFieldsPanel(RoadContext rpp,RoadFieldsPanelListener rfl) {
 		rdCxt=rpp;
-		setPreferredSize(new Dimension(250,100));
+		addRoad=new JButton("New road",TDEResources.getResources().getStraightRoad());
+		removeRoad=new JButton("Remove road",TDEResources.getResources().getRem());
+		addRoad.addActionListener(rfl);
+		removeRoad.addActionListener(rfl);
+		
 		setLayout(new GridBagLayout());
-		Insets ins=new Insets(5,5,5,5);
+		Insets ins=new Insets(2,2,2,2);
 		JLabel lblId = new JLabel("Id");
 		GridBagConstraints gbc_lbl = new GridBagConstraints();
 		gbc_lbl.insets = ins;
 		gbc_lbl.weightx=2;
 		gbc_lbl.anchor=GridBagConstraints.NORTHWEST;
 		gbc_lbl.fill=GridBagConstraints.BOTH;
+		add(addRoad,gbc_lbl);
+		gbc_lbl.gridwidth=GridBagConstraints.REMAINDER;
+		add(removeRoad,gbc_lbl);
+		gbc_lbl.gridwidth=1;
 		add(lblId, gbc_lbl);
 		
 		tfId = new JLabel();
@@ -56,7 +57,7 @@ public class RoadFieldsPanel extends JPanel {
 		JLabel lblName = new JLabel("Name");
 		add(lblName, gbc_lbl);
 		tfName = new JTextField();
-		tfName.setHighlighter(null);
+//		tfName.setHighlighter(null);
 		tfName.getDocument().addDocumentListener(rfl);
 		lblName.setLabelFor(tfName);
 		add(tfName, gbc_tf);
@@ -75,17 +76,14 @@ public class RoadFieldsPanel extends JPanel {
 		cbJunction.addActionListener(rfl);
 		lblJunction.setLabelFor(cbJunction);
 		add(cbJunction, gbc_tf);
-		
-	}
-	public void setSelectedRoad(RoadSegment selectedRoad) {
-		this.selectedRoad = selectedRoad;
+		rfl.setBlocked(false);
 	}
 	public void updateFields() {
-		if(selectedRoad==null)return;
-		tfId.setText(selectedRoad.getOdrRoad().getId());
-		tfName.setText(selectedRoad.getRoadName());
-		tfLength.setText(selectedRoad.getRoadLength()+"");
-		String jnc=selectedRoad.getOdrRoad().getJunction();
+		if(rdCxt.getSelectedRoad()==null)return;
+		tfId.setText(rdCxt.getSelectedRoad().getOdrRoad().getId());
+		tfName.setText(rdCxt.getSelectedRoad().getRoadName());
+		tfLength.setText(rdCxt.getSelectedRoad().getRoadLength()+"");
+		String jnc=rdCxt.getSelectedRoad().getOdrRoad().getJunction();
 		if(jnc.equals("-1"))jnc="None";
 		String[]jncs=new String[rdCxt.getRn().getOdrNetwork().getJunction().size()];
 		for(int i=0;i<jncs.length;i++){
@@ -95,13 +93,6 @@ public class RoadFieldsPanel extends JPanel {
 		cbJunction.addItem("None");
 		for(String s:jncs)cbJunction.addItem(s);
 		cbJunction.setSelectedItem(jnc);
-	}
-	public void updateFields(RoadSegment selectedRoad2) {
-		selectedRoad=selectedRoad2;
-		updateFields();
-	}
-	public RoadSegment getSelectedRoad() {
-		return selectedRoad;
 	}
 	public RoadNetwork getRn() {
 		return rdCxt.getRn();
@@ -120,6 +111,12 @@ public class RoadFieldsPanel extends JPanel {
 		tfName.setText("");
 		tfLength.setText("");
 		cbJunction.removeAllItems();
+	}
+	public JButton getAddRoad() {
+		return addRoad;
+	}
+	public JButton getRemoveRoad() {
+		return removeRoad;
 	}
 	
 }

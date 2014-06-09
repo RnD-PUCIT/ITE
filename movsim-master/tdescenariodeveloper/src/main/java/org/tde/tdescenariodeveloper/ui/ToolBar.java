@@ -31,7 +31,7 @@ public class ToolBar extends JToolBar implements ItemListener,ActionListener{
 	 */
 	private static final long serialVersionUID = -4127064504014635395L;
 
-JCheckBox name,id,axis;
+JCheckBox name,id,axis,dropRoadAtLast;
 JButton open,run,save;
 private boolean blocked=true;
 private MovsimConfigContext mvCxt;
@@ -43,7 +43,7 @@ DrawingArea drawingArea;
 		GridBagConstraints gbc=new GridBagConstraints();
 		gbc.fill=GridBagConstraints.BOTH;
 		gbc.anchor=GridBagConstraints.WEST;
-		gbc.insets=new Insets(5, 10, 5, 10);
+		gbc.insets=new Insets(1, 5, 1, 5);
 		gbc.ipadx=2;
 		gbc.ipady=2;
 		
@@ -54,6 +54,8 @@ DrawingArea drawingArea;
 		name=new JCheckBox("Draw road names");
 		id=new JCheckBox("Draw road id's");
 		axis=new JCheckBox("Draw axis");
+		dropRoadAtLast=new JCheckBox("Auto locate new road");
+		dropRoadAtLast.setToolTipText("Drop new road at end of the last road in network");
 		name.addItemListener(this);
 		id.addItemListener(this);
 		axis.addItemListener(this);
@@ -72,11 +74,13 @@ DrawingArea drawingArea;
 		
 		add(name,gbc);
 		add(id,gbc);
+		add(dropRoadAtLast,gbc);
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 		gbc.weightx=1;
 		add(axis,gbc);
 		id.setSelected(true);
 		axis.setSelected(true);
+		dropRoadAtLast.setSelected(false);
 	}
 	@Override
 	public void itemStateChanged(ItemEvent e) {
@@ -152,5 +156,8 @@ DrawingArea drawingArea;
 	}
 	public void setMvCxt(MovsimConfigContext mvCxt) {
 		this.mvCxt = mvCxt;
+	}
+	public JCheckBox getDropRoadAtLast() {
+		return dropRoadAtLast;
 	}
 }

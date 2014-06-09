@@ -90,7 +90,7 @@ public class LaneLinkPanel extends JPanel {
 		cbSelectLink.removeAllItems();
 		cbSelectLink.addItem("Predecessor");
 		cbSelectLink.addItem("Successor");
-		if (lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getPredecessor()!=null){
+		if (lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().isSetLink() && lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().isSetPredecessor()){
 			String preid=lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementId();
 			String pretype=lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementType();
 			switch(pretype){
@@ -118,6 +118,7 @@ public class LaneLinkPanel extends JPanel {
 			}
 			
 		}else{
+			if(!lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().isSetLink() || !lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().isSetSuccessor())return;
 			String sucid=lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getSuccessor().getElementId();
 			String suctype=lnPnl.getRdPrPnl().getSelectedRoad().getOdrRoad().getLink().getSuccessor().getElementType();
 			switch(suctype){

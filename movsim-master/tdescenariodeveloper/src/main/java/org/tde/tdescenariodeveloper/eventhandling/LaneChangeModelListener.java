@@ -8,6 +8,7 @@ import javax.swing.text.Document;
 
 import org.movsim.autogen.LaneChangeModelType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
+import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class LaneChangeModelListener implements DocumentListener,Blockable {
@@ -38,6 +39,8 @@ public class LaneChangeModelListener implements DocumentListener,Blockable {
 		if(blocked)return;
 		Document src=e.getDocument();
 		if(src==safeDec.getDocument()){
+			if(!Conditions.isValid(safeDec,laneChangeModelType.getModelParameterMOBIL().getSafeDeceleration()))
+				return;
 			try{
 				double d=Double.parseDouble(safeDec.getText());
 				GraphicsHelper.makeBlack(safeDec);
@@ -47,6 +50,8 @@ public class LaneChangeModelListener implements DocumentListener,Blockable {
 			}
 		}
 		else if(src==minGap.getDocument()){
+			if(!Conditions.isValid(minGap,laneChangeModelType.getModelParameterMOBIL().getMinimumGap()))
+				return;
 			try{
 				double d=Double.parseDouble(minGap.getText());
 				GraphicsHelper.makeBlack(minGap);
@@ -55,6 +60,8 @@ public class LaneChangeModelListener implements DocumentListener,Blockable {
 				GraphicsHelper.makeRed(minGap);
 			}
 		}else if(src==thAc.getDocument()){
+			if(!Conditions.isValid(thAc,laneChangeModelType.getModelParameterMOBIL().getThresholdAcceleration()))
+				return;
 			try{
 				double d=Double.parseDouble(thAc.getText());
 				GraphicsHelper.makeBlack(thAc);
@@ -63,6 +70,8 @@ public class LaneChangeModelListener implements DocumentListener,Blockable {
 				GraphicsHelper.makeRed(thAc);
 			}
 		}else if(src==rba.getDocument()){
+			if(!Conditions.isValid(rba,laneChangeModelType.getModelParameterMOBIL().getRightBiasAcceleration()))
+				return;
 			try{
 				double d=Double.parseDouble(rba.getText());
 				GraphicsHelper.makeBlack(rba);
@@ -71,6 +80,8 @@ public class LaneChangeModelListener implements DocumentListener,Blockable {
 				GraphicsHelper.makeRed(rba);
 			}
 		}else if(src==plt.getDocument()){
+			if(!Conditions.isValid(plt,laneChangeModelType.getModelParameterMOBIL().getPoliteness()))
+				return;
 			try{
 				double d=Double.parseDouble(plt.getText());
 				GraphicsHelper.makeBlack(plt);

@@ -38,6 +38,7 @@ public class AppFrameListener implements ActionListener,Blockable {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
+					mvCxt.getRdCxt().getAppFrame().getJp().reset();
 					MovsimScenario.setScenario(f, mvCxt);
 				}
 			});
@@ -59,6 +60,7 @@ public class AppFrameListener implements ActionListener,Blockable {
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
+					mvCxt.getRdCxt().getAppFrame().getJp().reset();
 					MovsimScenario.resetScenario(mvCxt);
 				}
 			});

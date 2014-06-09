@@ -56,6 +56,8 @@ public class DrawingAreaPopupListener implements ActionListener, ChangeListener 
 			rdCxt.getLanesPnl().getRemove().doClick();
 		}else if(src==rdCxt.getDrawingArea().getPopup().getToggleRotation()){
 			rdCxt.getGmPnl().getCurvature().setText(-1*Double.parseDouble(rdCxt.getGmPnl().getCurvature().getText())+"");
+		}else if(src==rdCxt.getDrawingArea().getPopup().getDelete()){
+			rdCxt.getRdFldPnl().getRemoveRoad().doClick();
 		}
 	}
 

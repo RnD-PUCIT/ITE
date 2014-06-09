@@ -1,16 +1,13 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -32,6 +29,7 @@ import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.eventhandling.ConnectionListener;
 import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
 import org.tde.tdescenariodeveloper.eventhandling.LaneLinkListener;
+import org.tde.tdescenariodeveloper.updation.JunctionsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
 public class JunctionsPanel extends JPanel {
@@ -46,22 +44,16 @@ public class JunctionsPanel extends JPanel {
 	RoadContext rdCxt;
 	String selectedJn="";
 	JButton add,remove,addCn;
-	ImageIcon rem,addIcon;
 	public JunctionsPanel(RoadContext rpp, JunctionsListener jl) {
 		rdCxt=rpp;
-		rem=new ImageIcon(getClass().getClassLoader().getResource("del.png"));
-		rem.setImage(rem.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH));
-		addIcon=new ImageIcon(getClass().getClassLoader().getResource("add.png"));
-		addIcon.setImage(addIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH));
-		add=new JButton("New junction");
-		remove=new JButton("Remove");
-		addCn=new JButton("New connection");
+		add=new JButton("New junction",TDEResources.getResources().getAddIcon());
+		remove=new JButton("Remove",TDEResources.getResources().getRem());
+		addCn=new JButton("New connection",TDEResources.getResources().getAddIcon());
 		add.addActionListener(jl);
 		remove.addActionListener(jl);
 		addCn.addActionListener(jl);
 		
 		sp=new JScrollPane();
-		sp.setPreferredSize(new Dimension(300,700));
 		sp.getViewport().add(this);
 		linkInfoPnl=new JPanel(new GridBagLayout());
 		setLayout(new GridBagLayout());
@@ -108,10 +100,10 @@ public class JunctionsPanel extends JPanel {
 		sp.revalidate();
 	
 	}
-	public ArrayList<RoadSegment> getJunctionRoadSegments(String key){
+	public static ArrayList<RoadSegment> getJunctionRoadSegments(String key,RoadContext rdCxt,Junction j){
 		if(rdCxt.getRn().getOdrNetwork().getJunction()==null)return null;
 		ArrayList<RoadSegment>rs=new ArrayList<RoadSegment>();
-		Junction j=getJunction(selectedJn);
+		if(j==null)return null;
 		if(j.getConnection().size()>0){
 			for(Connection cn:j.getConnection()){
 				RoadSegment r;
@@ -127,14 +119,8 @@ public class JunctionsPanel extends JPanel {
 		}
 		return rs;
 	}
-	public Junction getJunction(String id){
-		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
-			if(id.equals(j.getId()))return j;
-		}
-		return null;
-	}
 	public void updateJunction(){
-		if(selectedJn.equals(""))return;
+		if(selectedJn==null || selectedJn.equals(""))return;
 		cbSelectJunc.removeAll();
 		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
 			cbSelectJunc.addItem(j.getId());
@@ -148,7 +134,7 @@ public class JunctionsPanel extends JPanel {
 			addCn.setEnabled(true);
 		}
 		selectedJn=(String)cbSelectJunc.getSelectedItem();
-		updateJunctionPanel(getJunction(selectedJn));
+		updateJunctionPanel(JunctionsUpdater.getJunction(selectedJn, rdCxt));
 	}
 	public void updateJunctionPanel(Junction jn) {
 		//set tool tips
@@ -157,7 +143,8 @@ public class JunctionsPanel extends JPanel {
 		
 		
 		linkInfoPnl.removeAll();
-		ArrayList<RoadSegment>all=getJunctionRoadSegments("all");
+		ArrayList<RoadSegment>all=getJunctionRoadSegments("all",rdCxt,JunctionsUpdater.getJunction(selectedJn, rdCxt));
+		if(all==null || all.size()<=0)return;
 		String[]allRd=new String[all.size()];
 		for(int i=0;i<allRd.length;i++){
 			allRd[i]=all.get(i).userId();
@@ -202,9 +189,9 @@ public class JunctionsPanel extends JPanel {
 		incoming.setSelectedItem(cn.getIncomingRoad());
 		contactPnt.setSelectedItem(cn.getContactPoint());
 
-		JButton removeCn=new JButton("Remove connection");
+		JButton removeCn=new JButton("Remove connection",TDEResources.getResources().getRem());
 		removeCn.setToolTipText("Remove connection: "+cn.getId());
-		JButton addlnlnk=new JButton("New lane link",addIcon);
+		JButton addlnlnk=new JButton("New lane link",TDEResources.getResources().getAddIcon());
 		ConnectionListener cl=new ConnectionListener(rdCxt,connecting,incoming,contactPnt,cn,removeCn,addlnlnk);
 		removeCn.addActionListener(cl);
 		addlnlnk.addActionListener(cl);
@@ -272,7 +259,7 @@ public class JunctionsPanel extends JPanel {
 			}
 			to.setSelectedItem(ll.getTo()+"");
 			from.setSelectedItem(ll.getFrom()+"");
-			JButton rmLnLnk=new JButton(rem);
+			JButton rmLnLnk=new JButton(TDEResources.getResources().getRem());
 			LaneLinkListener lnLinkLis=new LaneLinkListener(rdCxt, from, to, ll,rmLnLnk,cn);
 			rmLnLnk.addActionListener(lnLinkLis);
 			to.addActionListener(lnLinkLis);
@@ -329,5 +316,24 @@ public class JunctionsPanel extends JPanel {
 	}
 	public JButton getAddCn() {
 		return addCn;
+	}
+	public static void removeJunctionOf(RoadSegment r,RoadContext rdCxt) {
+		Junction jj=null;
+		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
+			if(r.getOdrRoad().getJunction().equals(j.getId())){
+				jj=j;
+			}
+		}
+		if(!rdCxt.getRn().getOdrNetwork().getJunction().remove(jj)){
+			GraphicsHelper.showToast("Junction of road "+r.userId()+" couldn't be removed", rdCxt.getToastDurationMilis());
+			return;
+		}
+		r.getOdrRoad().setJunction("-1");
+	}
+
+	public void reset(){
+		cbSelectJunc.removeAllItems();
+		addCn.setEnabled(false);
+		remove.setEnabled(false);
 	}
 }

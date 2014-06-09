@@ -94,6 +94,7 @@ public class AppFrame extends JFrame {
 		
 		toolbar=new ToolBar(drawingArea);
 		toolbar.setBlocked(false);
+		tabPane.setPreferredSize(new Dimension(275,700));
 		tabPane.addTab("Road properties", icon, rdCxt.getSp(), "Editing panel for currently selected road");
 		tabPane.addTab("Junctions Editor", icon2,jp.getSp() , "Editiong panel for junctions");
 		getContentPane().add(tabPane, BorderLayout.EAST);
