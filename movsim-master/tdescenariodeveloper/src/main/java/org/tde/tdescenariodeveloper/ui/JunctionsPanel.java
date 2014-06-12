@@ -173,6 +173,7 @@ public class JunctionsPanel extends JPanel {
 		for(Connection cn:jn.getConnection())
 			linkInfoPnl.add(conToPnl(cn,allRd),c);
 		revalidate();
+		repaint();
 	}
 	
 	private JPanel conToPnl(Connection cn,String[]allRd){

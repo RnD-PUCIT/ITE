@@ -111,7 +111,7 @@ public class Simulator implements SimulationTimeStep, SimulationRun.CompletionCa
     }
 
     public void initialize() throws JAXBException, SAXException {
-        LOG.info("Copyright '\u00A9' by Arne Kesting, Martin Treiber, Ralph Germ and Martin Budden (2011-2013)");
+        // LOG.info("Copyright '\u00A9' by Arne Kesting, Martin Treiber, Ralph Germ and Martin Budden (2011-2013)");
 
         projectName = projectMetaData.getProjectName();
         // TODO temporary handling of Variable Message Sign until added to XML

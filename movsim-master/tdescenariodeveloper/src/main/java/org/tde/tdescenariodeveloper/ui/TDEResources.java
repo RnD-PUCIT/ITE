@@ -45,6 +45,7 @@ public class TDEResources {
 		trafficSource=new ImageIcon(getClass().getClassLoader().getResource("traffic_source.png"));
 		junctions=new ImageIcon(getClass().getClassLoader().getResource("junctions_tab_icon.png"));
 		linker=new ImageIcon(getClass().getClassLoader().getResource("linker.png"));
+		controller=new ImageIcon(getClass().getClassLoader().getResource("controller.png"));
 		JUNCTION_DEMO=Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("junction_demo.png"));
 		
 		run.setImage(run.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
@@ -59,6 +60,7 @@ public class TDEResources {
 		trafficSource.setImage(trafficSource.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		junctions.setImage(junctions.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		linker.setImage(linker.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		controller.setImage(controller.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 	}
 	public static TDEResources getResources(){
 		if(ir==null)ir=new TDEResources();
@@ -88,6 +90,8 @@ public class TDEResources {
 	public static final Color ROAD_BORDER_FONT_COLOR=new Color(0,0,0);
 	public static final Color ROUTE_BORDER_COLOR=new Color(60,60,60);
 	public static final Color ROUTE_BORDER_FONT_COLOR=new Color(60,60,60);
+	public static final Color SIGNALS_BORDER_COLOR=new Color(150,150,150);
+	public static final Color CONTROLLERS_BORDER_COLOR=new Color(150,150,150);
 	private static ImageIcon rem;
 	private static ImageIcon straightRoad;
 	private static ImageIcon addIcon;
@@ -100,6 +104,7 @@ public class TDEResources {
 	private static ImageIcon trafficSource;
 	private static ImageIcon junctions;
 	private static ImageIcon linker;
+	private static ImageIcon controller;
 	public static ImageIcon getRem() {
 		return rem;
 	}
@@ -135,6 +140,9 @@ public class TDEResources {
 	}
 	public Icon getLinker() {
 		return linker;
+	}
+	public Icon getController() {
+		return controller;
 	}
 	public Cursor getLinkCursor() {
 		return linkCursor;

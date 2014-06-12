@@ -122,7 +122,7 @@ public class DrawingAreaPopupMenu2 extends JPopupMenu implements ActionListener{
 			rdCxt.getRn().getOdrNetwork().getJunction().add(jn);
 			rdCxt.getAppFrame().getJp().selectedJn=jn.getId();
 			rdCxt.getAppFrame().getJp().updateJunction();
-		}else GraphicsHelper.showToast("Main road not selected", rdCxt.getToastDurationMilis());
+		}
 	}
 
 	public JMenuItem getMarkAsJunction() {

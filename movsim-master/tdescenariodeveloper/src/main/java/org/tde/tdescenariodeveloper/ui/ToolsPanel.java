@@ -264,6 +264,7 @@ public class ToolsPanel extends JPanel {
 			}
 			mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().add(r);
 			RoadNetworkUtils.refresh(mvCxt.getRdCxt());
+			mvCxt.updatePanels();
 		} catch (NoninvertibleTransformException e1) {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 		}
@@ -366,15 +367,13 @@ public class ToolsPanel extends JPanel {
 			}
 			mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().add(r);
 			RoadNetworkUtils.refresh(mvCxt.getRdCxt());
+			mvCxt.updatePanels();
 		} catch (NoninvertibleTransformException e1) {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 		}
-	
-	
 	}
 	public void trafficSourceClicked(MouseEvent e){
 		Point p=new Point();
-
 		try {
 			mvCxt.getRdCxt().getDrawingArea().transform.inverseTransform(new Point(e.getX(),e.getY()), p);
 			RoadSegment undr=RoadNetworkUtils.getUnderLyingRoadSegment(p, mvCxt);
@@ -402,14 +401,12 @@ public class ToolsPanel extends JPanel {
 						road.setTrafficSource(MovsimScenario.getTrafficSource());
 					}
 				}
-				
 				RoadNetworkUtils.refresh(mvCxt.getRdCxt());
 				mvCxt.updatePanels();
 			}
 		} catch (NoninvertibleTransformException e1) {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 		}
-	
 	}
 	public Set<RoadSegment> getSelectedRoads() {
 		return selectedRoads;

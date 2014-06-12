@@ -12,6 +12,8 @@ import org.movsim.input.network.OpenDriveHandlerJaxb;
 import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.Lane.Width;
 import org.movsim.network.autogen.opendrive.OpenDRIVE;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller.Control;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Header;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Lanes;
@@ -20,11 +22,13 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Lanes.LaneSection.Rig
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry.Line;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.movsim.simulator.trafficlights.TrafficLights;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 
@@ -35,6 +39,15 @@ public class RoadNetworkUtils {
 		odr.getRoad().add(getRoad(odr));
 		return odr;
 	}
+	public static String getFirstSignal(MovsimConfigContext mvCxt){
+		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
+			if(r.isSetSignals()){
+				return r.getSignals().getSignal().get(0).getId();
+			}
+		}
+		return null;
+	}
+
 	public static Point2D getStart(RoadSegment rs,int lane){
 //		LaneSegment ls=rs.getLaneSegments()[lane-1];
 		Point2D.Double p=new Point2D.Double();
@@ -58,6 +71,10 @@ public class RoadNetworkUtils {
 		p.setLocation(pt.x-rw*pt.sinTheta, pt.y-rw*pt.cosTheta);
 //		if(!ls.getBounds().contains(p))throw new IllegalArgumentException("Get start not found");
 		return p;
+	}
+	public static void syncTrafficPanels(MovsimConfigContext mvCxt){
+		mvCxt.getTrafficLights().getControllerPanel().updateControllerPanel();
+		mvCxt.getTrafficLights().updateTrafficLightsPanel();;
 	}
 	public static Point2D getEnd(RoadSegment rs,int lane){
 		Point2D.Double p=new Point2D.Double();
@@ -194,9 +211,9 @@ public class RoadNetworkUtils {
 		h.setWest(0.0);
 		return h;
 	}
-	public static void refresh(RoadContext rdCxt){
-		SwingUtilities.invokeLater(new Refresher(rdCxt));
-	}
+//	public static void refresh(RoadContext rdCxt){
+//		SwingUtilities.invokeLater(new Refresher(rdCxt));
+//	}
 	public static boolean areValidLaneIds(RoadContext rdCxt){
 		if(rdCxt.getLanesPnl().getOdrLanes().get(0).getId()!=-1)return false;
 		for(int i=1;i<rdCxt.getLanesPnl().getOdrLanes().size();i++){
@@ -248,6 +265,34 @@ public class RoadNetworkUtils {
 			}
 		}
 	}
+	public static void removeUncontrollerSignals(MovsimConfigContext mvCxt){
+		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
+			if(r.isSetSignals()){
+				for(Signal s:r.getSignals().getSignal()){
+					if(!isRefferedInController(s.getId(),mvCxt)){
+						r.getSignals().getSignal().remove(s);
+					}
+				}
+			}
+		}
+	}
+	private static boolean isRefferedInController(String id,
+			MovsimConfigContext mvCxt) {
+		if(!mvCxt.getRdCxt().getRn().getOdrNetwork().isSetController())return false;
+		for(Controller cc:mvCxt.getRdCxt().getRn().getOdrNetwork().getController()){
+			for(Control c:cc.getControl()){
+				if(c.getSignalId().equals(id))return true;
+			}
+		}
+		return false;
+	}
+	public static Controller getFirstController(RoadContext rdCxt){
+		if(!rdCxt.getRn().getOdrNetwork().isSetController())return null;
+		for(Controller cc:rdCxt.getRn().getOdrNetwork().getController()){
+			return cc;
+		}
+		return null;
+	}
 	public static RoadSegment getUnderLyingRoadSegment(Point2D p,
 			MovsimConfigContext mvCxt) {
 		RoadSegment r=null;
@@ -294,6 +339,11 @@ public class RoadNetworkUtils {
 		}
 		return null;
 	}
+	public static void SetupLights(MovsimConfigContext mvCxt){
+		if(!mvCxt.getMovsim().getScenario().isSetTrafficLights() || !mvCxt.getRdCxt().getRn().getOdrNetwork().isSetController())return;
+		mvCxt.getMovsim().getScenario().getTrafficLights().setLogging(false);
+		new TrafficLights(mvCxt.getMovsim().getScenario().getTrafficLights(), mvCxt.getRdCxt().getRn());
+	}
 	public static Shape getUnderLyingRoadShape(Point2D p,
 			MovsimConfigContext mvCxt) {
 		Shape r=null;
@@ -314,6 +364,9 @@ public class RoadNetworkUtils {
 			}
 		}
 		return r;
+	}
+	public static void refresh(RoadContext rdCxt){
+		SwingUtilities.invokeLater(new Refresher(rdCxt));
 	}
 }
 class Refresher extends SwingWorker<Object, String>{
@@ -336,6 +389,7 @@ class Refresher extends SwingWorker<Object, String>{
 			rdCxt.setSelectedRoadNull();
 			rdCxt.getRn().reset();
 			new OpenDriveHandlerJaxb().create("", rdCxt.getRn().getOdrNetwork(), rdCxt.getRn());
+			RoadNetworkUtils.SetupLights(rdCxt.getMvCxt());
 			if(rdCxt.getRn().getRoadSegments().size()-1<ind)ind=rdCxt.getRn().getRoadSegments().size()-1;
 			RoadSegment rs=rdCxt.getRn().getRoadSegments().get(ind);
 			if(rs.getOdrRoad().getPlanView().getGeometry().size()-1<gmInd)gmInd=rs.getOdrRoad().getPlanView().getGeometry().size()-1;
@@ -348,8 +402,6 @@ class Refresher extends SwingWorker<Object, String>{
 			rdCxt.getRn().reset();
 			new OpenDriveHandlerJaxb().create("", rdCxt.getRn().getOdrNetwork(), rdCxt.getRn());
 		}
-		rdCxt.getDrawingArea().paint(rdCxt.getDrawingArea().getGraphics());
 		return null;
 	}
-	
 }

@@ -5,12 +5,17 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Properties;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 
+import org.movsim.input.ProjectMetaData;
+import org.movsim.simulator.Simulator;
 import org.movsim.viewer.App;
+import org.movsim.viewer.graphics.TrafficCanvas;
+import org.movsim.viewer.ui.ViewProperties;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.FileUtils;

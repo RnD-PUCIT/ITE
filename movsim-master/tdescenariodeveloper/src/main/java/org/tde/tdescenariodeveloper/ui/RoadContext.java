@@ -30,6 +30,7 @@ public class RoadContext extends JPanel {
 	private GeometryPanel gmPnl;
 	private RoadFieldsPanel rdFldPnl;
 	private LanesPanel lanesPnl;
+	private SignalsPanel signalsPanel;
 	private GridBagConstraints gbc;
 	private DrawingArea drawingArea;
 	private AppFrame appFrame;
@@ -58,6 +59,7 @@ public class RoadContext extends JPanel {
 		
 		LanesPanelListener lpl=new LanesPanelListener(this);
 		lanesPnl=new LanesPanel(this,lpl);
+		signalsPanel=new SignalsPanel(this);
 		this.lpl=lpl;
 		
 		setLayout(new GridBagLayout());
@@ -72,6 +74,7 @@ public class RoadContext extends JPanel {
 			add(linkPanel, gbc);
 		add(gmPnl,gbc);
 		add(lanesPnl,gbc);
+		add(signalsPanel,gbc);
 	}
 	public void blockListeners(boolean b){
 		gpl.setBlocked(b);
@@ -81,18 +84,22 @@ public class RoadContext extends JPanel {
 		appFrame.getToolbar().setBlocked(b);
 		appFrame.getJl().setBlocked(b);
 		linkPanel.getListener().setBlocked(b);
+		signalsPanel.getListener().setBlocked(b);
 	}
 	public void updateGraphics(){
-		drawingArea.revalidate();
 		drawingArea.paint(drawingArea.getGraphics());
 	}
 	public void updatePanel(){
+		if(selectedRoad==null)return;
 		blockListeners(true);
 		rdFldPnl.updateFields();
 		updateLinkPanel();
 		gmPnl.updateGeomPanel();
 		lanesPnl.updatelanesPanel();
-		setVisible(true);
+		signalsPanel.updateSignalPanel();
+		updateGraphics();
+		revalidate();
+		repaint();
 		blockListeners(false);
 	}
 	private void updateLinkPanel() {
@@ -105,12 +112,10 @@ public class RoadContext extends JPanel {
 				gbc.fill = GridBagConstraints.BOTH;
 				gbc.insets = new Insets(5, 5, 5, 5);
 				add(linkPanel, gbc);
-				revalidate();
 			}
 			linkPanel.updateLinkPanel();
 		} else if (linkAdded) {
 			remove(linkPanel);
-			revalidate();
 		}
 	}
 
@@ -136,7 +141,9 @@ public class RoadContext extends JPanel {
 		gmPnl.reset();
 		rdFldPnl.reset();
 		lanesPnl.reset();
+		signalsPanel.reset();
 		blockListeners(false);
+		revalidate();
 	}
 	
 
@@ -200,6 +207,9 @@ public class RoadContext extends JPanel {
 	}
 	public void setMvCxt(MovsimConfigContext mvCxt) {
 		this.mvCxt = mvCxt;
+	}
+	public SignalsPanel getSignalsPanel() {
+		return signalsPanel;
 	}
 	
 }

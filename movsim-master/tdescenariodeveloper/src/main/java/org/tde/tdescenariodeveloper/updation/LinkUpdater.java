@@ -298,6 +298,7 @@ public class LinkUpdater {
 			}
 			if(rdCxt.getRn().getOdrNetwork().getRoad().remove(rdCxt.getSelectedRoad().getOdrRoad())){
 				RoadNetworkUtils.refresh(rdCxt);
+				rdCxt.getMvCxt().updatePanels();
 			}else GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" couldn't be remvoed", rdCxt.getToastDurationMilis());
 		}else GraphicsHelper.showToast("Select road to delete", rdCxt.getToastDurationMilis());
 	

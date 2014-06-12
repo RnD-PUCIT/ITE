@@ -14,6 +14,9 @@ import javax.swing.text.Document;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
+import org.movsim.roadmappings.RoadMapping;
+import org.movsim.roadmappings.RoadMappingPoly;
+import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.ui.JunctionsPanel;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
@@ -60,8 +63,22 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener,
 			}
 		}else if(srcBtn==rdCxt.getRdFldPnl().getAddRoad()){
 			Road r=RoadNetworkUtils.getRoad(rdCxt.getRn().getOdrNetwork());
-			r.getPlanView().getGeometry().get(0).setX(-300+Math.random()*600);
-			r.getPlanView().getGeometry().get(0).setY(-300+Math.random()*600);
+
+			if(rdCxt.getAppFrame().getToolbar().getDropRoadAtLast().isSelected() && rdCxt.getRn().getOdrNetwork().getRoad().size()>0){
+				RoadMapping rm=rdCxt.getRn().getRoadSegments().get(rdCxt.getRn().getRoadSegments().size()-1).roadMapping();
+				PosTheta pt=null;
+				if(rm instanceof RoadMappingPoly){
+					RoadMappingPoly rmp=(RoadMappingPoly)rm;
+					rm=rmp.getRoadMappings().get(rmp.getRoadMappings().size()-1);
+				}
+				pt=rm.map(rm.roadLength());
+				r.getPlanView().getGeometry().get(0).setX(pt.x);
+				r.getPlanView().getGeometry().get(0).setY(pt.y);
+				r.getPlanView().getGeometry().get(0).setHdg(pt.theta());
+			}else{
+				r.getPlanView().getGeometry().get(0).setX(-300+Math.random()*600);
+				r.getPlanView().getGeometry().get(0).setY(-300+Math.random()*600);
+			}
 			if(rdCxt.getRn().getOdrNetwork().getRoad().add(r)){
 				RoadNetworkUtils.refresh(rdCxt);
 			}else GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" couldn't be remvoed", rdCxt.getToastDurationMilis());

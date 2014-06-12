@@ -24,6 +24,7 @@ import org.movsim.autogen.VehiclePrototypeConfiguration;
 import org.movsim.autogen.VehiclePrototypes;
 import org.movsim.autogen.VehicleType;
 import org.movsim.input.network.OpenDriveReader;
+import org.movsim.simulator.trafficlights.TrafficLights;
 import org.movsim.xml.MovsimInputLoader;
 import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
@@ -37,6 +38,7 @@ public class MovsimScenario {
 			mvCxt.getRdCxt().setSelectedRoadNull();
 			mvCxt.getRdCxt().getRn().reset();
 			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath().replace(".xprj", ".xodr"));
+			RoadNetworkUtils.SetupLights(mvCxt);
 			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(true);
 			if(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().size()>0)mvCxt.getRdCxt().getAppFrame().getJp().setSelectedJn(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().get(0).getId());
 			mvCxt.getRdCxt().getAppFrame().getJp().updateJunction();
@@ -45,7 +47,6 @@ public class MovsimScenario {
 			mvCxt.getRdCxt().updateGraphics();
 			mvCxt.getRdCxt().getAppFrame().revalidate();
 			mvCxt.getRdCxt().getAppFrame().repaint();
-			mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getGraphics());
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -60,6 +61,7 @@ public class MovsimScenario {
 			File f=new File("\\tmp.xodr");
 			Marshalling.writeToXml(RoadNetworkUtils.getNewOdr(), f);
 			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath());
+			RoadNetworkUtils.SetupLights(mvCxt);
 			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(true);
 			mvCxt.getRdCxt().getAppFrame().getJp().updateJunction();
 			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(false);

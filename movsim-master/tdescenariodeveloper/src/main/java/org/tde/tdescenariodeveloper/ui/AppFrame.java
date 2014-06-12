@@ -4,13 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -39,6 +39,7 @@ public class AppFrame extends JFrame {
 		return rdCxt;
 	}
 	public AppFrame() {
+		GraphicsHelper.setWindowsUI();
 		setPreferredSize(new Dimension(1024, 768));
 		setMinimumSize(new Dimension(700, 500));
 		setTitle("Vehicular Traffic  Flow Scenario Development Environment");
@@ -95,12 +96,11 @@ public class AppFrame extends JFrame {
 		toolbar=new ToolBar(drawingArea);
 		toolbar.setBlocked(false);
 		tabPane.setPreferredSize(new Dimension(275,700));
-		tabPane.addTab("Road properties", icon, rdCxt.getSp(), "Editing panel for currently selected road");
-		tabPane.addTab("Junctions Editor", icon2,jp.getSp() , "Editiong panel for junctions");
+		tabPane.addTab("Road", icon, rdCxt.getSp(), "Editing panel for currently selected road");
+		tabPane.addTab("Junctions", icon2,jp.getSp() , "Editiong panel for junctions");
 		getContentPane().add(tabPane, BorderLayout.EAST);
 		statusPnl=new StatusPanel();
 		statusPnl.setStatus("Status");
-//		getContentPane().add(statusPnl, BorderLayout.SOUTH);
 		ms.setStatusPnl(statusPnl);
 		getContentPane().add(toolbar,BorderLayout.NORTH);
 		

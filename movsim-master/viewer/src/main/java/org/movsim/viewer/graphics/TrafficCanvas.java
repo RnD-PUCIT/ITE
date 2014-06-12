@@ -990,4 +990,8 @@ public class TrafficCanvas extends SimulationCanvasBase implements SimulationRun
         // }
     }
 
+    public RoadNetwork getRoadNetwork() {
+        return roadNetwork;
+    }
+
 }

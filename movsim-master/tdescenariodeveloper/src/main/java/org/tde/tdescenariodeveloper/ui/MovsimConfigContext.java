@@ -54,7 +54,7 @@ public class MovsimConfigContext extends JTabbedPane {
 		
 		addTab("Simulation configuration",sim,simulation,"Edit parameters for simulation");
 		addTab("Vehicle prototypes",prt,new JScrollPane(prototypes),"Decide which type of traffic to run on roads");
-		addTab("Traffic signals",trf,new JScrollPane(trafficLights),"Control traffic with signals");
+		addTab("Traffic signals",trf,trafficLights,"Control traffic with signals");
 		addTab("Routes configuration",rts,new JScrollPane(routes),"Tell simulator what fraction of vehicles should follow which route");
 		addTab("Output configuration",TDEResources.getResources().getOutput(),new JScrollPane(null),"Scenario statistics and result output for analysis");
 		updatePanels();
@@ -64,6 +64,7 @@ public class MovsimConfigContext extends JTabbedPane {
 		prototypes.updatePanel();
 		simulation.updateSimPanel();
 		routes.updateRoutesPanel();
+		trafficLights.updateTrafficLightsPanel();
 		blockListeners(false);
 		revalidate();
 		repaint();
