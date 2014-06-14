@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -19,6 +20,8 @@ import org.movsim.autogen.ControllerGroup;
 import org.movsim.autogen.Phase;
 import org.movsim.autogen.TrafficLightState;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.tde.tdescenariodeveloper.eventhandling.ControllerGroupListener;
 import org.tde.tdescenariodeveloper.eventhandling.PhaseListener;
 import org.tde.tdescenariodeveloper.eventhandling.TrafficLightStateListener;
@@ -42,11 +45,13 @@ public class TrafficLightsPanel extends JPanel {
 		sp1.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal controllers", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		sp2.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal controllers configurations", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(sp1,c);
+		c.weightx=3;
 //		c.gridwidth=GridBagConstraints.REMAINDER;
 		add(sp2,c);
 	}
 	public void updateTrafficLightsPanel(){
 		cntPnl.removeAll();
+		controllerPanel.updateControllerPanel();
 		if(mvCxt.getMovsim().getScenario().isSetTrafficLights()){
 			fillControllerGroupsPanel(cntPnl, mvCxt);
 			revalidate();
@@ -190,10 +195,18 @@ public class TrafficLightsPanel extends JPanel {
 
 		gbc.gridwidth=1;
 		main.add(new JLabel("Name"),gbc);
-		JTextField name=new JTextField(10);
-		name.getDocument().addDocumentListener(cl);
+		ArrayList<String>sgls=new ArrayList<>();
+		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
+			if(r.isSetSignals()){
+				for(Signal ss:r.getSignals().getSignal()){
+					sgls.add(ss.getId());
+				}
+			}
+		}
+		JComboBox<String> name=new JComboBox<String>(sgls.toArray(new String[sgls.size()]));
+		name.addActionListener(cl);
 		cl.setName(name);
-		name.setText(st.isSetName()?st.getName()+"":"");
+		name.setSelectedItem(st.getName());
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 		main.add(name,gbc);
 		

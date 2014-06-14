@@ -28,8 +28,11 @@ public class MovsimConfigContext extends JTabbedPane {
 	SimulationPanel simulation;
 	TrafficLightsPanel trafficLights;
 	RoutesPanel routes;
+	OutputPanel output;
+	public OutputPanel getOutput() {
+		return output;
+	}
 	Movsim movsim;
-	ImageIcon sim,prt,trf,rts;
 	private RoadContext rdCxt;
 	private boolean updateCanvas=false;
 	public MovsimConfigContext(Movsim m, RoadContext rdCxt) {
@@ -39,24 +42,17 @@ public class MovsimConfigContext extends JTabbedPane {
 		simulation=new SimulationPanel(this);
 		trafficLights=new TrafficLightsPanel(this);
 		routes=new RoutesPanel(this);
+		output=new OutputPanel(this);
 		setPreferredSize(new Dimension(1024,200));
 //		MovsimConfigContextMouseListener ml=new MovsimConfigContextMouseListener(this);
 //		addMouseListener(ml);
 //		addMouseMotionListener(ml);
-		sim=new ImageIcon(getClass().getClassLoader().getResource("simulation_icon.png"));
-		sim.setImage(sim.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
-		prt=new ImageIcon(getClass().getClassLoader().getResource("car_icon.png"));
-		prt.setImage(prt.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
-		trf=new ImageIcon(getClass().getClassLoader().getResource("trafficlight_icon.png"));
-		trf.setImage(trf.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
-		rts=new ImageIcon(getClass().getClassLoader().getResource("routes_icon.png"));
-		rts.setImage(rts.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		
-		addTab("Simulation configuration",sim,simulation,"Edit parameters for simulation");
-		addTab("Vehicle prototypes",prt,new JScrollPane(prototypes),"Decide which type of traffic to run on roads");
-		addTab("Traffic signals",trf,trafficLights,"Control traffic with signals");
-		addTab("Routes configuration",rts,new JScrollPane(routes),"Tell simulator what fraction of vehicles should follow which route");
-		addTab("Output configuration",TDEResources.getResources().getOutput(),new JScrollPane(null),"Scenario statistics and result output for analysis");
+		addTab("Simulation configuration",TDEResources.getResources().getSimulation(),simulation,"Edit parameters for simulation");
+		addTab("Vehicle prototypes",TDEResources.getResources().getPrototypes(),new JScrollPane(prototypes),"Decide which type of traffic to run on roads");
+		addTab("Traffic signals",TDEResources.getResources().getTraffic(),trafficLights,"Control traffic with signals");
+		addTab("Routes configuration",TDEResources.getResources().getRoutes(),new JScrollPane(routes),"Tell simulator what fraction of vehicles should follow which route");
+		addTab("Output configuration",TDEResources.getResources().getOutput(),output,"Scenario statistics and result output for analysis");
 		updatePanels();
 	}
 	public void updatePanels(){
@@ -65,6 +61,7 @@ public class MovsimConfigContext extends JTabbedPane {
 		simulation.updateSimPanel();
 		routes.updateRoutesPanel();
 		trafficLights.updateTrafficLightsPanel();
+		output.updateOutputPanels();
 		blockListeners(false);
 		revalidate();
 		repaint();

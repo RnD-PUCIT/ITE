@@ -91,7 +91,7 @@ public class SignalListener implements DocumentListener, ActionListener,
 			SignalsPanel.adjustControllersGroups(rdCxt,old,signal.getId());
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.updatePanel();
-			rdCxt.getMvCxt().updatePanels();;
+			rdCxt.getMvCxt().updatePanels();
 		}
 	}
 

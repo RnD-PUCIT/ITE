@@ -128,29 +128,29 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 	public void show(Component c,int a,int b){
 		rdCxt.blockListeners(true);
 		lnWidth.setValue((int)rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(0).getWidth().get(0).getA());
-		removeLane.setVisible(rdCxt.getLanesPnl().getOdrLanes().size()>1);
-		removegeo.setVisible(rdCxt.getGmPnl().getSelectedIndex()>0);
+		removeLane.setEnabled(rdCxt.getLanesPnl().getOdrLanes().size()>1);
+		removegeo.setEnabled(rdCxt.getGmPnl().getSelectedIndex()>0);
 		sOffset.setMinimum((int)popupListener.getGmVl().getStartLimit());
 		sOffset.setMaximum((int)popupListener.getGmVl().getEndLimit());
 		sOffset.setValue((int)rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getS());
-		sOffset.setVisible(rdCxt.getGmPnl().getSelectedIndex()>0);
+		sOffset.setEnabled(rdCxt.getGmPnl().getSelectedIndex()>0);
 		hdg.setMinimum(-628);
 		hdg.setMaximum(628);
 		hdg.setValue((int)(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getHdg()*100.0));
-		hdg.setVisible(rdCxt.getGmPnl().getSelectedIndex()==0);
-		hdgLbl.setVisible(rdCxt.getGmPnl().getSelectedIndex()==0);
-		gmsOffsetLbl.setVisible(rdCxt.getGmPnl().getSelectedIndex()>0);
+		hdg.setEnabled(rdCxt.getGmPnl().getSelectedIndex()==0);
+		hdgLbl.setEnabled(rdCxt.getGmPnl().getSelectedIndex()==0);
+		gmsOffsetLbl.setEnabled(rdCxt.getGmPnl().getSelectedIndex()>0);
 		if(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).isSetArc()){
-			toggleRotation.setVisible(true);
+			toggleRotation.setEnabled(true);
 			curv.setMinimum(-20);
 			curv.setMaximum(20);
 			curv.setValue((int)(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getArc().getCurvature()*2000.0));
-			curv.setVisible(true);
-			curvLbl.setVisible(true);
+			curv.setEnabled(true);
+			curvLbl.setEnabled(true);
 		}else{
-			toggleRotation.setVisible(false);
-			curv.setVisible(false);
-			curvLbl.setVisible(false);
+			toggleRotation.setEnabled(false);
+			curv.setEnabled(false);
+			curvLbl.setEnabled(false);
 		}
 		rdCxt.blockListeners(false);
 		super.show(c, a, b);

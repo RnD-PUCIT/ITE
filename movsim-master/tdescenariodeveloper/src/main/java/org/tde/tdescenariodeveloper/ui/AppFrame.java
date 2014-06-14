@@ -78,7 +78,7 @@ public class AppFrame extends JFrame {
 		JTabbedPane tabPane=new JTabbedPane();
 		ImageIcon icon=new ImageIcon(getClass().getClassLoader().getResource("road_icon.png"));
 		icon.setImage(icon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
-		ImageIcon icon2=new ImageIcon(getClass().getClassLoader().getResource("Junctions_tab_icon.png"));
+		ImageIcon icon2=new ImageIcon(getClass().getClassLoader().getResource("Junc_icon.png"));
 		icon2.setImage(icon2.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		rn=new RoadNetwork();
 		new OpenDriveHandlerJaxb().create("", RoadNetworkUtils.getNewOdr(), rn);

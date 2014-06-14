@@ -33,6 +33,12 @@ public class TDEResources {
 		ARC_ROAD_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("arc_road2.png")), p, "arcRoadCursor");
 		TRAFFIC_SOURCE_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("traffic_source2.png")), p, "trafficSourceCursor");
 		
+		
+		sim=new ImageIcon(getClass().getClassLoader().getResource("simulation_icon.png"));
+		prt=new ImageIcon(getClass().getClassLoader().getResource("car_icon.png"));
+		trf=new ImageIcon(getClass().getClassLoader().getResource("trafficlight_icon.png"));
+		rts=new ImageIcon(getClass().getClassLoader().getResource("routes_icon.png"));
+		
 		rem=new ImageIcon(getClass().getClassLoader().getResource("del.png"));
 		addIcon=new ImageIcon(getClass().getClassLoader().getResource("add.png"));
 		run=new ImageIcon(getClass().getClassLoader().getResource("run.png"));
@@ -43,7 +49,7 @@ public class TDEResources {
 		straightRoad=new ImageIcon(getClass().getClassLoader().getResource("straight_road.png"));
 		arcRoad=new ImageIcon(getClass().getClassLoader().getResource("arc_road.png"));
 		trafficSource=new ImageIcon(getClass().getClassLoader().getResource("traffic_source.png"));
-		junctions=new ImageIcon(getClass().getClassLoader().getResource("junctions_tab_icon.png"));
+		junctions=new ImageIcon(getClass().getClassLoader().getResource("Junc_icon.png"));
 		linker=new ImageIcon(getClass().getClassLoader().getResource("linker.png"));
 		controller=new ImageIcon(getClass().getClassLoader().getResource("controller.png"));
 		JUNCTION_DEMO=Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("junction_demo.png"));
@@ -61,6 +67,10 @@ public class TDEResources {
 		junctions.setImage(junctions.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		linker.setImage(linker.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		controller.setImage(controller.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		sim.setImage(sim.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		prt.setImage(prt.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		trf.setImage(trf.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		rts.setImage(rts.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 	}
 	public static TDEResources getResources(){
 		if(ir==null)ir=new TDEResources();
@@ -105,37 +115,41 @@ public class TDEResources {
 	private static ImageIcon junctions;
 	private static ImageIcon linker;
 	private static ImageIcon controller;
-	public static ImageIcon getRem() {
+	private static ImageIcon sim;
+	private static ImageIcon prt;
+	private static ImageIcon trf;
+	private static ImageIcon rts;
+	public ImageIcon getRem() {
 		return rem;
 	}
-	public static ImageIcon getArcRoad() {
+	public ImageIcon getArcRoad() {
 		return arcRoad;
 	}
-	public static ImageIcon getReset() {
+	public ImageIcon getReset() {
 		return reset;
 	}
-	public static ImageIcon getStraightRoad() {
+	public ImageIcon getStraightRoad() {
 		return straightRoad;
 	}
-	public static ImageIcon getAddIcon() {
+	public ImageIcon getAddIcon() {
 		return addIcon;
 	}
-	public static ImageIcon getOpen() {
+	public ImageIcon getOpen() {
 		return open;
 	}
-	public static ImageIcon getSave() {
+	public ImageIcon getSave() {
 		return save;
 	}
-	public static ImageIcon getRun() {
+	public ImageIcon getRun() {
 		return run;
 	}
-	public static ImageIcon getOutput() {
+	public ImageIcon getOutput() {
 		return output;
 	}
-	public static ImageIcon getTrafficSource() {
+	public ImageIcon getTrafficSource() {
 		return trafficSource;
 	}
-	public static ImageIcon getJunctions() {
+	public ImageIcon getJunctions() {
 		return junctions;
 	}
 	public Icon getLinker() {
@@ -146,5 +160,17 @@ public class TDEResources {
 	}
 	public Cursor getLinkCursor() {
 		return linkCursor;
+	}
+	public ImageIcon getSimulation() {
+		return sim;
+	}
+	public ImageIcon getPrototypes() {
+		return prt;
+	}
+	public ImageIcon getTraffic() {
+		return trf;
+	}
+	public ImageIcon getRoutes() {
+		return rts;
 	}
 }

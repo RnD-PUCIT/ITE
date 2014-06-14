@@ -1,6 +1,5 @@
 package org.tde.tdescenariodeveloper.ui;
 
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

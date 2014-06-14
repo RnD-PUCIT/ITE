@@ -25,6 +25,10 @@ import org.tde.tdescenariodeveloper.eventhandling.ControllerListener;
 import org.tde.tdescenariodeveloper.eventhandling.ControllerPanelListener;
 
 public class ControllerPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2395369509625914410L;
 	RoadContext rdCxt;
 	JPanel cntPnl;
 	JButton addNew;

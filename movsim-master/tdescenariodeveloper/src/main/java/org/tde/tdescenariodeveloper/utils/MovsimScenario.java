@@ -77,6 +77,8 @@ public class MovsimScenario {
 		}
 	}
 	public static void saveScenario(File f, MovsimConfigContext mvCxt) {
+//		RoadNetworkUtils.removeUncontrolledSignals(mvCxt);
+//		RoadNetworkUtils.cleanJunctions(mvCxt);
 		Marshalling.writeToXml(mvCxt.getMovsim(),f);
 		Marshalling.writeToXml(mvCxt.getRdCxt().getRn().getOdrNetwork(), new File(f.getAbsolutePath().replace(".xprj", ".xodr")));
 	}

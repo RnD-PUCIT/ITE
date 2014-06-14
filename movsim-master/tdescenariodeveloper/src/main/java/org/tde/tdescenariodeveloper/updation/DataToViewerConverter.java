@@ -1,6 +1,5 @@
 package org.tde.tdescenariodeveloper.updation;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -29,9 +28,9 @@ import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.eventhandling.InflowListener;
 import org.tde.tdescenariodeveloper.eventhandling.RoadToPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.VehicleTypeToPanelListener;
-import org.tde.tdescenariodeveloper.ui.TDEResources;
 import org.tde.tdescenariodeveloper.ui.LaneLinkPanel;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
+import org.tde.tdescenariodeveloper.ui.TDEResources;
 
 public class DataToViewerConverter {
 	private static JPanel roadToPanel(MovsimConfigContext mvCxt2, Road r,List<Road>rdList) {

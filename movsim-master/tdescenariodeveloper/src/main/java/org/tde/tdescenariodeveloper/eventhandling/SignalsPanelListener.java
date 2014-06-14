@@ -18,6 +18,7 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller.Control;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.tde.tdescenariodeveloper.ui.TrafficLightsPanel;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
 public class SignalsPanelListener implements ActionListener,Blockable {
@@ -39,20 +40,15 @@ public class SignalsPanelListener implements ActionListener,Blockable {
 			Signal s=new Signal();
 			s.setId(ControllerPanelListener.getUniqueId(rdCxt, "Signal"));
 			s.setName(s.getId());
-			s.setS(rdCxt.getSelectedRoad().roadLength()/4);
+			s.setS(rdCxt.getSelectedRoad().getOdrRoad().getSignals().getSignal().size()*40+rdCxt.getSelectedRoad().roadLength()/4);
 			rdCxt.getSelectedRoad().getOdrRoad().getSignals().getSignal().add(s);
 			Controller c=RoadNetworkUtils.getFirstController(rdCxt);
-//			ControllerGroup cg=TrafficLightsPanel.getControllerGroup(c, rdCxt.getMvCxt());
+			ControllerGroup cg=TrafficLightsPanel.getControllerGroup(c, rdCxt.getMvCxt());
 			if(c==null){
 				c=new Controller();
-				ControllerGroup cg=new ControllerGroup();
+				cg=new ControllerGroup();
 				Phase p=new Phase();
 				p.setDuration(30);
-				TrafficLightState st=new TrafficLightState();
-				st.setName(s.getId());
-				st.setCondition(TrafficLightCondition.NONE);
-				st.setStatus(TrafficLightStatus.GREEN);
-				p.getTrafficLightState().add(st);
 				cg.getPhase().add(p);
 				String id=ControllerPanelListener.getUniqueId(rdCxt, "Plan");
 				c.setId(id);
@@ -60,11 +56,16 @@ public class SignalsPanelListener implements ActionListener,Blockable {
 				if(!rdCxt.getMvCxt().getMovsim().getScenario().isSetTrafficLights())
 					rdCxt.getMvCxt().getMovsim().getScenario().setTrafficLights(new TrafficLights());
 				rdCxt.getMvCxt().getMovsim().getScenario().getTrafficLights().getControllerGroup().add(cg);
+				rdCxt.getRn().getOdrNetwork().getController().add(c);
 			}
+			TrafficLightState st=new TrafficLightState();
+			st.setName(s.getId());
+			st.setCondition(TrafficLightCondition.NONE);
+			st.setStatus(TrafficLightStatus.GREEN);
+			cg.getPhase().get(0).getTrafficLightState().add(st);
 			Control cn=new Control();
 			cn.setSignalId(s.getId());
 			c.getControl().add(cn);
-			rdCxt.getRn().getOdrNetwork().getController().add(c);
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.getMvCxt().updatePanels();
 			rdCxt.updatePanel();

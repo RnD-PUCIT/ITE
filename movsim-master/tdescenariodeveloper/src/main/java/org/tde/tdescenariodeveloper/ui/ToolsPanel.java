@@ -50,7 +50,7 @@ public class ToolsPanel extends JPanel {
 		setLayout(new BorderLayout());
 		JPanel p=new JPanel();
 		add(p,BorderLayout.NORTH);
-		p.setLayout(new GridLayout(0,2));
+		p.setLayout(new GridLayout(0,1));
 		straightRoad=new JToggleButton(TDEResources.getResources().getStraightRoad());
 		arcRoad=new JToggleButton(TDEResources.getResources().getArcRoad());
 		addTrafficSource=new JToggleButton(TDEResources.getResources().getTrafficSource());

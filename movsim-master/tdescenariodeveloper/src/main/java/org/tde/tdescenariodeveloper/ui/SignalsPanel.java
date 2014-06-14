@@ -25,6 +25,10 @@ import org.tde.tdescenariodeveloper.eventhandling.SignalListener;
 import org.tde.tdescenariodeveloper.eventhandling.SignalsPanelListener;
 
 public class SignalsPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	RoadContext rdCxt;
 	JPanel sigPnl;
 	JButton addNew;
@@ -134,6 +138,17 @@ public class SignalsPanel extends JPanel {
 				for(Control c:clr.getControl()){
 					if(old.equals(c.getSignalId())){
 						clr.getControl().remove(c);
+					}
+				}
+			}
+		}
+		for(ControllerGroup clr:rdCxt.getMvCxt().getMovsim().getScenario().getTrafficLights().getControllerGroup()){
+			if(clr.isSetPhase()){
+				for(Phase c:clr.getPhase()){
+					if(c.isSetTrafficLightState()){
+						for(TrafficLightState tls:c.getTrafficLightState()){
+							if(tls.getName().equals(old))c.getTrafficLightState().remove(tls);
+						}
 					}
 				}
 			}

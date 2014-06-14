@@ -15,6 +15,7 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller.Control;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Header;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Lanes;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Lanes.LaneSection;
@@ -265,7 +266,7 @@ public class RoadNetworkUtils {
 			}
 		}
 	}
-	public static void removeUncontrollerSignals(MovsimConfigContext mvCxt){
+	public static void removeUncontrolledSignals(MovsimConfigContext mvCxt){
 		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
 			if(r.isSetSignals()){
 				for(Signal s:r.getSignals().getSignal()){
@@ -368,6 +369,11 @@ public class RoadNetworkUtils {
 	public static void refresh(RoadContext rdCxt){
 		SwingUtilities.invokeLater(new Refresher(rdCxt));
 	}
+	public static void cleanJunctions(MovsimConfigContext mvCxt) {
+		for(Junction j:mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction()){
+			if(j.getConnection().size()<1)mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().remove(j);
+		}
+	}
 }
 class Refresher extends SwingWorker<Object, String>{
 	RoadContext rdCxt;
@@ -397,6 +403,7 @@ class Refresher extends SwingWorker<Object, String>{
 			rdCxt.getGmPnl().setSelectedGeometry(gmInd,false);
 			rdCxt.getLanesPnl().setSelectedLane(lnInd, false);
 			rdCxt.setSelectedRoad(rs);
+			rdCxt.updateGraphics();
 		}else{
 			rdCxt.setSelectedRoadNull();
 			rdCxt.getRn().reset();

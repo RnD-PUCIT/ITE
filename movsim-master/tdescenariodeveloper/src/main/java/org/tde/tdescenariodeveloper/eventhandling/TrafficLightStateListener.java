@@ -6,25 +6,16 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 
-import org.movsim.autogen.Phase;
 import org.movsim.autogen.TrafficLightCondition;
 import org.movsim.autogen.TrafficLightState;
 import org.movsim.autogen.TrafficLightStatus;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
-import org.tde.tdescenariodeveloper.updation.Conditions;
-import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 
-public class TrafficLightStateListener implements ActionListener, Blockable,
-		DocumentListener {
+public class TrafficLightStateListener implements ActionListener, Blockable {
 	boolean blocked=true;
 	MovsimConfigContext mvCxt;
-	JTextField name;
-	JComboBox<String>cbCondition,cbStatus;
+	JComboBox<String>cbCondition,cbStatus,name;
 	TrafficLightState state;
 	private List<TrafficLightState> states;
 	JButton remove;
@@ -33,21 +24,6 @@ public class TrafficLightStateListener implements ActionListener, Blockable,
 		this.mvCxt=mvCxt;
 		this.state=st;
 		this.states=states;
-	}
-
-	@Override
-	public void changedUpdate(DocumentEvent e) {
-		textChanged(e);
-	}
-
-	@Override
-	public void insertUpdate(DocumentEvent e) {
-		textChanged(e);
-	}
-
-	@Override
-	public void removeUpdate(DocumentEvent e) {
-		textChanged(e);
 	}
 
 	@Override
@@ -64,9 +40,6 @@ public class TrafficLightStateListener implements ActionListener, Blockable,
 		if(e.getSource() instanceof JComboBox<?>)cb=(JComboBox<String>)e.getSource();
 		if(b==remove){
 			states.remove(state);
-//			RoadNetworkUtils.refresh(rdCxt);
-//			rdCxt.updatePanel();
-//			rdCxt.getMvCxt().updatePanels();
 			mvCxt.getTrafficLights().updateTrafficLightsPanel();
 		}else if(cb==cbCondition){
 			String s=(String)cbCondition.getSelectedItem();
@@ -100,18 +73,13 @@ public class TrafficLightStateListener implements ActionListener, Blockable,
 			}
 			mvCxt.getTrafficLights().updateTrafficLightsPanel();
 		}
-	}
-
-	private void textChanged(DocumentEvent e) {
-		if(blocked)return;
-		Document doc=e.getDocument();
-		if(doc==name.getDocument()){
-			if(!Conditions.isValid(name, state.getName()))return;
-			state.setName(name.getText());
+		else if(cb==name){
+			String s=(String)name.getSelectedItem();
+			state.setName(s);
 		}
 	}
 
-	public void setName(JTextField name) {
+	public void setName(JComboBox name) {
 		this.name = name;
 	}
 

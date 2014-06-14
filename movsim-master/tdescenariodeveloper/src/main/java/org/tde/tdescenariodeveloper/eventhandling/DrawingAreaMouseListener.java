@@ -163,6 +163,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
 	        	trafficCanvas.getRoadPrPnl().updateGraphics();
 	        	if(e.getButton()==MouseEvent.BUTTON3){
 	        		trafficCanvas.getPopup().show(trafficCanvas, e.getX(), e.getY());
+	        		statusPnl.setStatus(" ");
 	        	}
 	        }
     	}
