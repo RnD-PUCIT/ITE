@@ -5,16 +5,22 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import org.movsim.network.autogen.opendrive.CenterLane.Link;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.GeometryUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.GeometryValidator;
-
+/**
+ * Class used to listen for changes made to {@link Geometry}
+ * @author Shmeel
+ *
+ */
 public class GeometryPanelListener implements DocumentListener,ActionListener,Blockable {
 	RoadContext rdCxt;
 	GeometryValidator validator;
@@ -23,6 +29,10 @@ public class GeometryPanelListener implements DocumentListener,ActionListener,Bl
 	boolean inDocUpdate=false;
 	boolean inActionUpdate=false;
 	boolean blocked=true;
+	/**
+	 * 
+	 * @param roadPropertiesPanel Road properties panel
+	 */
 	public GeometryPanelListener(RoadContext roadPropertiesPanel) {
 		rdCxt=roadPropertiesPanel;
 		validator=new GeometryValidator(rdCxt);
@@ -90,6 +100,10 @@ public class GeometryPanelListener implements DocumentListener,ActionListener,Bl
 		}
 		inActionUpdate=false;
 	}
+	/**
+	 * Called when related {@link JTextField} text is changed
+	 * @param e document event
+	 */
 	public void textChnaged(DocumentEvent e){
 		if(docListLocked || rdCxt.getSelectedRoad()==null)return;
 		Document doc=e.getDocument();

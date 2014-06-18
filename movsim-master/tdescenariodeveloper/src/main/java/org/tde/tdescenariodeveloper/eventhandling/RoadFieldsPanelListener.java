@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
@@ -20,6 +21,7 @@ import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.ui.JunctionsPanel;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.tde.tdescenariodeveloper.ui.RoadFieldsPanel;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.LanesUpdater;
 import org.tde.tdescenariodeveloper.updation.LinkUpdater;
@@ -27,12 +29,23 @@ import org.tde.tdescenariodeveloper.updation.RoadFieldsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 import org.tde.tdescenariodeveloper.validation.RoadFieldsValidator;
-
+/**
+ * Class is used to listen for changes made to selected road
+ * @author Shmeel
+ * @see RoadFieldsPanel
+ * @see Road
+ * @see RoadFieldsUpdater
+ * @see RoadFieldsValidator
+ */
 public class RoadFieldsPanelListener implements DocumentListener,ActionListener,Blockable {
 	RoadContext rdCxt;
 	RoadFieldsUpdater roadFieldsUpdater;
 	RoadFieldsValidator validator;
 	private boolean blocked=true;
+	/**
+	 * 
+	 * @param roadPropertiesPanel contains reference to loaded .xodr and other added panels in it
+	 */
 	public RoadFieldsPanelListener(RoadContext roadPropertiesPanel) {
 		rdCxt=roadPropertiesPanel;
 		this.roadFieldsUpdater=new RoadFieldsUpdater(rdCxt);
@@ -100,6 +113,10 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener,
 	public void removeUpdate(DocumentEvent e) {
 		textChanged(e);
 	}
+	/**
+	 * Called when text of related {@link JTextField} is changed
+	 * @param e
+	 */
 	public void textChanged(DocumentEvent e){
 		if(blocked)return;
 		Document doc=e.getDocument();
@@ -110,6 +127,7 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener,
 			rdCxt.updateGraphics();
 		}
 	}
+	@Override
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
 	}

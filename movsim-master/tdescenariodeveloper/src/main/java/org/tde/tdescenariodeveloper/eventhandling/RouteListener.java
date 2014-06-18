@@ -16,7 +16,12 @@ import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen for changes made to related {@link Route}
+ * @author Shmeel
+ * @see Route
+ * @see Road
+ */
 public class RouteListener implements DocumentListener, ActionListener ,Blockable{
 
 	private JButton removeRoute;
@@ -25,6 +30,11 @@ public class RouteListener implements DocumentListener, ActionListener ,Blockabl
 	private JTextField routeLabel;
 	private boolean blocked=true;
 	private JButton addRoad;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @param r {@link Route}
+	 */
 	public RouteListener(MovsimConfigContext mvCxt,Route r) {
 		super();
 		this.mvCxt = mvCxt;
@@ -64,6 +74,10 @@ public class RouteListener implements DocumentListener, ActionListener ,Blockabl
 	public void removeUpdate(DocumentEvent e) {
 		textChanged(e);
 	}
+	/**
+	 * called when text of related {@link JTextField} changes
+	 * @param e
+	 */
 	private void textChanged(DocumentEvent e){
 		if(blocked)return;
 		Document doc=e.getDocument();

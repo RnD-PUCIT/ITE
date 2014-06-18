@@ -8,16 +8,25 @@ import javax.swing.JComboBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.JunctionsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.validation.JunctionsValidator;
-
+/**
+ * Class for listening chages made to related {@link Junction} 
+ * @author Shmeel
+ * @see Junction
+ */
 public class JunctionsListener implements ActionListener, ChangeListener,Blockable {
 	RoadContext rdCxt;
 	JunctionsUpdater updater;
 	JunctionsValidator validator;
 	boolean blocked=true;
+	/**
+	 * 
+	 * @param rd contains reference to loaded .xodr and other added panels in it
+	 */
 	public JunctionsListener(RoadContext rd) {
 		rdCxt=rd;
 		updater=new JunctionsUpdater(rd);

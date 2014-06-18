@@ -10,12 +10,21 @@ import org.movsim.autogen.LaneChangeModelType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listening changes made to {@link LaneChangeModelType}
+ * @author Shmeel
+ * @see LaneChangeModelType
+ */
 public class LaneChangeModelListener implements DocumentListener,Blockable {
 	private boolean blocked=true;
 	MovsimConfigContext mvCxt;
 	JTextField safeDec,minGap,thAc,rba,plt;
 	LaneChangeModelType laneChangeModelType;
+	/**
+	 * 
+	 * @param mv contains reference to loaded .xprj and other added panels in it
+	 * @param laneChangeModelType lane change model to which this listener is attached
+	 */
 	public LaneChangeModelListener(MovsimConfigContext mv, LaneChangeModelType laneChangeModelType) {
 		mvCxt=mv;
 		this.laneChangeModelType=laneChangeModelType;

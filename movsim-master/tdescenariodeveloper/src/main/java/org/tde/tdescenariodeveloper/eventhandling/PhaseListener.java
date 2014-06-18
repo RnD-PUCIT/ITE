@@ -15,11 +15,18 @@ import org.movsim.autogen.Phase;
 import org.movsim.autogen.TrafficLightCondition;
 import org.movsim.autogen.TrafficLightState;
 import org.movsim.autogen.TrafficLightStatus;
+import org.movsim.autogen.TrafficLights;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * Class used to listen changes made to {@link Phase}
+ * @author Shmeel
+ * @see Phase
+ * @see TrafficLightState
+ * @see TrafficLights
+ */
 public class PhaseListener implements  ActionListener,Blockable ,DocumentListener{
 	MovsimConfigContext mvCxt;
 	List<Phase>phases;
@@ -28,6 +35,12 @@ public class PhaseListener implements  ActionListener,Blockable ,DocumentListene
 	JTextField duration;
 	private boolean blocked=true;
 	private JButton newState;
+	/**
+	 * 
+	 * @param s {@link Phase}
+	 * @param phases list of {@link Phase}s in which above referred phase is contained
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public PhaseListener(Phase s, List<Phase> phases, MovsimConfigContext mvCxt) {
 		this.mvCxt=mvCxt;
 		this.phases=phases;
@@ -72,7 +85,10 @@ public class PhaseListener implements  ActionListener,Blockable ,DocumentListene
 		textChanged(e);
 		
 	}
-
+/**
+ * called when text is changed of related {@link JTextField}
+ * @param e
+ */
 	private void textChanged(DocumentEvent e) {
 		if(blocked)return;
 		Document doc=e.getDocument();

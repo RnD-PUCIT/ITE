@@ -45,9 +45,9 @@ public class LanesPanel extends JPanel{
 		gbc_lbl.anchor=GridBagConstraints.NORTHWEST;
 		gbc_lbl.fill=GridBagConstraints.BOTH;
 		gbc_lbl.weightx=1;
-		add=new JButton("Add new");
+		add=new JButton("Add new",TDEResources.getResources().getAddIcon());
 		add.addActionListener(lpl);
-		remove=new JButton("Remove");
+		remove=new JButton("Remove",TDEResources.getResources().getRem());
 		remove.addActionListener(lpl);
 		add(add,gbc_lbl);
 		gbc_lbl.weightx=2;

@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -133,27 +135,39 @@ public class SignalsPanel extends JPanel {
 	}
 	public static void adjustControllersAfterSignalRemove(RoadContext rdCxt,
 			String old) {
+		ArrayList<Controller>ctrls=new ArrayList<>();
 		for(Controller clr:rdCxt.getRn().getOdrNetwork().getController()){
 			if(clr.isSetControl()){
+				ArrayList<Control>ctrl=new ArrayList<>();
 				for(Control c:clr.getControl()){
 					if(old.equals(c.getSignalId())){
-						clr.getControl().remove(c);
+						ctrl.add(c);
 					}
 				}
+				clr.getControl().removeAll(ctrl);
+				if(clr.getControl().size()<1)ctrls.add(clr);
 			}
 		}
+		rdCxt.getRn().getOdrNetwork().getController().removeAll(ctrls);
+		HashSet<ControllerGroup>cgs=new HashSet<>();
 		for(ControllerGroup clr:rdCxt.getMvCxt().getMovsim().getScenario().getTrafficLights().getControllerGroup()){
 			if(clr.isSetPhase()){
+				ArrayList<Phase>phses=new ArrayList<>();
 				for(Phase c:clr.getPhase()){
 					if(c.isSetTrafficLightState()){
-						for(TrafficLightState tls:c.getTrafficLightState()){
-							if(tls.getName().equals(old))c.getTrafficLightState().remove(tls);
-						}
+						ArrayList<TrafficLightState>sts=new ArrayList<>();
+						for(TrafficLightState tls:c.getTrafficLightState())
+							if(tls.getName().equals(old))sts.add(tls);
+						c.getTrafficLightState().removeAll(sts);
+						if(c.getTrafficLightState().size()<1)phses.add(c);
 					}
 				}
+				clr.getPhase().removeAll(phses);
+				if(clr.getPhase().size()<1)cgs.add(clr);
 			}
 		}
-		
+		rdCxt.getMvCxt().getMovsim().getScenario().getTrafficLights().getControllerGroup().removeAll(cgs);
+		if(rdCxt.getMvCxt().getMovsim().getScenario().getTrafficLights().getControllerGroup().size()<1)rdCxt.getMvCxt().getMovsim().getScenario().setTrafficLights(null);
 	}
 	public static void adjustControllersGroups(RoadContext rdCxt, String old,
 			String id) {

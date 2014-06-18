@@ -14,6 +14,7 @@ import javax.swing.event.DocumentListener;
 
 import org.movsim.autogen.Inflow;
 import org.movsim.autogen.Road;
+import org.movsim.autogen.Simulation;
 import org.movsim.autogen.TrafficComposition;
 import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
@@ -21,7 +22,15 @@ import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
-
+/**
+ * Class used to listen for changes made to a {@link Road}
+ * @author Shmeel
+ * @see Road
+ * @see org.movsim.network.autogen.opendrive.OpenDRIVE.Road
+ * @see Simulation
+ * @see TrafficComposition
+ * @see VehicleType
+ */
 public class RoadToPanelListener implements ActionListener, ItemListener,Blockable{
 	boolean blocked=true;
 	private MovsimConfigContext mvCxt;
@@ -36,6 +45,12 @@ public class RoadToPanelListener implements ActionListener, ItemListener,Blockab
 	Road road;
 	List<Road>rdList;
 	private JButton newType;
+	/**
+	 * 
+	 * @param mvCxt2 contains reference to loaded .xprj and other added panels in it
+	 * @param r {@link Road}
+	 * @param rdList list of roads in which above referred road is contained
+	 */
 	public RoadToPanelListener(MovsimConfigContext mvCxt2,Road r,List<Road>rdList) {
 		this.mvCxt=mvCxt2;
 		road=r;

@@ -14,7 +14,11 @@ import org.movsim.autogen.TrafficSource;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen for changes made to {@link Inflow}
+ * @author Shmeel
+ *
+ */
 public class InflowListener implements DocumentListener ,ActionListener,Blockable{
 	boolean blocked=true;
 	MovsimConfigContext mvCxt;
@@ -24,6 +28,12 @@ public class InflowListener implements DocumentListener ,ActionListener,Blockabl
 	private JTextField t;
 	private JTextField qPerH;
 	private JTextField v;
+	/**
+	 * 
+	 * @param mvCxt2 contains reference to loaded .xprj and other added panels in it
+	 * @param inflow inflow to which this listener is attached
+	 * @param trafficSource {@link TrafficSource} in which related inflow is contained
+	 */
 	public InflowListener(MovsimConfigContext mvCxt2, Inflow inflow,
 			TrafficSource trafficSource) {
 		this.mvCxt=mvCxt2;

@@ -14,7 +14,11 @@ import org.movsim.autogen.VehiclePrototypeConfiguration;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen for changes made to data of {@link VehiclePrototypeConfiguration}
+ * @author Shmeel
+ * @see VehiclePrototypeConfiguration
+ */
 public class PrototypesListener implements ActionListener, DocumentListener ,Blockable{
 	private boolean blocked=true;
 	private MovsimConfigContext mvCxt;
@@ -22,6 +26,10 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 	JTextField label;
 	private VehiclePrototypeConfiguration vpc;
 	private JTextField lengthTf,widthTf,maxDec;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public PrototypesListener(MovsimConfigContext mvCxt) {
 		this.mvCxt=mvCxt;
 	}
@@ -76,6 +84,10 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 	public void removeUpdate(DocumentEvent e) {
 		textChanged(e);		
 	}
+	/**
+	 * Called when text of related field is changed
+	 * @param e document event
+	 */
 	public void textChanged(DocumentEvent e){
 		if(blocked)return;
 		Document src=e.getDocument();
@@ -128,7 +140,7 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 			}
 		}
 	}
-
+	@Override
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
 	}

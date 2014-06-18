@@ -9,7 +9,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -17,12 +16,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.ObjectInputStream.GetField;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-
-import javax.naming.ldap.Rdn;
 
 import org.movsim.autogen.Road;
 import org.movsim.autogen.TrafficLightStatus;
@@ -41,7 +36,7 @@ import org.movsim.simulator.roadnetwork.TrafficSink;
 import org.movsim.simulator.trafficlights.TrafficLight;
 import org.movsim.simulator.trafficlights.TrafficLightLocation;
 import org.movsim.viewer.roadmapping.PaintRoadMapping;
-import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaKeyListener;
+import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaController;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 
@@ -74,13 +69,28 @@ public class DrawingArea extends Canvas {
     protected boolean drawSlopes=true;
     
     final DrawingAreaMouseListener mouseListener;
-    final DrawingAreaKeyListener keyListener;
 	private boolean drawAxis=true;
 	private boolean drawRoadBounds=false;
 	private boolean drawRoadNames=false;
 	private boolean drawLaneBounds=false;
 	private boolean drawSelectedLane=true;
 	private boolean drawSelectedGeometry=true;
+	private boolean drawSignals=true;
+	public void setDrawSignals(boolean drawSignals) {
+		this.drawSignals = drawSignals;
+	}
+	public void setDrawSpeedLimits(boolean drawSpeedLimits) {
+		this.drawSpeedLimits = drawSpeedLimits;
+	}
+	public void setDrawSelectedLane(boolean drawSelectedLane) {
+		this.drawSelectedLane = drawSelectedLane;
+	}
+	public void setDrawSelectedGeometry(boolean drawSelectedGeometry) {
+		this.drawSelectedGeometry = drawSelectedGeometry;
+	}
+	public void setDrawLaneLinks(boolean drawLaneLinks) {
+		this.drawLaneLinks = drawLaneLinks;
+	}
 	private boolean drawLaneLinks=true;
     private DrawingAreaPopupMenu popup;
 	private DrawingAreaPopupMenu2 popup2;
@@ -106,9 +116,8 @@ public class DrawingArea extends Canvas {
 		popup=new DrawingAreaPopupMenu(roadPrPnl);
 		popup2=new DrawingAreaPopupMenu2(roadPrPnl);
 		setSize(new Dimension(bufferWidth,bufferHeight));
-		keyListener=new DrawingAreaKeyListener(this);
-		addKeyListener(keyListener);
-		mouseListener=new DrawingAreaMouseListener(this, keyListener);
+		DrawingAreaController controller=new DrawingAreaController(this);
+		mouseListener=new DrawingAreaMouseListener(this, controller);
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(mouseListener);
@@ -360,7 +369,7 @@ public class DrawingArea extends Canvas {
 
     }
     protected void drawBackground(Graphics2D g) {
-    	drawTrafficLights(g);
+    	if(drawSignals)drawTrafficLights(g);
         if (drawSources) {
             drawSources(g);
         }

@@ -15,7 +15,12 @@ import org.movsim.autogen.FloatingCarOutput;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen for changes made to {@link FloatingCarOutput} and to add new {@link FloatingCar}
+ * @author Shmeel
+ * @see FloatingCar
+ * @see FloatingCarOutput
+ */
 public class FloatingCarOutputListener implements Blockable, ActionListener,
 		DocumentListener {
 	boolean blocked=true;
@@ -28,6 +33,11 @@ public class FloatingCarOutputListener implements Blockable, ActionListener,
 
 	MovsimConfigContext mvCxt;
 	FloatingCarOutput fco;
+	/**
+	 * 
+	 * @param fco {@link FloatingCarOutput}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public FloatingCarOutputListener(FloatingCarOutput fco,
 			MovsimConfigContext mvCxt) {
 		super();
@@ -55,7 +65,10 @@ public class FloatingCarOutputListener implements Blockable, ActionListener,
 	public void changedUpdate(DocumentEvent e) {
 		textChanged(e);
 	}
-
+	/**
+	 * Called when related {@link JTextField}'s content changes
+	 * @param e
+	 */
 	private void textChanged(DocumentEvent e) {
 		if(blocked)return;
 		Document doc=e.getDocument();

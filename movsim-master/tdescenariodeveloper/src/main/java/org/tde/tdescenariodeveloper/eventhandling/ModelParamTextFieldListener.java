@@ -6,14 +6,36 @@ import javax.swing.event.DocumentListener;
 
 import org.movsim.autogen.AccelerationModelType;
 import org.movsim.autogen.ModelParameterACC;
+import org.movsim.autogen.ModelParameterGipps;
+import org.movsim.autogen.ModelParameterIDM;
+import org.movsim.autogen.ModelParameterKrauss;
+import org.movsim.autogen.ModelParameterMOBIL;
+import org.movsim.autogen.ModelParameterNSM;
+import org.movsim.autogen.ModelParameterNewell;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen changes made to model parameters
+ * @author Shmeel
+ * @see AccelerationModelType
+ * @see ModelParameterACC
+ * @see ModelParameterGipps
+ * @see ModelParameterIDM
+ * @see ModelParameterKrauss
+ * @see ModelParameterMOBIL
+ * @see ModelParameterNewell
+ * @see ModelParameterNSM
+ */
 public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 	JTextField tf;
 	AccelerationModelType accT;
 	int time;
 	boolean blocked=false;
+	/**
+	 * 
+	 * @param tf {@link JTextField} to which this listener is attached
+	 * @param at {@link AccelerationModelType} model
+	 */
 	public ModelParamTextFieldListener(JTextField tf,AccelerationModelType at) {
 		this.tf=tf;
 		accT=at;
@@ -32,7 +54,10 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 	public void removeUpdate(DocumentEvent e) {
 		textChanged(e);
 	}
-
+	/**
+	 * Called when text is changed of the field
+	 * @param e document event
+	 */
 	private void textChanged(DocumentEvent e) {
 		if(blocked)return;
 		if(!Conditions.isValid(tf, ""))return;
@@ -55,6 +80,9 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 			changeNSM();
 		}
 	}
+	/**
+	 * Called if set model was Newell 
+	 */
 	private void changeNewell() {
 		try{
 			double d=Double.parseDouble(tf.getText());
@@ -71,6 +99,9 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 			GraphicsHelper.makeRed(tf);
 		}
 	}
+	/**
+	 * Called if set model was NSM 
+	 */
 	private void changeNSM() {
 		try{
 			double d=Double.parseDouble(tf.getText());
@@ -93,6 +124,9 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 			GraphicsHelper.makeRed(tf);
 		}
 	}
+	/**
+	 * Called if set model was Gipps 
+	 */
 	private void changeGipps() {
 		try{
 			double d=Double.parseDouble(tf.getText());
@@ -115,6 +149,9 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 			GraphicsHelper.makeRed(tf);
 		}
 	}
+	/**
+	 * Called if set model was Krauss 
+	 */
 	private void changeKrauss() {
 		try{
 			double d=Double.parseDouble(tf.getText());
@@ -140,6 +177,9 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 			GraphicsHelper.makeRed(tf);
 		}
 	}
+	/**
+	 * Called if set model was IDM 
+	 */
 	private void changeIDM() {
 		try{
 			double d=Double.parseDouble(tf.getText());
@@ -171,6 +211,9 @@ public class ModelParamTextFieldListener implements DocumentListener,Blockable {
 			GraphicsHelper.makeRed(tf);
 		}
 	}
+	/**
+	 * Called if set model was ACC 
+	 */
 	private void changeACC() {
 		try{
 			double d=Double.parseDouble(tf.getText());

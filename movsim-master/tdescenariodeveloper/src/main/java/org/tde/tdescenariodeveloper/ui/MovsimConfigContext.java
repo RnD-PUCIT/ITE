@@ -34,7 +34,6 @@ public class MovsimConfigContext extends JTabbedPane {
 	}
 	Movsim movsim;
 	private RoadContext rdCxt;
-	private boolean updateCanvas=false;
 	public MovsimConfigContext(Movsim m, RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 		this.movsim=m;
@@ -65,14 +64,6 @@ public class MovsimConfigContext extends JTabbedPane {
 		blockListeners(false);
 		revalidate();
 		repaint();
-		if(updateCanvas){
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					rdCxt.updateGraphics();
-				}
-			});
-		}
 	}
 	private void blockListeners(boolean b) {
 		Stack<Component>stack=new Stack<>();
@@ -122,8 +113,5 @@ public class MovsimConfigContext extends JTabbedPane {
 	}
 	public RoadContext getRdCxt() {
 		return rdCxt;
-	}
-	public void setUpdateCanvas(boolean updateCanvas) {
-		this.updateCanvas = updateCanvas;
 	}
 }

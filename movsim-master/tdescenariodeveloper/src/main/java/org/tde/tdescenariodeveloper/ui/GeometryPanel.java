@@ -34,9 +34,9 @@ public class GeometryPanel extends JPanel{
 	public GeometryPanel(RoadContext roadPropertiesPanel, GeometryPanelListener gpl) {
 		rdCxt=roadPropertiesPanel;
 		this.gpl=gpl;
-		add=new JButton("Add new");
+		add=new JButton("Add new",TDEResources.getResources().getAddIcon());
 		add.addActionListener(gpl);
-		remove=new JButton("Remove");
+		remove=new JButton("Remove",TDEResources.getResources().getRem());
 		remove.addActionListener(gpl);
 		
 		arcTypePnl=new JPanel(new GridBagLayout());

@@ -403,12 +403,13 @@ class Refresher extends SwingWorker<Object, String>{
 			rdCxt.getGmPnl().setSelectedGeometry(gmInd,false);
 			rdCxt.getLanesPnl().setSelectedLane(lnInd, false);
 			rdCxt.setSelectedRoad(rs);
-			rdCxt.updateGraphics();
 		}else{
 			rdCxt.setSelectedRoadNull();
 			rdCxt.getRn().reset();
 			new OpenDriveHandlerJaxb().create("", rdCxt.getRn().getOdrNetwork(), rdCxt.getRn());
+			RoadNetworkUtils.SetupLights(rdCxt.getMvCxt());
 		}
+		rdCxt.updateGraphics();
 		return null;
 	}
 }

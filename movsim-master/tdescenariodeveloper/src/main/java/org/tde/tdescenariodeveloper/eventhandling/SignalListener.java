@@ -13,13 +13,25 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import org.movsim.autogen.TrafficLightState;
+import org.movsim.autogen.TrafficLights;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.ui.SignalsPanel;
+import org.tde.tdescenariodeveloper.ui.TrafficLightsPanel;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * Class used to listen changes made to Signal of selected road
+ * @author Shmeel
+ * @see Signal
+ * @see Control
+ * @see TrafficLights
+ * @see TrafficLightState
+ * @see TrafficLightStateListener
+ * @see TrafficLightsPanel
+ */
 public class SignalListener implements DocumentListener, ActionListener,
 		ChangeListener,Blockable {
 	RoadContext rdCxt;
@@ -29,6 +41,12 @@ public class SignalListener implements DocumentListener, ActionListener,
 	private boolean blocked=true;
 	private JTextField id;
 	private JSlider slider;
+	/**
+	 * 
+	 * @param s {@link Signal} to which this listener is attached
+	 * @param signals {@link List} of signals in which above referred signal is contained
+	 * @param rdCxt contains reference to loaded .xodr and other added panels in it
+	 */
 	public SignalListener(Signal s, List<Signal> signals, RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 		this.signals=signals;
@@ -45,7 +63,6 @@ public class SignalListener implements DocumentListener, ActionListener,
 				signal.setS(src.getValue());
 				RoadNetworkUtils.refresh(rdCxt);
 				rdCxt.getMvCxt().updatePanels();
-				rdCxt.updatePanel();
 			}
 		}
 	}
@@ -57,8 +74,8 @@ public class SignalListener implements DocumentListener, ActionListener,
 			String old=signal.getId();
 			signals.remove(signal);
 			SignalsPanel.adjustControllersAfterSignalRemove(rdCxt,old);
+			if(signals.size()<1)rdCxt.getSelectedRoad().getOdrRoad().setSignals(null);
 			RoadNetworkUtils.refresh(rdCxt);
-			rdCxt.updatePanel();
 			rdCxt.getMvCxt().updatePanels();
 		}
 	}
@@ -77,7 +94,10 @@ public class SignalListener implements DocumentListener, ActionListener,
 	public void removeUpdate(DocumentEvent e) {
 		textChanged(e);
 	}
-
+/**
+ * Called when text of related {@link JTextField} is changed
+ * @param e
+ */
 	private void textChanged(DocumentEvent e) {
 		if(blocked)return;
 		Document doc=e.getDocument();

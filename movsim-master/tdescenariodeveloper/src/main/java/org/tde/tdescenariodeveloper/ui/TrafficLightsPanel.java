@@ -51,6 +51,7 @@ public class TrafficLightsPanel extends JPanel {
 	}
 	public void updateTrafficLightsPanel(){
 		cntPnl.removeAll();
+		cntPnl.add(new JLabel("Add signals from road tab"));
 		controllerPanel.updateControllerPanel();
 		if(mvCxt.getMovsim().getScenario().isSetTrafficLights()){
 			fillControllerGroupsPanel(cntPnl, mvCxt);
@@ -110,13 +111,13 @@ public class TrafficLightsPanel extends JPanel {
 		for(Phase cc:phases){
 			if(i++%2==0 && i>2)c.gridwidth=GridBagConstraints.REMAINDER;
 			else c.gridwidth=1;
-			JPanel p=phaseToPanel(cc,phases, mvCxt);
+			JPanel p=phaseToPanel(cc,phases, mvCxt,i>2);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Phase", TitledBorder.LEADING, TitledBorder.TOP, null, null));			
 			phasesPnl.add(p,c);
 		}
 	}
 	private static JPanel phaseToPanel(Phase cc, List<Phase> phases,
-			MovsimConfigContext mvCxt) {
+			MovsimConfigContext mvCxt, boolean b) {
 		JPanel main=new JPanel(new GridBagLayout());
 		JPanel states=new JPanel(new GridBagLayout());
 		states.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal states", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -130,13 +131,13 @@ public class TrafficLightsPanel extends JPanel {
 		gbc.weightx=1;
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 
-		
 		PhaseListener cl=new PhaseListener(cc,phases, mvCxt);
-		JButton remove=new JButton("Remove this phase",TDEResources.getResources().getRem());
-		remove.addActionListener(cl);
-		cl.setRemove(remove);
-		main.add(remove,gbc);
-
+		if(b){
+			JButton remove=new JButton("Remove this phase",TDEResources.getResources().getRem());
+			remove.addActionListener(cl);
+			cl.setRemove(remove);
+			main.add(remove,gbc);
+		}
 		gbc.gridwidth=1;
 		main.add(new JLabel("Duration"),gbc);
 		JTextField cbId=new JTextField(10);
@@ -149,10 +150,10 @@ public class TrafficLightsPanel extends JPanel {
 
 		main.add(states,gbc);
 		
-		JButton newState=new JButton("New traffic light state",TDEResources.getResources().getAddIcon());
-		newState.addActionListener(cl);
-		cl.setNewStete(newState);
-		main.add(newState,gbc);
+//		JButton newState=new JButton("New traffic light state",TDEResources.getResources().getAddIcon());
+//		newState.addActionListener(cl);
+//		cl.setNewStete(newState);
+//		main.add(newState,gbc);
 		
 		cl.setBlocked(false);
 		return main;
@@ -188,27 +189,26 @@ public class TrafficLightsPanel extends JPanel {
 		
 		TrafficLightStateListener cl=new TrafficLightStateListener(st,states, mvCxt);
 		
-		JButton remove=new JButton("Remove this state",TDEResources.getResources().getRem());
-		remove.addActionListener(cl);
-		cl.setRemove(remove);
-		main.add(remove,gbc);
+//		JButton remove=new JButton("Remove this state",TDEResources.getResources().getRem());
+//		remove.addActionListener(cl);
+//		cl.setRemove(remove);
+//		main.add(remove,gbc);
 
-		gbc.gridwidth=1;
-		main.add(new JLabel("Name"),gbc);
-		ArrayList<String>sgls=new ArrayList<>();
-		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
-			if(r.isSetSignals()){
-				for(Signal ss:r.getSignals().getSignal()){
-					sgls.add(ss.getId());
-				}
-			}
-		}
-		JComboBox<String> name=new JComboBox<String>(sgls.toArray(new String[sgls.size()]));
-		name.addActionListener(cl);
-		cl.setName(name);
-		name.setSelectedItem(st.getName());
-		gbc.gridwidth=GridBagConstraints.REMAINDER;
-		main.add(name,gbc);
+		main.add(new JLabel("Signal: "+st.getName()),gbc);
+//		ArrayList<String>sgls=new ArrayList<>();
+//		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
+//			if(r.isSetSignals()){
+//				for(Signal ss:r.getSignals().getSignal()){
+//					sgls.add(ss.getId());
+//				}
+//			}
+//		}
+//		JComboBox<String> name=new JComboBox<String>(sgls.toArray(new String[sgls.size()]));
+//		name.addActionListener(cl);
+//		cl.setName(name);
+//		name.setSelectedItem(st.getName());
+//		gbc.gridwidth=GridBagConstraints.REMAINDER;
+//		main.add(name,gbc);
 		
 		gbc.gridwidth=1;
 		main.add(new JLabel("Status"),gbc);
@@ -238,7 +238,16 @@ public class TrafficLightsPanel extends JPanel {
 	public static ControllerGroup getControllerGroup(Controller c,MovsimConfigContext mvCxt){
 		if(mvCxt.getMovsim().getScenario().isSetTrafficLights()){
 			for(ControllerGroup cg:mvCxt.getMovsim().getScenario().getTrafficLights().getControllerGroup()){
-				if(cg.getId()==c.getId())return cg;
+				if(cg.getId().equals(c.getId()))return cg;
+			}
+		}
+		return null;
+	}
+
+	public static Controller getController(String id,RoadContext rdCxt){
+		if(rdCxt.getMvCxt().getMovsim().getScenario().isSetTrafficLights()){
+			for(Controller cg:rdCxt.getRn().getOdrNetwork().getController()){
+				if(cg.getId().equals(id))return cg;
 			}
 		}
 		return null;

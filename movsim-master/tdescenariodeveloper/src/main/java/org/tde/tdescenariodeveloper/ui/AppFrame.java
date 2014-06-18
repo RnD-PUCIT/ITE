@@ -102,12 +102,11 @@ public class AppFrame extends JFrame {
 		statusPnl=new StatusPanel();
 		statusPnl.setStatus("Status");
 		ms.setStatusPnl(statusPnl);
-		getContentPane().add(toolbar,BorderLayout.NORTH);
+		getContentPane().add(new JScrollPane(toolbar),BorderLayout.NORTH);
 		
 		mvCxt=new MovsimConfigContext(MovsimScenario.getMovsim(),rdCxt);
 		rdCxt.setMvCxt(mvCxt);
 		toolbar.setMvCxt(mvCxt);
-		mvCxt.setUpdateCanvas(true);
 		AppFrameListener appListener=new  AppFrameListener(mvCxt);
 		appListener.setOpen(mntmOpen);
 		appListener.setSave(mntmSave);

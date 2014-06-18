@@ -31,12 +31,12 @@ public class ControllerPanel extends JPanel {
 	private static final long serialVersionUID = 2395369509625914410L;
 	RoadContext rdCxt;
 	JPanel cntPnl;
-	JButton addNew;
+//	JButton addNew;
 	ControllerPanelListener cpl;
 	public ControllerPanel(RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 		cntPnl=new JPanel(new GridBagLayout());
-		addNew=new JButton("New controller",TDEResources.getResources().getAddIcon());
+//		addNew=new JButton("New controller",TDEResources.getResources().getAddIcon());
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints c=new GridBagConstraints();
@@ -47,15 +47,15 @@ public class ControllerPanel extends JPanel {
 		c.weighty=1;
 		
 		cpl=new ControllerPanelListener(rdCxt);
-		addNew.addActionListener(cpl);
+//		addNew.addActionListener(cpl);
 		add(cntPnl,c);
 		c.weighty=0;
-		add(addNew,c);
+//		add(addNew,c);
 		cpl.setBlocked(false);
 	}
-	public JButton getAddNew() {
-		return addNew;
-	}
+//	public JButton getAddNew() {
+//		return addNew;
+//	}
 	public void updateControllerPanel(){
 		cntPnl.removeAll();
 		if(rdCxt.getRn().getOdrNetwork().isSetController() && rdCxt.getRn().getOdrNetwork().getController().size()>0)fillControllerPanel(rdCxt.getRn().getOdrNetwork().getController(),cntPnl, rdCxt);
@@ -90,10 +90,10 @@ public class ControllerPanel extends JPanel {
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 
 		ControllerListener cl=new ControllerListener(s, controllers, rdCxt);
-		JButton remove=new JButton("Remove this controller",TDEResources.getResources().getRem());
-		remove.addActionListener(cl);
-		cl.setRemove(remove);
-		main.add(remove,gbc);
+//		JButton remove=new JButton("Remove this controller",TDEResources.getResources().getRem());
+//		remove.addActionListener(cl);
+//		cl.setRemove(remove);
+//		main.add(remove,gbc);
 
 		gbc.gridwidth=1;
 		main.add(new JLabel("Name"),gbc);
@@ -105,13 +105,10 @@ public class ControllerPanel extends JPanel {
 		main.add(id,gbc);
 		main.add(signals,gbc);
 
-		
-		
-		
-		JButton newControl=new JButton("Add new signal to this controller",TDEResources.getResources().getAddIcon());
-		newControl.addActionListener(cl);
-		cl.setNewControl(newControl);
-		main.add(newControl,gbc);
+//		JButton newControl=new JButton("Add new signal to this controller",TDEResources.getResources().getAddIcon());
+//		newControl.addActionListener(cl);
+//		cl.setNewControl(newControl);
+//		main.add(newControl,gbc);
 		
 		cl.setBlocked(false);
 		return main;
@@ -125,12 +122,12 @@ public class ControllerPanel extends JPanel {
 		c.weightx=1;
 		c.insets=new Insets(5, 3, 5, 3);
 		for(Control cc:s.getControl()){
-			JPanel p=signalToPanel(cc,s.getControl(), rdCxt);
+			JPanel p=signalToPanel(cc,s, rdCxt);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal", TitledBorder.LEADING, TitledBorder.TOP, null, null));			
 			signals.add(p,c);
 		}
 	}
-	private static JPanel signalToPanel(Control cc, List<Control> controls,
+	private static JPanel signalToPanel(Control cc, Controller controller,
 			RoadContext rdCxt) {
 		JPanel main=new JPanel(new GridBagLayout());
 		main.setBorder(new LineBorder(TDEResources.getResources().CONTROLLERS_BORDER_COLOR, 1, true));
@@ -140,22 +137,31 @@ public class ControllerPanel extends JPanel {
 		gbc.weightx=1;
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 
-		
-		ControlListener cl=new ControlListener(cc,controls, rdCxt);
-		JButton remove=new JButton("Remove this controller",TDEResources.getResources().getRem());
-		remove.addActionListener(cl);
-		cl.setRemove(remove);
-		main.add(remove,gbc);
+//		
+		ControlListener cl=new ControlListener(cc,controller, rdCxt);
+//		JButton remove=new JButton("Remove this controller",TDEResources.getResources().getRem());
+//		remove.addActionListener(cl);
+//		cl.setRemove(remove);
+//		main.add(remove,gbc);
 
-		
+//		
+//		gbc.gridwidth=1;
+//		main.add(new JLabel("Select signal"),gbc);
+//		JComboBox<String> cbId=new JComboBox<String>(getSignalsIds(rdCxt));
+//		cbId.addActionListener(cl);
+//		cl.setIdCb(cbId);
+//		cbId.setSelectedItem(cc.getSignalId());
+//		gbc.gridwidth=GridBagConstraints.REMAINDER;
+		main.add(new JLabel(cc.getSignalId()),gbc);
+//		
 		gbc.gridwidth=1;
-		main.add(new JLabel("Select signal"),gbc);
-		JComboBox<String> cbId=new JComboBox<String>(getSignalsIds(rdCxt));
-		cbId.addActionListener(cl);
-		cl.setIdCb(cbId);
-		cbId.setSelectedItem(cc.getSignalId());
+		main.add(new JLabel("Move to controller"),gbc);
+		JComboBox<String> move=new JComboBox<String>(getOtherControllerIds(rdCxt, controller));
+		move.addActionListener(cl);
+		cl.setMove(move);
+		move.setSelectedItem("This");
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
-		main.add(cbId,gbc);
+		main.add(move,gbc);
 		
 		cl.setBlocked(false);
 		return main;
@@ -171,6 +177,21 @@ public class ControllerPanel extends JPanel {
 				}
 			}
 		}
+		s=new String[nms.size()];
+		int i=0;
+		for(String m:nms){
+			s[i++]=m;
+		}
+		return s;
+	}
+	public static String[] getOtherControllerIds(RoadContext rdCxt,Controller ctr){
+		String[]s;
+		HashSet<String>nms=new HashSet<>();
+		nms.add("This");
+		for(Controller r:rdCxt.getRn().getOdrNetwork().getController()){
+			if(!ctr.getId().equals(r.getId()))nms.add(r.getId());
+		}
+		nms.add("New controller");
 		s=new String[nms.size()];
 		int i=0;
 		for(String m:nms){
@@ -216,10 +237,13 @@ public class ControllerPanel extends JPanel {
 	public static void removeRelatedSignals(String signalId,RoadContext rdCxt){
 		for(Road r:rdCxt.getRn().getOdrNetwork().getRoad()){
 			if(r.isSetSignals()){
+				HashSet<Signal>sgnls=new HashSet<>();
 				for(Signal s:r.getSignals().getSignal()){
 					if(signalId.equals(s.getId()))
-						r.getSignals().getSignal().remove(s);
+						sgnls.add(s);
 				}
+				r.getSignals().getSignal().removeAll(sgnls);
+				if(r.getSignals().getSignal().size()<1)r.setSignals(null);
 			}
 		}
 	}

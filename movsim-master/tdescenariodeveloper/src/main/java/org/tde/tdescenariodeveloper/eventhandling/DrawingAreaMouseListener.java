@@ -25,7 +25,12 @@ import org.tde.tdescenariodeveloper.updation.LinkUpdater;
 import org.tde.tdescenariodeveloper.updation.RoadLaneSegmentPair;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * Used to listen for drawing area mouse gestures/clicks/movements
+ * @author Shmeel
+ * @see DrawingArea
+ *
+ */
 public class DrawingAreaMouseListener implements MouseListener, MouseMotionListener, MouseWheelListener {
     private final DrawingArea trafficCanvas;
     public final DrawingAreaController controller;

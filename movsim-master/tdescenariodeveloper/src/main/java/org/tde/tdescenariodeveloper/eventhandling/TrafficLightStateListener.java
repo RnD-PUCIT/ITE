@@ -11,15 +11,30 @@ import org.movsim.autogen.TrafficLightCondition;
 import org.movsim.autogen.TrafficLightState;
 import org.movsim.autogen.TrafficLightStatus;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
-
+/**
+ * Class used to listen for changes made to {@link TrafficLightState}
+ * @author Shmeel
+ * @see TrafficLightState
+ * @see TrafficLightCondition
+ * @see TrafficLightStatus
+ * @see Signal
+ * @see Control
+ * @see ControlListener
+ * @see SignalListener
+ */
 public class TrafficLightStateListener implements ActionListener, Blockable {
 	boolean blocked=true;
 	MovsimConfigContext mvCxt;
 	JComboBox<String>cbCondition,cbStatus,name;
 	TrafficLightState state;
 	private List<TrafficLightState> states;
-	JButton remove;
-	
+//	JButton remove;
+	/**
+	 * 
+	 * @param st {@link TrafficLightState} to which this listener is attached
+	 * @param states {@link List} of states in which above referred {@link TrafficLightState} is contained
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public TrafficLightStateListener(TrafficLightState st,List<TrafficLightState> states, MovsimConfigContext mvCxt) {
 		this.mvCxt=mvCxt;
 		this.state=st;
@@ -34,14 +49,13 @@ public class TrafficLightStateListener implements ActionListener, Blockable {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(blocked)return;
-		JButton b=null;
-		if(e.getSource() instanceof JButton)b=(JButton)e.getSource();
 		JComboBox<String> cb=null;
 		if(e.getSource() instanceof JComboBox<?>)cb=(JComboBox<String>)e.getSource();
-		if(b==remove){
-			states.remove(state);
-			mvCxt.getTrafficLights().updateTrafficLightsPanel();
-		}else if(cb==cbCondition){
+//		if(b==remove){
+//			states.remove(state);
+//			mvCxt.getTrafficLights().updateTrafficLightsPanel();
+//		}else 
+		if(cb==cbCondition){
 			String s=(String)cbCondition.getSelectedItem();
 			switch(s){
 			case "none":
@@ -78,10 +92,10 @@ public class TrafficLightStateListener implements ActionListener, Blockable {
 			state.setName(s);
 		}
 	}
-
-	public void setName(JComboBox name) {
-		this.name = name;
-	}
+//
+//	public void setName(JComboBox name) {
+//		this.name = name;
+//	}
 
 	public void setCbCondition(JComboBox<String> cbCondition) {
 		this.cbCondition = cbCondition;
@@ -90,8 +104,8 @@ public class TrafficLightStateListener implements ActionListener, Blockable {
 	public void setCbStatus(JComboBox<String> cbStatus) {
 		this.cbStatus = cbStatus;
 	}
-
-	public void setRemove(JButton remove) {
-		this.remove = remove;
-	}
+//
+//	public void setRemove(JButton remove) {
+//		this.remove = remove;
+//	}
 }

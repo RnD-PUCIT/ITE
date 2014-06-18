@@ -11,10 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -31,7 +29,7 @@ public class ToolBar extends JToolBar implements ItemListener,ActionListener{
 	 */
 	private static final long serialVersionUID = -4127064504014635395L;
 
-JCheckBox name,id,axis,dropRoadAtLast;
+JCheckBox name,id,axis,dropRoadAtLast,showSelectedGeometry,showSelectedLane,showSpeedLimits,showLinks,showSignals;
 JButton open,run,save;
 private boolean blocked=true;
 private MovsimConfigContext mvCxt;
@@ -43,7 +41,7 @@ DrawingArea drawingArea;
 		GridBagConstraints gbc=new GridBagConstraints();
 		gbc.fill=GridBagConstraints.BOTH;
 		gbc.anchor=GridBagConstraints.WEST;
-		gbc.insets=new Insets(1, 5, 1, 5);
+		gbc.insets=new Insets(5, 1, 5, 1);
 		gbc.ipadx=2;
 		gbc.ipady=2;
 		
@@ -51,13 +49,24 @@ DrawingArea drawingArea;
 		save=new JButton("Save",TDEResources.getResources().getSave());
 		run=new JButton("Run",TDEResources.getResources().getRun());
 		
-		name=new JCheckBox("Draw road names");
-		id=new JCheckBox("Draw road id's");
-		axis=new JCheckBox("Draw axis");
-		dropRoadAtLast=new JCheckBox("Auto locate new road");
+		name=new JCheckBox("Show Rd. names");
+		id=new JCheckBox("Show Rd. id's");
+		axis=new JCheckBox("Show axis");
+		showSelectedGeometry=new JCheckBox("Show selected geom.");
+		showSelectedGeometry.setToolTipText("Yellow boundry line shows currently selected geometry/road segment.");
+		showSelectedLane=new JCheckBox("Show lane boundry");
+		showSpeedLimits=new JCheckBox("Show speed limits");
+		showLinks=new JCheckBox("Show Rd. links");
+		showSignals=new JCheckBox("Show signals");
+		dropRoadAtLast=new JCheckBox("Auto locate new Rd.");
 		dropRoadAtLast.setToolTipText("Drop new road at end of the last road in network");
 		name.addItemListener(this);
 		id.addItemListener(this);
+		showSelectedGeometry.addItemListener(this);
+		showSelectedLane.addItemListener(this);
+		showSpeedLimits.addItemListener(this);
+		showLinks.addItemListener(this);
+		showSignals.addItemListener(this);
 		axis.addItemListener(this);
 		
 		open.setFocusable(false);
@@ -75,11 +84,21 @@ DrawingArea drawingArea;
 		add(name,gbc);
 		add(id,gbc);
 		add(dropRoadAtLast,gbc);
-		gbc.gridwidth=GridBagConstraints.REMAINDER;
 		gbc.weightx=1;
 		add(axis,gbc);
+		add(showLinks,gbc);
+//		add(showSignals,gbc);
+		add(showSelectedGeometry,gbc);
+		add(showSelectedLane,gbc);
+		gbc.gridwidth=GridBagConstraints.REMAINDER;
+		add(showSpeedLimits,gbc);
 		id.setSelected(true);
 		axis.setSelected(true);
+		showLinks.setSelected(true);
+		showSignals.setSelected(true);
+		showSelectedLane.setSelected(true);
+		showSpeedLimits.setSelected(true);
+		showSelectedGeometry.setSelected(true);
 		dropRoadAtLast.setSelected(false);
 	}
 	@Override
@@ -101,6 +120,21 @@ DrawingArea drawingArea;
 		}
 		else if(chsrc==axis){
 			drawingArea.setDrawAxis(axis.isSelected());
+		}
+		else if(chsrc==showLinks){
+			drawingArea.setDrawLaneLinks(showLinks.isSelected());
+		}
+		else if(chsrc==showSignals){
+			drawingArea.setDrawSignals(showSignals.isSelected());
+		}
+		else if(chsrc==showSelectedGeometry){
+			drawingArea.setDrawSelectedGeometry(showSelectedGeometry.isSelected());
+		}
+		else if(chsrc==showSelectedLane){
+			drawingArea.setDrawSelectedLane(showSelectedLane.isSelected());
+		}
+		else if(chsrc==showSpeedLimits){
+			drawingArea.setDrawSpeedLimits(showSpeedLimits.isSelected());
 		}
 		drawingArea.getRoadPrPnl().updateGraphics();
 	}

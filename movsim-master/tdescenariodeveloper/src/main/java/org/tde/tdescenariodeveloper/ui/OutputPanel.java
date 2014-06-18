@@ -19,6 +19,7 @@ import org.movsim.autogen.FloatingCar;
 import org.movsim.autogen.FloatingCarOutput;
 import org.movsim.autogen.Route;
 import org.movsim.autogen.TravelTimes;
+import org.tde.tdescenariodeveloper.eventhandling.FloatingCarListener;
 import org.tde.tdescenariodeveloper.eventhandling.FloatingCarOutputListener;
 import org.tde.tdescenariodeveloper.eventhandling.OutputListener;
 import org.tde.tdescenariodeveloper.eventhandling.TravelTimesListener;
@@ -254,7 +255,7 @@ public class OutputPanel extends JPanel {
 		JTextField number=new JTextField(5);
 		number.getDocument().addDocumentListener(tl);
 		tl.setNumber(number);
-		number.setText(fc.getNumber()+"");
+		number.setText(fc.getNumber());
 		c.gridwidth=GridBagConstraints.REMAINDER;
 		main.add(number,c);
 		

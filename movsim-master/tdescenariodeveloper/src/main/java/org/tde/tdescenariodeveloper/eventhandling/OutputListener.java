@@ -13,11 +13,19 @@ import org.movsim.autogen.Trajectories;
 import org.movsim.autogen.TravelTimes;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen for changes made to {@link OutputConfiguration}
+ * @author Shmeel
+ * @see OutputConfiguration
+ */
 public class OutputListener implements ActionListener,Blockable{
 	boolean blocked=true;
 	JButton addNewTravelTimes,addNewFloatingCars;
 	MovsimConfigContext mvCxt;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public OutputListener(MovsimConfigContext mvCxt) {
 		this.mvCxt=mvCxt;		
 	}

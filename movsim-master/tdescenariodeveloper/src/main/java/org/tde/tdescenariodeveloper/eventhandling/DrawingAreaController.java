@@ -2,7 +2,11 @@ package org.tde.tdescenariodeveloper.eventhandling;
 
 import org.tde.tdescenariodeveloper.ui.DrawingArea;
 
-
+/**
+ * Class used to listen for wheel movements
+ * @author Shmeel
+ * @see DrawingArea
+ */
 public class DrawingAreaController {
     final DrawingArea trafficCanvas;
     public DrawingAreaController(DrawingArea trafficCanvas) {

@@ -6,24 +6,45 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.Lane.Link.Predecessor;
+import org.movsim.network.autogen.opendrive.Lane.Link.Successor;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.LanesUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 import org.tde.tdescenariodeveloper.validation.LanesValidator;
-
+/**
+ * Class used to listen for changes made to lanes of selected road
+ * @author Shmeel
+ * @see Lane
+ * @see LaneLink
+ * @see Predecessor
+ * @see Successor
+ */
 public class LanesPanelListener implements DocumentListener, ActionListener,ChangeListener,Blockable {
 	boolean locked=true;
 	RoadContext rdCxt;
+	/**
+	 * used for lanes data validation
+	 */
 	LanesValidator validator;
+	/**
+	 *  used to update lanes data
+	 */
 	LanesUpdater updater;
+	/**
+	 * 
+	 * @param roadPropertiesPanel road properties panel
+	 */
 	public LanesPanelListener(RoadContext roadPropertiesPanel) {
 		rdCxt=roadPropertiesPanel;
 		validator=new LanesValidator(rdCxt);
@@ -80,6 +101,10 @@ public class LanesPanelListener implements DocumentListener, ActionListener,Chan
 	public void removeUpdate(DocumentEvent e) {
 		textChanged(e);
 	}
+	/**
+	 * called when content of related {@link JTextField} changes
+	 * @param e document event
+	 */
 	private void textChanged(DocumentEvent e){
 		if(locked)return;
 		Document doc=e.getDocument();

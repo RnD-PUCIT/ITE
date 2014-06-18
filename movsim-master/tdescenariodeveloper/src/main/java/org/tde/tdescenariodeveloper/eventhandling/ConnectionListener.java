@@ -12,12 +12,27 @@ import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.JunctionsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * The class to listen for changes made to any field of {@link Connection}
+ * Each connection in the junction holds its own instance of this class.
+ * @author Shmeel
+ * @see Connection
+ */
 public class ConnectionListener implements ActionListener,Blockable {
 	RoadContext rdCxt;
 	JComboBox<String>connecting;
 	JComboBox<String>incoming;
 	JButton remove,addLn;
+	/**
+	 * 
+	 * @param rdCxt contains reference to loaded .xodr and other added panels
+	 * @param connecting connecting road selection
+	 * @param incoming incoming road selection
+	 * @param cntPnt  contact point selection
+	 * @param cn connection to which this listener is attached
+	 * @param remove button used to remove related connection
+	 * @param addlnlnk button used to add new {@link LaneLink} in related connection
+	 */
 	public ConnectionListener(RoadContext rdCxt, JComboBox<String> connecting,
 			JComboBox<String> incoming, JComboBox<String> cntPnt, Connection cn, JButton remove, JButton addlnlnk) {
 		super();
@@ -75,6 +90,7 @@ public class ConnectionListener implements ActionListener,Blockable {
 			}
 		}
 	}
+	@Override
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
 	}

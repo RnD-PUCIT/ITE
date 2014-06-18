@@ -6,15 +6,37 @@ import java.awt.event.ActionListener;
 import javax.swing.JComboBox;
 
 import org.movsim.autogen.AccelerationModelType;
+import org.movsim.autogen.ModelParameterACC;
+import org.movsim.autogen.ModelParameterGipps;
+import org.movsim.autogen.ModelParameterIDM;
+import org.movsim.autogen.ModelParameterKrauss;
+import org.movsim.autogen.ModelParameterMOBIL;
+import org.movsim.autogen.ModelParameterNSM;
+import org.movsim.autogen.ModelParameterNewell;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
-
+/**
+ * Class used to monitor selected model
+ * @author Shmeel
+ * @see AccelerationModelType
+ * @see ModelParameterACC
+ * @see ModelParameterGipps
+ * @see ModelParameterIDM
+ * @see ModelParameterKrauss
+ * @see ModelParameterMOBIL
+ * @see ModelParameterNewell
+ * @see ModelParameterNSM
+ */
 public class ModelSelectorListener implements ActionListener,Blockable {
 	MovsimConfigContext mvCxt;
 	JComboBox<String>src;
 	AccelerationModelType accelerationModelType;
 	boolean blocked=true;
-	
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @param accelerationModelType acceleration model
+	 */
 	public ModelSelectorListener(MovsimConfigContext mvCxt, AccelerationModelType accelerationModelType) {
 		this.mvCxt=mvCxt;
 		this.accelerationModelType=accelerationModelType;
@@ -56,6 +78,9 @@ public class ModelSelectorListener implements ActionListener,Blockable {
 			break;
 		}
 	}
+	/**
+	 * called before setting any model, clear all other models
+	 */
 	public void clearMdls(){
 		accelerationModelType.setModelParameterACC(null);
 		accelerationModelType.setModelParameterNSM(null);

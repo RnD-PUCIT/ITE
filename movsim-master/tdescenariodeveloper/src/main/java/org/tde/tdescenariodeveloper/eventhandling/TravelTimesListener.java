@@ -10,13 +10,22 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import org.movsim.autogen.FloatingCar;
+import org.movsim.autogen.OutputConfiguration;
 import org.movsim.autogen.TravelTimes;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
-import org.tde.tdescenariodeveloper.ui.SignalsPanel;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * Class used to listen for changes made to {@link TravelTimes}
+ * @author Shmeel
+ * @see TravelTimes
+ * @see OutputListener
+ * @see OutputConfiguration
+ * @see FloatingCarOutputListener
+ * @see FloatingCarListener
+ * @see FloatingCar
+ */
 public class TravelTimesListener implements Blockable, DocumentListener,ActionListener {
 	boolean blocked=true;
 	MovsimConfigContext mvCxt;
@@ -47,7 +56,10 @@ public class TravelTimesListener implements Blockable, DocumentListener,ActionLi
 	public void removeUpdate(DocumentEvent e) {
 		textChanged(e);
 	}
-
+/**
+ * called when text of related {@link JTextField} is changed
+ * @param e
+ */
 	private void textChanged(DocumentEvent e) {
 		if(blocked)return;
 		Document doc=e.getDocument();

@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -15,13 +16,23 @@ import javax.swing.text.Document;
 
 import org.movsim.autogen.Road;
 import org.movsim.autogen.TrafficComposition;
+import org.movsim.autogen.TrafficSource;
 import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
-
+/**
+ * Class used to listen for changes made to simulation properties
+ * @author Shmeel
+ * @see Simulation
+ * @see VehicleType
+ * @see Road
+ * @see TrafficComposition
+ * @see TrafficSource
+ * @see Inflow
+ */
 public class SimulationListener implements ItemListener, DocumentListener,ActionListener,Blockable {
 	JTextField tmSt,dur,seed;
 	JCheckBox crEx,withSeed;
@@ -29,6 +40,17 @@ public class SimulationListener implements ItemListener, DocumentListener,Action
 	JButton add,addRoad;
 	TrafficComposition tc;
 	List<Road>rdList;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @param tmSt {@link JTextField} time step
+	 * @param dur  {@link JTextField} duration
+	 * @param seed {@link JTextField} seed
+	 * @param crEx {@link JCheckBox} crash on exit
+	 * @param withSeed {@link JCheckBox} use seed 
+	 * @param add {@link JButton} to add new {@link TrafficComposition}
+	 * @param addRoad to add new {@link Road}
+	 */
 	public SimulationListener(MovsimConfigContext mvCxt,JTextField tmSt, JTextField dur, JTextField seed,
 			JCheckBox crEx, JCheckBox withSeed, JButton add, JButton addRoad) {
 		this.mvCxt=mvCxt;

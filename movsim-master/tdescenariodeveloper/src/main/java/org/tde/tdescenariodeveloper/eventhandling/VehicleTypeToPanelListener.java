@@ -14,10 +14,17 @@ import org.movsim.autogen.DistributionTypeEnum;
 import org.movsim.autogen.TrafficComposition;
 import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
+import org.tde.tdescenariodeveloper.ui.SimulationPanel;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen for changes made to {@link VehicleType}
+ * @author Shmeel
+ * @see VehicleType
+ * @see SimulationPanel
+ * @see TrafficComposition
+ */
 public class VehicleTypeToPanelListener implements ActionListener,DocumentListener,Blockable{
 	private boolean blocked=true;
 	private VehicleType vt;
@@ -26,6 +33,12 @@ public class VehicleTypeToPanelListener implements ActionListener,DocumentListen
 	JTextField relV0Rand,fraction;
 	JButton remove;
 	TrafficComposition tc;
+	/**
+	 * 
+	 * @param vt {@link VehicleType}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @param tc {@link TrafficComposition}
+	 */
 	public VehicleTypeToPanelListener(VehicleType vt, MovsimConfigContext mvCxt,TrafficComposition tc) {
 		this.vt = vt;
 		this.mvCxt = mvCxt;
@@ -85,6 +98,10 @@ public class VehicleTypeToPanelListener implements ActionListener,DocumentListen
 			mvCxt.updatePanels();
 		}
 	}
+	/**
+	 * called when text of related {@link JTextField} is changed
+	 * @param e Document event
+	 */
 	private void textChanged(DocumentEvent e){
 		if(blocked)return;
 		Document doc=e.getDocument();

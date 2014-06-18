@@ -12,7 +12,13 @@ import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to listen for chagnes made to {@link Road} in {@link Route}
+ * @author Shmeel
+ * @see Route
+ * @see Road
+ * 
+ */
 public class RoutesRoadToPanelListener implements ActionListener,Blockable{
 	Road r;
 	MovsimConfigContext mvCxt;
@@ -20,6 +26,12 @@ public class RoutesRoadToPanelListener implements ActionListener,Blockable{
 	JComboBox<String>id;
 	boolean blocked=true;
 	Route rt;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @param r {@link Road} to which this listener is attached
+	 * @param rt {@link Route} in which this road is contained
+	 */
 	public RoutesRoadToPanelListener(MovsimConfigContext mvCxt,Road r,Route rt) {
 		this.r=r;
 		this.mvCxt=mvCxt;

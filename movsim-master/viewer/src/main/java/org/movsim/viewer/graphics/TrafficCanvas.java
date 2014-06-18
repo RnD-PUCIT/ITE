@@ -64,7 +64,7 @@ import org.movsim.viewer.util.SwingHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
+   
 /**
  * <p>
  * TrafficCanvas class.
@@ -90,6 +90,8 @@ import org.xml.sax.SAXException;
  */
 public class TrafficCanvas extends SimulationCanvasBase implements SimulationRunnable.UpdateDrawingCallback,
         SimulationRunnable.HandleExceptionCallback {
+//    ImageIcon car=SwingHelper.createImageIcon(this.getClass(), "/images/" + "button_play"
+//            + ".png", 32, 32);
 
     final static Logger logger = LoggerFactory.getLogger(TrafficCanvas.class);
     static final long serialVersionUID = 1L;
@@ -519,6 +521,8 @@ public class TrafficCanvas extends SimulationCanvasBase implements SimulationRun
             g.setPaint(brakeLightColor);
             g.draw(vehiclePath);
         }
+//        g.drawImage(car, (int)polygon.xPoints[0], (int)polygon.yPoints[0], (int)vehicle.getWidth(), (int)vehicle.getLength(), null);
+//        g.drawImage(car.getImage(),(int)polygon.xPoints[2], (int)polygon.yPoints[2], (int)vehicle.getWidth(), (int)vehicle.getLength(),null);
     }
 
     /**

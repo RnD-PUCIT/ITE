@@ -21,12 +21,23 @@ import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
-
+/**
+ * Class for Listening frame events triggered by user.
+ * @author Shmeel
+ * @see App
+ *
+ */
 public class AppFrameListener implements ActionListener,Blockable {
-
+	/**
+	 * Contains reference to Movsim configuration loaded xml and panels added in it. 
+	 */
 	MovsimConfigContext mvCxt;
 	JMenuItem open,save,run,reset;
 	boolean blocked=true;
+	/**
+	 * 
+	 * @param mvCxt MovsimConfigurationContext containing reference to loaded .xprj
+	 */
 	public AppFrameListener(MovsimConfigContext mvCxt) {
 		this.mvCxt = mvCxt;
 	}

@@ -8,16 +8,25 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.tde.tdescenariodeveloper.ui.DrawingAreaPopupMenu;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.GeometryUpdater;
 import org.tde.tdescenariodeveloper.updation.LanesUpdater;
 import org.tde.tdescenariodeveloper.validation.GeometryValidator;
 import org.tde.tdescenariodeveloper.validation.LanesValidator;
-
+/**
+ * Class for listening right click menu clickes
+ * @author Shmeel
+ * @see DrawingAreaPopupMenu
+ */
 public class DrawingAreaPopupListener implements ActionListener, ChangeListener {
 	boolean blocked=true;
 	GeometryValidator gmVl;
 	RoadContext rdCxt;
+	/**
+	 * 
+	 * @param rdCxt contains reference to loaded .xodr and other added panels in it
+	 */
 	public DrawingAreaPopupListener(RoadContext rdCxt){
 		this.rdCxt=rdCxt;
 		gmVl=new GeometryValidator(rdCxt);

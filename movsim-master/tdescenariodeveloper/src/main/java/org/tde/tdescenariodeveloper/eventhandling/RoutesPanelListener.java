@@ -8,12 +8,22 @@ import javax.swing.JButton;
 import org.movsim.autogen.Route;
 import org.movsim.autogen.Routes;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
+import org.tde.tdescenariodeveloper.ui.RoutesPanel;
 import org.tde.tdescenariodeveloper.updation.Conditions;
-
+/**
+ * Class used to add new routes and to listen for changes made to routes.
+ * @author Shmeel
+ * @see RoutesPanel
+ * @see Route
+ */
 public class RoutesPanelListener implements ActionListener,Blockable {
 	JButton addRoute,setRoutes,clearRoutes;
 	MovsimConfigContext mvCxt;
 	boolean blocked=true;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public RoutesPanelListener(MovsimConfigContext mvCxt) {
 		this.mvCxt = mvCxt;
 	}
@@ -36,6 +46,10 @@ public class RoutesPanelListener implements ActionListener,Blockable {
 			mvCxt.updatePanels();
 		}
 	}
+	/**
+	 * used to get id of the road which is not already in this route
+	 * @return returns id of route not added in route yet
+	 */
 	public String getUniqueRouteLabel(){
 		String s="Route"+((int)(Math.random()*10));
 		while(Conditions.existsLabelInRoutes(s, mvCxt)){
