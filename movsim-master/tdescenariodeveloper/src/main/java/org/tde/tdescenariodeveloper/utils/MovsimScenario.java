@@ -31,7 +31,11 @@ import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.xml.sax.SAXException;
 
 public class MovsimScenario {
-	
+	/**
+	 * loads and sets scenario from given file
+	 * @param f .xprj {@link File} to be loaded
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 */
 	public static void setScenario(File f,MovsimConfigContext mvCxt){
 		try {
 			mvCxt.setMovsim(MovsimInputLoader.getInputData(f));
@@ -53,6 +57,10 @@ public class MovsimScenario {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * reloads default scenario
+	 * @param mvCxt
+	 */
 	public static void resetScenario(MovsimConfigContext mvCxt){
 		try {
 			mvCxt.setMovsim(getMovsim());
@@ -76,9 +84,14 @@ public class MovsimScenario {
 			e.printStackTrace();
 		}
 	}
+	/**
+	 * saves scenario to given file
+	 * @param f {@link File} to be stored on
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 */
 	public static void saveScenario(File f, MovsimConfigContext mvCxt) {
-//		RoadNetworkUtils.removeUncontrolledSignals(mvCxt);
-//		RoadNetworkUtils.cleanJunctions(mvCxt);
+		RoadNetworkUtils.removeUncontrolledSignals(mvCxt);
+		RoadNetworkUtils.cleanJunctions(mvCxt);
 		Marshalling.writeToXml(mvCxt.getMovsim(),f);
 		Marshalling.writeToXml(mvCxt.getRdCxt().getRn().getOdrNetwork(), new File(f.getAbsolutePath().replace(".xprj", ".xodr")));
 	}
@@ -181,7 +194,6 @@ public class MovsimScenario {
 		nsm.setV0(35);
 		nsm.setPSlowdown(0.5);
 		nsm.setPSlowStart(0.5);
-		//TODO
 		return nsm;
 	}
 	public static ModelParameterKrauss getModelParameterKrauss() {
@@ -191,7 +203,6 @@ public class MovsimScenario {
 		kr.setS0(3);
 		kr.setV0(35);
 		kr.setEpsilon(0.5);
-		//TODO  
 		return kr;
 	}
 	public static ModelParameterNewell getModelParameterNewell() {

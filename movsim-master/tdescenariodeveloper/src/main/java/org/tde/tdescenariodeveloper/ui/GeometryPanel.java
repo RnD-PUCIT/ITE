@@ -21,8 +21,17 @@ import javax.swing.border.TitledBorder;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.tde.tdescenariodeveloper.eventhandling.GeometryPanelListener;
+import org.tde.tdescenariodeveloper.updation.GeometryUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+import org.tde.tdescenariodeveloper.validation.GeometryValidator;
+/**
+ * Class used to hold all geometries' panels
+ * @author Shmeel
+ * @see Geometry
+ * @see GeometryPanelListener
+ * @see GeometryUpdater
+ * @see GeometryValidator
+ */
 public class GeometryPanel extends JPanel{
 	JComboBox<String>cbGeom,cbGmType;
 	JTextField s,tfx,tfy,hdg,l,curvature;
@@ -31,6 +40,11 @@ public class GeometryPanel extends JPanel{
 	JPanel arcTypePnl;
 	RoadContext rdCxt;
 	GeometryPanelListener gpl;
+	/**
+	 * 
+	 * @param roadPropertiesPanel rdCxt contains reference to loaded .xodr file and other panels added to it
+	 * @param gpl {@link GeometryPanelListener} Listener of this GeometryPanel
+	 */
 	public GeometryPanel(RoadContext roadPropertiesPanel, GeometryPanelListener gpl) {
 		rdCxt=roadPropertiesPanel;
 		this.gpl=gpl;
@@ -117,6 +131,9 @@ public class GeometryPanel extends JPanel{
 		add(lblGmType,gbc_lbl);
 		add(cbGmType,gbc_tf);
 	}
+	/**
+	 * reloads panels from loaded .xodr from memory 
+	 */
 	public void updateGeomPanel(){
 		gpl.setDocListLocked(true);
 		if(rdCxt.getSelectedRoad()==null)return;
@@ -129,13 +146,14 @@ public class GeometryPanel extends JPanel{
 		geometryChanged();
 		gpl.setDocListLocked(false);
 	}
-//	@Override
-//	public void paintComponent(Graphics g){
-//		super.paintComponent(g);
-//		Graphics2D g2=(Graphics2D)g;
-//		g2.setPaint(Color.CYAN);
-//		g2.fillRect(0, 0, getWidth(), getHeight());
-//	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
+	}
+	/**
+	 * to notify that {@link Geometry} has changed
+	 */
 	public void geometryChanged(){
 		cbGmType.removeAllItems();
 		cbGmType.addItem("line");
@@ -240,6 +258,9 @@ public class GeometryPanel extends JPanel{
 	public JButton getAdd() {
 		return add;
 	}
+	/**
+	 * resets panel
+	 */
 	public void reset() {
 		cbGeom.removeAllItems();
 		cbGmType.removeAllItems();

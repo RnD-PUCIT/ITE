@@ -3,6 +3,7 @@ package org.tde.tdescenariodeveloper.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,8 +20,19 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
-
+import org.tde.tdescenariodeveloper.exception.LaneException;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * Class used hold information of lanes of selected {@link Road}
+ * @author Shmeel
+ * @see Road
+ * @see LanesPanelListener
+ * @see Lane
+ * @see LaneLinkPanel
+ * @see LaneException
+ */
 public class LanesPanel extends JPanel{
 	/**
 	 * 
@@ -34,6 +46,11 @@ public class LanesPanel extends JPanel{
 	private int lnInd=0;
 	RoadContext rdCxt;
 	JSlider position;
+	/**
+	 * 
+	 * @param rpp contains reference to loaded .xodr file and other panels added to it
+	 * @param lpl {@link LanesPanelListener} listener attached to this {@link LanesPanel}
+	 */
 	public LanesPanel(RoadContext rpp,LanesPanelListener lpl) {
 		rdCxt=rpp;
 		lnLinkPnl=new LaneLinkPanel(rdCxt);
@@ -62,6 +79,7 @@ public class LanesPanel extends JPanel{
 		
 		
 		JPanel tmp=new JPanel(new GridBagLayout());
+		tmp.setOpaque(false);
 		tmp.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 		tfwidth=new JTextField(10);
 //		tfwidth.setHighlighter(null);
@@ -111,6 +129,9 @@ public class LanesPanel extends JPanel{
 		add(posLbl,gbc_lbl);
 		add(position,gbc_tf);
 	}
+	/**
+	 * used to update lanes' panels from memory
+	 */
 	public void updatelanesPanel() {
 		if(rdCxt.getSelectedRoad()==null)return;
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true),"Lane"+(rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()>1?"s ("+rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size()+")":"") , TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -121,6 +142,9 @@ public class LanesPanel extends JPanel{
 		cbLanes.setSelectedIndex(lnInd);
 		laneChanged();
 	}
+	/**
+	 * used to be notifed if lane selection changes
+	 */
 	public void laneChanged() {
 		cbtype.removeAllItems();
 		cbtype.addItem("driving");
@@ -155,15 +179,33 @@ public class LanesPanel extends JPanel{
 		rdCxt.updateGraphics();
 		
 	}
+	/**
+	 * Used to get selected odr lane
+	 * @return reference to {@link Lane}
+	 */
 	public Lane getSelectedLane(){
 		return getOdrLanes().get(lnInd);
 	}
+	/**
+	 * used to get {@link List} lanes of selected {@link Road}
+	 * @return
+	 */
 	public List<Lane> getOdrLanes(){
 		return rdCxt.getSelectedRoad().getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane();
 	}
+	/**
+	 * used to check if Component is added to this {@link LanesPanel}
+	 * @param c Components to be checked
+	 * @return true if components is added false otherwise
+	 */
 	public boolean isAdded(Component c){
 		return (LanesPanel)c.getParent()==this;
 	}
+	/**
+	 * sets index of the selected lane
+	 * @param ind index of lane
+	 * @param update if true {@link LanesPanel} will be updated from memory
+	 */
 	public void setSelectedLane(int ind,boolean update) {
 //		try{
 //			if(rdCxt.getSelectedRoad()==null)
@@ -186,6 +228,10 @@ public class LanesPanel extends JPanel{
 //			GraphicsHelper.showToast("Item doesn't exit in list", rdCxt.getToastDurationMilis());
 //		}
 	}
+	/**
+	 * used to set index of selected {@link Lane} and to update
+	 * @param ind index
+	 */
 	public void setSelectedLane(int ind) {
 		setSelectedLane(ind,true);
 	}
@@ -216,6 +262,9 @@ public class LanesPanel extends JPanel{
 	public LaneLinkPanel getLnLinkPnl() {
 		return lnLinkPnl;
 	}
+	/**
+	 * Resets this {@link LanesPanel}
+	 */
 	public void reset() {
 		cbLanes.removeAllItems();
 		cbtype.removeAllItems();
@@ -226,5 +275,10 @@ public class LanesPanel extends JPanel{
 	}
 	public JSlider getPosition() {
 		return position;
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

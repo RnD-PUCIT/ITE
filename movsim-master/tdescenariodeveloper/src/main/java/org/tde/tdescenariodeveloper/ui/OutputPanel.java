@@ -1,6 +1,7 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -17,21 +18,39 @@ import javax.swing.border.TitledBorder;
 
 import org.movsim.autogen.FloatingCar;
 import org.movsim.autogen.FloatingCarOutput;
+import org.movsim.autogen.OutputConfiguration;
 import org.movsim.autogen.Route;
 import org.movsim.autogen.TravelTimes;
 import org.tde.tdescenariodeveloper.eventhandling.FloatingCarListener;
 import org.tde.tdescenariodeveloper.eventhandling.FloatingCarOutputListener;
 import org.tde.tdescenariodeveloper.eventhandling.OutputListener;
 import org.tde.tdescenariodeveloper.eventhandling.TravelTimesListener;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * This class holds panels representing output configurations
+ * @author Shmeel
+ * @see OutputListener
+ * @see OutputPanel
+ * @see OutputConfiguration
+ * @see FloatingCarOutput
+ * @see FloatingCarOutputListener
+ * @see FloatingCar
+ */
 public class OutputPanel extends JPanel {
 	JPanel floatingCarPnl,travalTimesPnl;
 	JButton addNewTravelTimes,addNewFloatingCars;
 	
 	MovsimConfigContext mvCxt;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 */
 	public OutputPanel(MovsimConfigContext mvCxt) {
 		this.mvCxt=mvCxt;
 		floatingCarPnl=new JPanel(new GridBagLayout());
 		travalTimesPnl=new JPanel(new GridBagLayout());
+		floatingCarPnl.setOpaque(false);
+		travalTimesPnl.setOpaque(false);
 		setLayout(new GridBagLayout());
 		GridBagConstraints c=new GridBagConstraints();
 		c.anchor=GridBagConstraints.CENTER;
@@ -40,6 +59,10 @@ public class OutputPanel extends JPanel {
 		c.weighty=1;
 		c.insets=new Insets(5,10,5,10);
 		JScrollPane sp1=new JScrollPane(floatingCarPnl),sp4=new JScrollPane(travalTimesPnl);
+		sp1.getViewport().setOpaque(false);
+		sp4.getViewport().setOpaque(false);
+		sp1.setOpaque(false);
+		sp4.setOpaque(false);
 		sp1.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Floating cars", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		sp4.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Traval times", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(sp1,c);
@@ -56,6 +79,9 @@ public class OutputPanel extends JPanel {
 		addNewTravelTimes.addActionListener(ol);
 		ol.setAddNewTravelTimes(addNewTravelTimes);
 	}
+	/**
+	 * updates this {@link OutputPanel} from memory
+	 */
 	public void updateOutputPanels(){
 		floatingCarPnl.removeAll();
 		travalTimesPnl.removeAll();
@@ -78,7 +104,12 @@ public class OutputPanel extends JPanel {
 			fillTravalTimesPnl(travalTimesPnl,mvCxt);
 		}
 	}
-	private void fillTravalTimesPnl(JPanel travalTimesPnl,
+	/**
+	 * used to fill the given {@link JPanel} with {@link TravelTimes}
+	 * @param travalTimesPnl {@link TravelTimes}
+	 * @param mvCxt contains reference to loaded .xodr file and other panels added to it
+	 */
+	public void fillTravalTimesPnl(JPanel travalTimesPnl,
 			MovsimConfigContext mvCxt) {
 		travalTimesPnl.removeAll();
 
@@ -92,12 +123,20 @@ public class OutputPanel extends JPanel {
 		travalTimesPnl.add(addNewTravelTimes,c);
 		for(TravelTimes s:mvCxt.getMovsim().getScenario().getOutputConfiguration().getTravelTimes()){
 			JPanel p=travalTimeToPanel(s, mvCxt);
+			p.setOpaque(false);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Traval time", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			travalTimesPnl.add(p,c);
 		}
 	}
-	private JPanel travalTimeToPanel(TravelTimes s, MovsimConfigContext mvCxt) {
+	/**
+	 * converts {@link TravelTimes} to {@link JPanel}
+	 * @param s {@link TravelTimes} to be converted
+	 * @param mvCxt contains reference to loaded .xodr file and other panels added to it
+	 * @return return {@link JPanel}
+	 */
+	public JPanel travalTimeToPanel(TravelTimes s, MovsimConfigContext mvCxt) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		TravelTimesListener tl=new TravelTimesListener(s,mvCxt);
 		GridBagConstraints c=new GridBagConstraints();
 		c.fill=GridBagConstraints.BOTH;
@@ -155,14 +194,23 @@ public class OutputPanel extends JPanel {
 		floatingCarPnl.add(addNewFloatingCars,c);
 		for(FloatingCarOutput s:mvCxt.getMovsim().getScenario().getOutputConfiguration().getFloatingCarOutput()){
 			JPanel p=floatingCarOutputToPanel(s, mvCxt);
+			p.setOpaque(false);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Floating cars", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			floatingCarPnl.add(p,c);
 		}
 	}
-	private JPanel floatingCarOutputToPanel(FloatingCarOutput s,
+	/**
+	 * converts {@link FloatingCarOutput} to {@link JPanel}
+	 * @param s {@link FloatingCarOutput} to be converted
+	 * @param mvCxt contains reference to loaded .xodr file and other panels added to it
+	 * @return return {@link JPanel}
+	 */
+	public JPanel floatingCarOutputToPanel(FloatingCarOutput s,
 			MovsimConfigContext mvCxt) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		JPanel floatingcarPnl=new JPanel(new GridBagLayout());
+		floatingcarPnl.setOpaque(false);
 		fillFloatingCarPnl(s,floatingcarPnl,mvCxt);
 		FloatingCarOutputListener tl=new FloatingCarOutputListener(s,mvCxt);
 		GridBagConstraints c=new GridBagConstraints();
@@ -230,13 +278,22 @@ public class OutputPanel extends JPanel {
 		c.insets=new Insets(5, 3, 5, 3);
 		for(FloatingCar fc:s.getFloatingCar()){
 			JPanel p=floatingCarToPanel(fc,s, mvCxt);
+			p.setOpaque(false);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Floating car", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			floatingcarPnl.add(p,c);
 		}
 	}
-	private JPanel floatingCarToPanel(FloatingCar fc, FloatingCarOutput s,
+	/**
+	 * converts {@link FloatingCar} to {@link JPanel}
+	 * @param fc {@link FloatingCar} to be converted
+	 * @param s {@link FloatingCarOutput} in which above {@link FloatingCar} is referred
+	 * @param mvCxt contains reference to loaded .xodr file and other panels added to it
+	 * @return {@link JPanel}
+	 */
+	public JPanel floatingCarToPanel(FloatingCar fc, FloatingCarOutput s,
 			MovsimConfigContext mvCxt) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		FloatingCarListener tl=new FloatingCarListener(fc,s,mvCxt);
 		GridBagConstraints c=new GridBagConstraints();
 		c.fill=GridBagConstraints.BOTH;
@@ -261,5 +318,11 @@ public class OutputPanel extends JPanel {
 		
 		tl.setBlocked(false);
 		return main;
+	}
+	
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

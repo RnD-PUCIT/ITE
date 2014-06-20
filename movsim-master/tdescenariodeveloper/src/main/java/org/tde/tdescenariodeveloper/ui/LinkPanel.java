@@ -1,6 +1,7 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -13,13 +14,19 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link;
 import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.LinkPanelListener;
-
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * Class used to show {@link Link} information of the selected {@link Road}
+ * @author Shmeel
+ * @see Road
+ * @see Link
+ * @see LinkPanelListener
+ */
 public class LinkPanel extends JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 76435681L;
 	private JComboBox<String> cbElementType;
 	private JLabel cbElementId;
@@ -28,6 +35,10 @@ public class LinkPanel extends JPanel {
 	GridBagConstraints c,gbc_lbl,gbc_tf;
 	RoadContext rdCxt;
 	LinkPanelListener lpl;
+	/**
+	 * 
+	 * @param rpp contains reference to loaded .xodr file and other panels added to it
+	 */
 	public LinkPanel(RoadContext rpp) {
 		rdCxt=rpp;
 		setLayout(new GridBagLayout());
@@ -82,7 +93,9 @@ public class LinkPanel extends JPanel {
 		add(cbContactPoint,gbc_tf);
 		lp.setBlocked(false);
 	}
-
+	/**
+	 * used to udpate {@link LinkPanel}
+	 */
 	public void updateLinkPanel() {
 		if(rdCxt.getSelectedRoad()==null){
 			return;
@@ -132,6 +145,9 @@ public class LinkPanel extends JPanel {
 		cbElementType.setSelectedItem(type);
 		cbContactPoint.setText(cntPnt);
 	}
+	/**
+	 * resets this {@link LinkPanel}
+	 */
 	public void reset() {
 		cbElementId.setText("");
 		cbContactPoint.setText("");
@@ -146,5 +162,10 @@ public class LinkPanel extends JPanel {
 	}
 	public LinkPanelListener getListener() {
 		return lpl;
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

@@ -102,7 +102,7 @@ public class SwingHelper {
             public void windowClosing(WindowEvent evnt) {
                 evnt.getWindow().setVisible(false);
                 evnt.getWindow().dispose();
-                System.exit(0);
+//                System.exit(0);
             }
         });
     }

@@ -2,10 +2,12 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -31,7 +33,12 @@ import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
 import org.tde.tdescenariodeveloper.eventhandling.LaneLinkListener;
 import org.tde.tdescenariodeveloper.updation.JunctionsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to hold {@link Junction}s
+ * @author Shmeel
+ * @see Junction
+ * @see JunctionsListener
+ */
 public class JunctionsPanel extends JPanel {
 	/**
 	 * 
@@ -44,6 +51,11 @@ public class JunctionsPanel extends JPanel {
 	RoadContext rdCxt;
 	String selectedJn="";
 	JButton add,remove,addCn;
+	/**
+	 * 
+	 * @param rpp rdCxt contains reference to loaded .xodr file and other panels added to it
+	 * @param jl {@link JunctionsListener} listener of this {@link JunctionsPanel}
+	 */
 	public JunctionsPanel(RoadContext rpp, JunctionsListener jl) {
 		rdCxt=rpp;
 		add=new JButton("New junction",TDEResources.getResources().getAddIcon());
@@ -54,8 +66,11 @@ public class JunctionsPanel extends JPanel {
 		addCn.addActionListener(jl);
 		
 		sp=new JScrollPane();
+		sp.setOpaque(false);
+		sp.getViewport().setOpaque(false);
 		sp.getViewport().add(this);
 		linkInfoPnl=new JPanel(new GridBagLayout());
+		linkInfoPnl.setOpaque(false);
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new CompoundBorder(new LineBorder(Color.BLACK, 1, false), new EmptyBorder(10, 5, 10, 5)) , "Junctions", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
 		cbSelectJunc = new JComboBox<>();
@@ -100,6 +115,14 @@ public class JunctionsPanel extends JPanel {
 		sp.revalidate();
 	
 	}
+	/**
+	 * used to get specified {@link RoadSegment}s from given junction
+	 * returns road ids either of incoming or connecting or both
+	 * @param key could be "connecting" or "incoming" or "all"
+	 * @param rdCxt rdCxt contains reference to loaded .xodr file and other panels added to it
+	 * @param j given {@link Junction} 
+	 * @return returns {@link List} of {@link RoadSegment}s
+	 */
 	public static ArrayList<RoadSegment> getJunctionRoadSegments(String key,RoadContext rdCxt,Junction j){
 		if(rdCxt.getRn().getOdrNetwork().getJunction()==null)return null;
 		ArrayList<RoadSegment>rs=new ArrayList<RoadSegment>();
@@ -119,6 +142,9 @@ public class JunctionsPanel extends JPanel {
 		}
 		return rs;
 	}
+	/**
+	 * updates {@link Junction}s Panel from memory
+	 */
 	public void updateJunction(){
 		if(selectedJn==null || selectedJn.equals(""))return;
 		cbSelectJunc.removeAll();
@@ -136,6 +162,10 @@ public class JunctionsPanel extends JPanel {
 		selectedJn=(String)cbSelectJunc.getSelectedItem();
 		updateJunctionPanel(JunctionsUpdater.getJunction(selectedJn, rdCxt));
 	}
+	/**
+	 * updates {@link Junction}s Panel from given {@link Junction}
+	 * @param jn given {@link Junction}
+	 */
 	public void updateJunctionPanel(Junction jn) {
 		//set tool tips
 		remove.setToolTipText("Remove junction: "+selectedJn);
@@ -175,9 +205,15 @@ public class JunctionsPanel extends JPanel {
 		revalidate();
 		repaint();
 	}
-	
-	private JPanel conToPnl(Connection cn,String[]allRd){
+	/**
+	 * converts {@link Connection} to {@link JPanel}
+	 * @param cn {@link Connection} to be converted
+	 * @param allRd array of road ids referred in connection
+	 * @return converted {@link JPanel}
+	 */
+	public JPanel conToPnl(Connection cn,String[]allRd){
 		JPanel p=new JPanel(new GridBagLayout());
+		p.setOpaque(false);
 		p.setBorder(new CompoundBorder(new LineBorder(Color.GRAY,1,true),new EmptyBorder(new Insets(10, 8, 10, 8))));
 		JLabel id=new JLabel("Connection id: "+cn.getId());
 		id.setFont(new Font("Serif",Font.BOLD,12));
@@ -243,6 +279,7 @@ public class JunctionsPanel extends JPanel {
 		}
 		boolean toRdPredJunc=isPredecessorJunction(toRoad);
 		JPanel p2=new JPanel(new GridBagLayout());
+		p2.setOpaque(false);
 		p2.add(new JLabel("From"),gbc_lbl);
 		p2.add(new JLabel("To"),gbc_lbl);
 		gbc_lbl.gridwidth=GridBagConstraints.REMAINDER;
@@ -277,6 +314,12 @@ public class JunctionsPanel extends JPanel {
 		p.add(p2,c);
 		return p;
 	}
+	/**
+	 * tells if {@link Predecessor} of {@link Road} is {@link Junction}
+	 * @param toRoad {@link Road} of which predecessor is to be checked
+	 * @return true if {@link Predecessor} is Junciton, false otherwise
+	 * @throws IllegalArgumentException
+	 */
 	public static boolean isPredecessorJunction(Road toRoad) throws IllegalArgumentException{
 		boolean predJun=false;
 		boolean sucJun=false;
@@ -318,6 +361,11 @@ public class JunctionsPanel extends JPanel {
 	public JButton getAddCn() {
 		return addCn;
 	}
+	/**
+	 * Removes {@link Junction} of given {@link RoadSegment}
+	 * @param r Given {@link RoadSegment}
+	 * @param rdCxt rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public static void removeJunctionOf(RoadSegment r,RoadContext rdCxt) {
 		Junction jj=null;
 		for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){
@@ -331,10 +379,17 @@ public class JunctionsPanel extends JPanel {
 		}
 		r.getOdrRoad().setJunction("-1");
 	}
-
+	/**
+	 * resets panel
+	 */
 	public void reset(){
 		cbSelectJunc.removeAllItems();
 		addCn.setEnabled(false);
 		remove.setEnabled(false);
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

@@ -2,6 +2,7 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,10 +17,20 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.movsim.autogen.Road;
+import org.movsim.autogen.Simulation;
+import org.movsim.autogen.TrafficComposition;
+import org.movsim.autogen.VehiclePrototypes;
 import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.eventhandling.SimulationListener;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
-
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * Class to represent data of {@link Simulation}
+ * @author Shmeel
+ * @see Simulation
+ * @see TrafficComposition
+ * @see Road
+ */
 public class SimulationPanel extends JPanel {
 	private static final long serialVersionUID = -786294065529819367L;
 	MovsimConfigContext mvCxt;
@@ -27,6 +38,10 @@ public class SimulationPanel extends JPanel {
 	JTextField timeStep,duration,seed;
 	JPanel trafficCompositionPnl,roadsPnl;
 	JButton add,addRoad;
+	/**
+	 * 
+	 * @param movsimConfigPane contains reference to loaded .xprj file and other panels added to it
+	 */
 	public SimulationPanel(MovsimConfigContext movsimConfigPane) {
 		setLayout(new GridBagLayout());
 		add=new JButton("<html><i>New type</i></html>",TDEResources.getResources().getAddIcon());
@@ -40,15 +55,27 @@ public class SimulationPanel extends JPanel {
 		seed.setToolTipText("An integer used for randomization");
 		withSeed=new JCheckBox("Use seed");
 		crashExit=new JCheckBox("Exit on crash");
+		crashExit.setOpaque(false);
+		withSeed.setOpaque(false);
 		crashExit.setToolTipText("Stop simulation if traffic crash occurs");
 		trafficCompositionPnl=new JPanel(new GridBagLayout());
+		trafficCompositionPnl.setOpaque(false);
 		roadsPnl=new JPanel(new GridBagLayout());
+		roadsPnl.setOpaque(false);
 		JPanel prop=new JPanel(new GridBagLayout());
+		prop.setOpaque(false);
 		
 		JPanel trPnl=new JPanel(new GridBagLayout());
+		trPnl.setOpaque(false);
 		JPanel rdPnl=new JPanel(new GridBagLayout());
-		
+		rdPnl.setOpaque(false);
 		JScrollPane pr=new JScrollPane(prop),rds=new JScrollPane(rdPnl),trfc=new JScrollPane(trPnl);
+		pr.setOpaque(false);
+		pr.getViewport().setOpaque(false);
+		rds.setOpaque(false);
+		rds.getViewport().setOpaque(false);
+		trfc.setOpaque(false);
+		trfc.getViewport().setOpaque(false);
 		pr.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Simulation properties" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
 		rds.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Road customizations" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
 		trfc.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Generic Traffic composition" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
@@ -127,6 +154,9 @@ public class SimulationPanel extends JPanel {
 		addRoad.addActionListener(sl);
 		sl.setBlocked(false);
 	}
+	/**
+	 * updates this {@link SimulationPanel} from memory
+	 */
 	public void updateSimPanel(){
 		duration.setText(mvCxt.getMovsim().getScenario().getSimulation().isSetDuration()?mvCxt.getMovsim().getScenario().getSimulation().getDuration()+"":"");
 		timeStep.setText(mvCxt.getMovsim().getScenario().getSimulation().isSetTimestep()?mvCxt.getMovsim().getScenario().getSimulation().getTimestep()+"":"");
@@ -141,7 +171,11 @@ public class SimulationPanel extends JPanel {
 		DataToViewerConverter.fillroadsPnl(mvCxt,roadsPnl,mvCxt.getMovsim().getScenario().getSimulation().getRoad());
 	}
 
-	
+	/**
+	 * adjusts related {@link VehicleType}s when {@link VehiclePrototypes} is renamed
+	 * @param oldlbl old label of {@link VehiclePrototypes}
+	 * @param newlbl new label of {@link VehiclePrototypes}
+	 */
 	public void updateTrafficCompostionLabel(String oldlbl, String newlbl) {
 		for(VehicleType vt:mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType())
 			if(vt.getLabel().equals(oldlbl))vt.setLabel(newlbl);
@@ -153,6 +187,11 @@ public class SimulationPanel extends JPanel {
 		}
 		updateSimPanel();
 	}
+	/**
+	 * updates routes of {@link VehicleType} when label of any route is changed 
+	 * @param oldlbl old label of modified route
+	 * @param newlbl new label to be set
+	 */
 	public void updateRoutesLabel(String oldlbl, String newlbl) {
 		for(VehicleType vt:mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType())
 			if(vt.getRouteLabel().equals(oldlbl))vt.setRouteLabel(newlbl);
@@ -163,5 +202,10 @@ public class SimulationPanel extends JPanel {
 			}
 		}
 		updateSimPanel();
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

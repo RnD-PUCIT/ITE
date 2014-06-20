@@ -3,8 +3,10 @@ package org.tde.tdescenariodeveloper.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.util.prefs.Preferences;
 
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -23,8 +25,13 @@ import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * Main application UI Frame
+ * @author Shmeel
+ *
+ */
 public class AppFrame extends JFrame {
+	JCheckBoxMenuItem name,id,axis,dropRoadAtLast,showSelectedGeometry,showSelectedLane,showSpeedLimits,showLinks,showSignals,useTheme;
 	private static final long serialVersionUID = 14320973455L;
 	private RoadContext rdCxt;
 	private StatusPanel statusPnl;
@@ -34,18 +41,54 @@ public class AppFrame extends JFrame {
 	private JunctionsListener jl;
 	private MovsimConfigContext mvCxt;
 	JMenuBar menuBar;
+	org.movsim.viewer.ui.AppFrame movsimFrame;
+	public org.movsim.viewer.ui.AppFrame getMovsimFrame() {
+		return movsimFrame;
+	}
+	public void setMovsimFrame(org.movsim.viewer.ui.AppFrame movsimFrame) {
+		this.movsimFrame = movsimFrame;
+	}
 	ToolsPanel tpnl;
+	/**
+	 * 
+	 * @return return {@link RoadContext}
+	 */
 	public RoadContext getrdCxt(){
 		return rdCxt;
 	}
 	public AppFrame() {
-		GraphicsHelper.setWindowsUI();
+		GraphicsHelper.setNativeUI();
 		setPreferredSize(new Dimension(1024, 768));
 		setMinimumSize(new Dimension(700, 500));
 		setTitle("Vehicular Traffic  Flow Scenario Development Environment");
+		setIconImage(TDEResources.getResources().APP_ICON);
+		
+		name=new JCheckBoxMenuItem("Show road names");
+		id=new JCheckBoxMenuItem("Show road id's");
+		axis=new JCheckBoxMenuItem("Show axis");
+		showSelectedGeometry=new JCheckBoxMenuItem("Show selected geometry");
+		showSelectedGeometry.setToolTipText("Yellow boundry line shows currently selected geometry/road segment.");
+		showSelectedLane=new JCheckBoxMenuItem("Show lane boundry");
+		showSpeedLimits=new JCheckBoxMenuItem("Show speed limits");
+		showLinks=new JCheckBoxMenuItem("Show road links");
+		showSignals=new JCheckBoxMenuItem("Show signals");
+		useTheme=new JCheckBoxMenuItem("Use color theme");
+		dropRoadAtLast=new JCheckBoxMenuItem("Auto locate new road");
+		dropRoadAtLast.setToolTipText("Drop new road at end of the last road in network");
+		
+		id.setSelected(true);
+		axis.setSelected(true);
+		showLinks.setSelected(true);
+		showSignals.setSelected(true);
+		useTheme.setSelected(Preferences.userRoot().node(TDEResources.class.getName()).getBoolean("useTheme",false));
+		showSelectedLane.setSelected(true);
+		showSpeedLimits.setSelected(true);
+		showSelectedGeometry.setSelected(true);
+		dropRoadAtLast.setSelected(false);
 		
 		
-		menuBar = new JMenuBar();
+		
+		menuBar = new TDEMenuBar();
 		setJMenuBar(menuBar);
 		
 		JMenu mnFile = new JMenu("File");
@@ -66,14 +109,17 @@ public class AppFrame extends JFrame {
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 		
-		JMenuItem mntmChangeToastDelay = new JMenuItem("Change toast delay");
+		JMenuItem mntmChangeToastDelay = new JMenuItem("Change toast delay",TDEResources.getResources().getSimulation());
 		mnEdit.add(mntmChangeToastDelay);
 		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 		
-		JMenuItem mntmAbout = new JMenuItem("About");
+		JMenuItem mntmAbout = new JMenuItem("About",TDEResources.getResources().getLinker());
 		mnHelp.add(mntmAbout);
+
+		JMenuItem mntmEmail= new JMenuItem("Request tutorials",TDEResources.getResources().getEmail());
+		mnHelp.add(mntmEmail);
 		
 		JTabbedPane tabPane=new JTabbedPane();
 		ImageIcon icon=new ImageIcon(getClass().getClassLoader().getResource("road_icon.png"));
@@ -94,6 +140,21 @@ public class AppFrame extends JFrame {
 		getContentPane().add(drawingArea, BorderLayout.CENTER);
 		
 		toolbar=new ToolBar(drawingArea);
+		
+
+		mnEdit.add(name);
+		mnEdit.add(id);
+		mnEdit.add(showSelectedGeometry);
+		mnEdit.add(showSelectedLane);
+		mnEdit.add(showSpeedLimits);
+		mnEdit.add(showLinks);
+		mnEdit.add(showSignals);
+		mnEdit.add(axis);
+		mnEdit.add(dropRoadAtLast);
+		mnEdit.add(useTheme);
+		
+		
+		
 		toolbar.setBlocked(false);
 		tabPane.setPreferredSize(new Dimension(275,700));
 		tabPane.addTab("Road", icon, rdCxt.getSp(), "Editing panel for currently selected road");
@@ -102,20 +163,49 @@ public class AppFrame extends JFrame {
 		statusPnl=new StatusPanel();
 		statusPnl.setStatus("Status");
 		ms.setStatusPnl(statusPnl);
-		getContentPane().add(new JScrollPane(toolbar),BorderLayout.NORTH);
+		getContentPane().add(toolbar,BorderLayout.NORTH);
 		
 		mvCxt=new MovsimConfigContext(MovsimScenario.getMovsim(),rdCxt);
 		rdCxt.setMvCxt(mvCxt);
 		toolbar.setMvCxt(mvCxt);
 		AppFrameListener appListener=new  AppFrameListener(mvCxt);
+		name.addActionListener(appListener);
+		id.addActionListener(appListener);
+		showSelectedGeometry.addActionListener(appListener);
+		showSelectedLane.addActionListener(appListener);
+		showSpeedLimits.addActionListener(appListener);
+		showLinks.addActionListener(appListener);
+		showSignals.addActionListener(appListener);
+		useTheme.addActionListener(appListener);
+		axis.addActionListener(appListener);
+		dropRoadAtLast.addActionListener(appListener);
+
+		appListener.setName(name);
+		appListener.setId(id);
+		appListener.setShowSelectedGeometry(showSelectedGeometry);
+		appListener.setShowSelectedLane(showSelectedLane);
+		appListener.setShowSpeedLimits(showSpeedLimits);
+		appListener.setShowLinks(showLinks);
+		appListener.setShowSignals(showSignals);
+		appListener.setUseTheme(useTheme);
+		appListener.setAxis(axis);
+		appListener.setDropRoadAtLast(dropRoadAtLast);
+		
+		
 		appListener.setOpen(mntmOpen);
 		appListener.setSave(mntmSave);
 		appListener.setReset(mntmReset);
+		appListener.setChangeToastDelay(mntmChangeToastDelay);
 		appListener.setRun(mntmRun);
+		appListener.setAbout(mntmAbout);
+		appListener.setEmail(mntmEmail);
 		mntmOpen.addActionListener(appListener);
 		mntmRun.addActionListener(appListener);
 		mntmSave.addActionListener(appListener);
 		mntmReset.addActionListener(appListener);
+		mntmChangeToastDelay.addActionListener(appListener);
+		mntmAbout.addActionListener(appListener);
+		mntmEmail.addActionListener(appListener);
 		tpnl=new ToolsPanel(mvCxt);
 		getContentPane().add(tpnl, BorderLayout.WEST);
 		JPanel southPanel=new JPanel(new BorderLayout());
@@ -125,24 +215,39 @@ public class AppFrame extends JFrame {
 		appListener.setBlocked(false);
 		GraphicsHelper.finalizeFrame(this);
 	}
+	public JCheckBoxMenuItem getDropRoadAtLast() {
+		return dropRoadAtLast;
+	}
 	public StatusPanel getStatusPnl() {
 		return statusPnl;
 	}
 	public void setStatusPnl(StatusPanel statusPnl) {
 		this.statusPnl = statusPnl;
 	}
+	/**
+	 * 
+	 * @return return {@link JunctionsPanel}
+	 */
 	public JunctionsPanel getJp() {
 		return jp;
 	}
 	public ToolBar getToolbar() {
 		return toolbar;
 	}
+	/**
+	 * 
+	 * @return returns {@link JunctionsListener}
+	 */
 	public JunctionsListener getJl() {
 		return jl;
 	}
 	public JMenuBar getMenuBar2() {
 		return menuBar;
 	}
+	/**
+	 * 
+	 * @return returns {@link ToolsPanel}
+	 */
 	public ToolsPanel getTpnl() {
 		return tpnl;
 	}

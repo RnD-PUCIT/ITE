@@ -1,6 +1,7 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -18,16 +19,25 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.Lane.Link;
+import org.movsim.network.autogen.opendrive.OpenDRIVE;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-
+import org.tde.tdescenariodeveloper.eventhandling.LaneLinkListener;
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * Class to hold lane links panels
+ * @author Shmeel
+ * @see Lane
+ * @see Link
+ * @see LaneLink
+ * @see LaneLinkPanel
+ * @see LaneLinkListener
+ */
 public class LaneLinkPanel extends JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 76435681L;
 	LanesPanel lnPnl;
 	private JComboBox<String> cbElementId;
@@ -37,10 +47,15 @@ public class LaneLinkPanel extends JPanel {
 	JPanel linkInfoPnl;
 	boolean showFullJunc=true;
 	RoadContext rdCxt;
+	/**
+	 * 
+	 * @param rpp contains reference to loaded .xodr file and other panels added to it
+	 */
 	
 	public LaneLinkPanel(RoadContext rpp) {
 		rdCxt=rpp;
 		linkInfoPnl=new JPanel(new GridBagLayout());
+		linkInfoPnl.setOpaque(false);
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Lane link", TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, null));
 		
@@ -83,7 +98,9 @@ public class LaneLinkPanel extends JPanel {
 		add(cbSelectLink,c);
 		add(linkInfoPnl,c);
 	}
-
+	/**
+	 * Updates link panels from memory
+	 */
 	public void updateLinkPanel() {
 		linkInfoPnl.removeAll();
 		cbElementId.removeAllItems();
@@ -149,8 +166,11 @@ public class LaneLinkPanel extends JPanel {
 	private void setLinkFields(String linkType, boolean isJunction) {
 		ajdustLinkInfoPnl(isJunction);
 	}
-
-	private void ajdustLinkInfoPnl(boolean isJunction) {
+/**
+ * 
+ * @param isJunction used to update link panel if lane is connected to a junction
+ */
+	public void ajdustLinkInfoPnl(boolean isJunction) {
 		if(isJunction){
 			ArrayList<String>conn=new ArrayList<>();
 			ArrayList<String>incom=new ArrayList<>();
@@ -167,6 +187,7 @@ public class LaneLinkPanel extends JPanel {
 				incoming[i]=incom.get(i);
 			}
 			JPanel lables=new JPanel(new GridLayout(1,4,1,1));
+			lables.setOpaque(false);
 			lables.add(new JLabel(" ID"));
 			lables.add(new JLabel(" Conn. road"));
 			lables.add(new JLabel(" In. road"));
@@ -191,6 +212,12 @@ public class LaneLinkPanel extends JPanel {
 		}
 		
 	}
+	/**
+	 * Used to fill an {@link ArrayList} rejecting elements already added
+	 * @param al {@link ArrayList}
+	 * @param key any {@link Object}
+	 * @return true if object is added false otherwise
+	 */
 	public static <T> boolean putOrReject(ArrayList<T>al,T key){
 		boolean exists=false;
 		for(T s:al){
@@ -202,11 +229,23 @@ public class LaneLinkPanel extends JPanel {
 		if(!exists)al.add(key);
 		return exists;
 	}
+	/**
+	 * sets parent {@link LanesPanel}
+	 * @param lanesPanel
+	 */
 	public void setLanePanel(LanesPanel lanesPanel) {
 		lnPnl=lanesPanel;
 	}
-	private JPanel conToPnl(Connection cn,String[]conn,String[]incom){
+	/**
+	 * used to convert {@link Connection} to {@link JPanel}
+	 * @param cn {@link Connection} to be converted
+	 * @param conn ids of connecting {@link Road}s
+	 * @param incom ids of incoming {@link Road}s
+	 * @return {@link JPanel} representing above referred {@link Connection}
+	 */
+	public JPanel conToPnl(Connection cn,String[]conn,String[]incom){
 		JPanel p=new JPanel(new GridBagLayout());
+		p.setOpaque(false);
 		p.setBorder(BorderFactory.createLineBorder(new Color(150,150,150)));
 		JTextField id=new JTextField(5);
 		id.setText(cn.getId());
@@ -254,7 +293,12 @@ public class LaneLinkPanel extends JPanel {
 		}
 		return p;
 	}
-	private Road getRoad(int id){
+	/**
+	 * used to get {@link Road} provided id of the road
+	 * @param id id of {@link Road}
+	 * @return returns {@link Road}
+	 */
+	public Road getRoad(int id){
 		for(RoadSegment rs:rdCxt.getRn()){
 			if(id==Integer.parseInt(rs.getOdrRoad().getId())){
 				return rs.getOdrRoad();
@@ -262,9 +306,16 @@ public class LaneLinkPanel extends JPanel {
 		}
 		return null;
 	}
-
+	/**
+	 * resets all panels
+	 */
 	public void reset() {
 		cbSelectLink.removeAllItems();
 		linkInfoPnl.removeAll();
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

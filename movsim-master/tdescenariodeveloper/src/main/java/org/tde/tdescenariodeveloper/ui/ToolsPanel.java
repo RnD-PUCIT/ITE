@@ -1,32 +1,46 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.prefs.Preferences;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
+import org.movsim.autogen.TrafficSource;
 import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.Lane.Width;
+import org.movsim.network.autogen.opendrive.OpenDRIVE;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Predecessor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry.Arc;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry.Line;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
@@ -35,33 +49,83 @@ import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
-public class ToolsPanel extends JPanel {
-	private final ToolsPanel tb;
+/**
+ * This class show different tools to the user like straight road editor, arc road editor, {@link Junction}s editor and {@link Link}er
+ * @author Shmeel
+ * @see Link
+ * @see Junction
+ * @see Road
+ * @see Link
+ * @see org.movsim.network.autogen.opendrive.Lane.Link
+ */
+public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 	private Border defaultBorder;
 	private static final long serialVersionUID = -1452084837775482733L;
 	private AbstractButton straightRoad,arcRoad,addTrafficSource,junctionEditor,linker;
+	JButton chooseColor;
+	public JButton getChooseColor() {
+		return chooseColor;
+	}
 	private MovsimConfigContext mvCxt;
+	private JSlider colorDensity;
+	private JColorChooser colorChooser;
 	private Set<RoadSegment> selectedRoads=Collections.synchronizedSet(new HashSet<RoadSegment>());
 	Insets in;
+	/**
+	 * 
+	 * @param mvCxt contains reference to loaded .xodr file and other panels added to it
+	 */
+	@SuppressWarnings("static-access")
 	public ToolsPanel(MovsimConfigContext mvCxt) {
-		tb=this;
 		this.mvCxt=mvCxt;
+		colorChooser=new JColorChooser();
+		colorDensity=new JSlider(JSlider.VERTICAL);
+		colorDensity.setMinimum(-3);
+		colorDensity.setMaximum(3);
+		colorDensity.setValue(Preferences.userRoot().node(TDEResources.class.getName()).getInt("colorDensity", 0));
+		colorDensity.addChangeListener(this);
+		colorDensity.setEnabled(Preferences.userRoot().node(TDEResources.class.getName()).getBoolean("useTheme",false));
 		setLayout(new BorderLayout());
 		JPanel p=new JPanel();
+		p.setOpaque(false);
 		add(p,BorderLayout.NORTH);
-		p.setLayout(new GridLayout(0,1));
+		p.setLayout(new GridBagLayout());
+		GridBagConstraints c=new GridBagConstraints();
+		c.anchor=GridBagConstraints.NORTH;
+		c.fill=GridBagConstraints.BOTH;
+		c.gridwidth=GridBagConstraints.REMAINDER;
 		straightRoad=new JToggleButton(TDEResources.getResources().getStraightRoad());
 		arcRoad=new JToggleButton(TDEResources.getResources().getArcRoad());
 		addTrafficSource=new JToggleButton(TDEResources.getResources().getTrafficSource());
 		junctionEditor=new JToggleButton(TDEResources.getResources().getJunctions());
 		linker=new JToggleButton(TDEResources.getResources().getLinker());
+		chooseColor=new JButton(TDEResources.getResources().getColorChooser());
+		chooseColor.setToolTipText("Choose theme color");
+		chooseColor.setEnabled(Preferences.userRoot().node(TDEResources.class.getName()).getBoolean("useTheme",false));
 		Insets in=new Insets(3, 3, 3, 3);
 		straightRoad.setMargin(in);
 		arcRoad.setMargin(in);
 		addTrafficSource.setMargin(in);
 		junctionEditor.setMargin(in);
 		linker.setMargin(in);
+		chooseColor.setMargin(in);
+		
+		Dimension btnsize=new Dimension(30,30);
+		straightRoad.setPreferredSize(btnsize);
+		arcRoad.setPreferredSize(btnsize);
+		addTrafficSource.setPreferredSize(btnsize);
+		junctionEditor.setPreferredSize(btnsize);
+		linker.setPreferredSize(btnsize);
+		chooseColor.setPreferredSize(btnsize);
+		
+		
+		straightRoad.setMargin(in);
+		arcRoad.setMargin(in);
+		addTrafficSource.setMargin(in);
+		junctionEditor.setMargin(in);
+		linker.setMargin(in);
+		chooseColor.setMargin(in);
+		
 		straightRoad.setToolTipText("Straight road");
 		arcRoad.setToolTipText("Arc raod");
 		addTrafficSource.setToolTipText("Traffic Source");
@@ -79,13 +143,24 @@ public class ToolsPanel extends JPanel {
 		addListener(addTrafficSource);
 		addListener(junctionEditor);
 		addListener(linker);
-		p.add(straightRoad);
-		p.add(arcRoad);
-		p.add(addTrafficSource);
-		p.add(junctionEditor);
-		p.add(linker);
-		
+		p.add(straightRoad,c);
+		p.add(arcRoad,c);
+		p.add(addTrafficSource,c);
+		p.add(junctionEditor,c);
+		p.add(linker,c);
+		p.add(colorDensity,c);
+		c.weighty=1;
+		p.add(chooseColor,c);
+		chooseColor.addActionListener(this);
+		ToolBar.setOpaqueness(false, straightRoad,arcRoad,addTrafficSource,junctionEditor,linker);
+		colorDensity.setOpaque(false);
 		defaultBorder=arcRoad.getBorder();
+	}
+	public JSlider getColorDensity() {
+		return colorDensity;
+	}
+	public JColorChooser getColorChooser() {
+		return colorChooser;
 	}
 	private void addListener(final AbstractButton absBtn) {
 		absBtn.addMouseListener(new MouseAdapter() {
@@ -95,7 +170,6 @@ public class ToolsPanel extends JPanel {
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				Point2D p=new Point2D.Double();
 				AbstractButton src=null;
 				if(e.getSource() instanceof AbstractButton)src=(AbstractButton)e.getSource();
 				in=defaultBorder.getBorderInsets(absBtn);
@@ -171,6 +245,11 @@ public class ToolsPanel extends JPanel {
 			}
 		});
 	}
+	/**
+	 * Creates and adds new {@link Road} to the {@link OpenDRIVE}
+	 * Called when user has selected straight {@link Line} road and clicks on canvas or on road
+	 * @param e
+	 */
 	public void straightRoadClicked(MouseEvent e){
 		Point p=new Point();
 		try {
@@ -245,7 +324,7 @@ public class ToolsPanel extends JPanel {
 				sr.setElementType("road");
 				undr.getOdrRoad().getLink().setSuccessor(sr);
 			}else{
-				if(mvCxt.getRdCxt().getAppFrame().getToolbar().getDropRoadAtLast().isSelected() && mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().size()>0){
+				if(mvCxt.getRdCxt().getAppFrame().getDropRoadAtLast().isSelected() && mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().size()>0){
 					RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(mvCxt.getRdCxt().getRn().getRoadSegments().size()-1).roadMapping();
 					PosTheta pt=null;
 					if(rm instanceof RoadMappingPoly){
@@ -269,6 +348,11 @@ public class ToolsPanel extends JPanel {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 		}
 	}
+	/**
+	 * Creates and adds new {@link Road} to the {@link OpenDRIVE}
+	 * Called when user has selected {@link Arc} road and clicks on canvas or on road
+	 * @param e
+	 */
 	public void arcRoadClicked(MouseEvent e){
 		Point p=new Point();
 		try {
@@ -348,7 +432,7 @@ public class ToolsPanel extends JPanel {
 				sr.setElementType("road");
 				undr.getOdrRoad().getLink().setSuccessor(sr);
 			}else{
-				if(mvCxt.getRdCxt().getAppFrame().getToolbar().getDropRoadAtLast().isSelected() && mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().size()>0){
+				if(mvCxt.getRdCxt().getAppFrame().getDropRoadAtLast().isSelected() && mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().size()>0){
 					RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(mvCxt.getRdCxt().getRn().getRoadSegments().size()-1).roadMapping();
 					PosTheta pt=null;
 					if(rm instanceof RoadMappingPoly){
@@ -372,6 +456,10 @@ public class ToolsPanel extends JPanel {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 		}
 	}
+	/**
+	 * Adds new {@link TrafficSource} on which road, user clicked
+	 * @param e {@link MouseEvent}
+	 */
 	public void trafficSourceClicked(MouseEvent e){
 		Point p=new Point();
 		try {
@@ -427,6 +515,9 @@ public class ToolsPanel extends JPanel {
 		}
 		return selectedRoads.remove(rs);
 	}
+	/**
+	 * clears all selected roads which were marked to be part of {@link Junction}
+	 */
 	public void clearRoadSelections(){
 		selectedRoads.clear();
 	}
@@ -453,5 +544,27 @@ public class ToolsPanel extends JPanel {
 	}
 	public JToggleButton getAddTrafficSource() {
 		return (JToggleButton)addTrafficSource;
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
+	}
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		JSlider src=(JSlider)e.getSource();
+		if(!src.getValueIsAdjusting()){
+			TDEResources.getResources().setColorDensity(colorDensity.getValue());
+			mvCxt.getRdCxt().getAppFrame().repaint();
+		}
+	}
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		Color c=colorChooser.showDialog(mvCxt.getRdCxt().getDrawingArea(), "Choose theme color", TDEResources.getResources().getThemeColor());
+		if(c!=null){
+			TDEResources.getResources().setThemeColor(c);
+			TDEResources.getResources().setColorDensity(colorDensity.getValue());
+			mvCxt.getRdCxt().getAppFrame().repaint();
+		}
 	}
 }

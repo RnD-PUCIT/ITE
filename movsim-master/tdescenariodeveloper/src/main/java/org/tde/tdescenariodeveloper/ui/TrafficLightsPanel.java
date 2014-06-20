@@ -1,10 +1,10 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -20,12 +20,21 @@ import org.movsim.autogen.ControllerGroup;
 import org.movsim.autogen.Phase;
 import org.movsim.autogen.TrafficLightState;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller;
-import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller.Control;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.tde.tdescenariodeveloper.eventhandling.ControllerGroupListener;
 import org.tde.tdescenariodeveloper.eventhandling.PhaseListener;
 import org.tde.tdescenariodeveloper.eventhandling.TrafficLightStateListener;
-
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * This {@link Class} is used to {@link Signal}s, {@link Controller}s, {@link Control}s {@link ControllerGroup}s, {@link Phase}s and {@link TrafficLightState}s 
+ * @author Shmeel
+ * @see Signal
+ * @see ControllerGroup
+ * @see Controller
+ * @see Control
+ * @see TrafficLightState
+ */
 public class TrafficLightsPanel extends JPanel {
 	MovsimConfigContext mvCxt;
 	JPanel cntPnl;
@@ -33,6 +42,7 @@ public class TrafficLightsPanel extends JPanel {
 	public TrafficLightsPanel(MovsimConfigContext rdCxt) {
 		this.mvCxt=rdCxt;
 		cntPnl=new JPanel(new GridBagLayout());
+		cntPnl.setOpaque(false);
 		setLayout(new GridBagLayout());
 		controllerPanel=new ControllerPanel(rdCxt.getRdCxt());
 		GridBagConstraints c=new GridBagConstraints();
@@ -42,6 +52,10 @@ public class TrafficLightsPanel extends JPanel {
 		c.weighty=1;
 		c.insets=new Insets(5,10,5,10);
 		JScrollPane sp1=new JScrollPane(controllerPanel),sp2=new JScrollPane(cntPnl);
+		sp1.setOpaque(false);
+		sp1.getViewport().setOpaque(false);
+		sp2.setOpaque(false);
+		sp2.getViewport().setOpaque(false);
 		sp1.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal controllers", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		sp2.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal controllers configurations", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(sp1,c);
@@ -49,6 +63,9 @@ public class TrafficLightsPanel extends JPanel {
 //		c.gridwidth=GridBagConstraints.REMAINDER;
 		add(sp2,c);
 	}
+	/**
+	 * updates this {@link TrafficLightsPanel}
+	 */
 	public void updateTrafficLightsPanel(){
 		cntPnl.removeAll();
 		cntPnl.add(new JLabel("Add signals from road tab"));
@@ -70,13 +87,22 @@ public class TrafficLightsPanel extends JPanel {
 		List<ControllerGroup>controllerGrps=mvCxt.getMovsim().getScenario().getTrafficLights().getControllerGroup();
 		for(ControllerGroup s:controllerGrps){
 			JPanel p=ControllerGroupToControllerGroupPanel(s, mvCxt);
+			p.setOpaque(false);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Controller group", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 			cntPnl.add(p,c);
 		}
 	}
-	private static JPanel ControllerGroupToControllerGroupPanel(ControllerGroup s,MovsimConfigContext mvCxt) {
+	/**
+	 * Converts {@link ControllerGroup} to {@link JPanel} 
+	 * @param s {@link ControllerGroup} to be converted
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @return {@link JPanel}
+	 */
+	public static JPanel ControllerGroupToControllerGroupPanel(ControllerGroup s,MovsimConfigContext mvCxt) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		JPanel phases=new JPanel(new GridBagLayout());
+		phases.setOpaque(false);
 		phases.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Phases", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		ControllerGroupListener cgl=new ControllerGroupListener(s, mvCxt);
 		fillPhasesPanel(s.getPhase(),phases,mvCxt);
@@ -112,14 +138,25 @@ public class TrafficLightsPanel extends JPanel {
 			if(i++%2==0 && i>2)c.gridwidth=GridBagConstraints.REMAINDER;
 			else c.gridwidth=1;
 			JPanel p=phaseToPanel(cc,phases, mvCxt,i>2);
+			p.setOpaque(false);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Phase", TitledBorder.LEADING, TitledBorder.TOP, null, null));			
 			phasesPnl.add(p,c);
 		}
 	}
-	private static JPanel phaseToPanel(Phase cc, List<Phase> phases,
+	/**
+	 * Converts {@link Phase} to {@link JPanel}
+	 * @param cc {@link Phase} to be converted
+	 * @param phases {@link List} of {@link Phase}s in which above referred {@link Phase} is contained
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @param b if true {@link Phase} is removable
+	 * @return {@link JPanel}
+	 */
+	public static JPanel phaseToPanel(Phase cc, List<Phase> phases,
 			MovsimConfigContext mvCxt, boolean b) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		JPanel states=new JPanel(new GridBagLayout());
+		states.setOpaque(false);
 		states.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal states", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		fillStatesPanel(cc,states,mvCxt);
 		
@@ -172,13 +209,22 @@ public class TrafficLightsPanel extends JPanel {
 			if(i++%2==0 && i>2)c.gridwidth=GridBagConstraints.REMAINDER;
 			else c.gridwidth=1;
 			JPanel p=stateToPanel(st,cc.getTrafficLightState(), mvCxt);
+			p.setOpaque(false);
 			p.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "State", TitledBorder.LEADING, TitledBorder.TOP, null, null));			
 			states.add(p,c);
 		}
 	}
-	private static JPanel stateToPanel(TrafficLightState st, List<TrafficLightState> states,
+	/**
+	 * Converts {@link TrafficLightState} to {@link JPanel}
+	 * @param st {@link TrafficLightState} to be converted
+	 * @param states {@link List} of {@link TrafficLightState}s in which above referred State is contained
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @return {@link JPanel}
+	 */
+	public static JPanel stateToPanel(TrafficLightState st, List<TrafficLightState> states,
 			MovsimConfigContext mvCxt) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		main.setBorder(new LineBorder(TDEResources.getResources().CONTROLLERS_BORDER_COLOR, 1, true));
 		GridBagConstraints gbc=new GridBagConstraints();
 		gbc.fill=GridBagConstraints.BOTH;
@@ -234,7 +280,12 @@ public class TrafficLightsPanel extends JPanel {
 	public void reset() {
 		cntPnl.removeAll();
 	}
-
+	/**
+	 * used to get related {@link ControllerGroup} provided a {@link Control}
+	 * @param c {@link Controller} of which {@link ControllerGroup} is to be found
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @return {@link ControllerGroup}
+	 */
 	public static ControllerGroup getControllerGroup(Controller c,MovsimConfigContext mvCxt){
 		if(mvCxt.getMovsim().getScenario().isSetTrafficLights()){
 			for(ControllerGroup cg:mvCxt.getMovsim().getScenario().getTrafficLights().getControllerGroup()){
@@ -243,7 +294,12 @@ public class TrafficLightsPanel extends JPanel {
 		}
 		return null;
 	}
-
+	/**
+	 * used to get {@link Controller} provided id of the {@link Controller}
+	 * @param id id of {@link Controller}
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 * @return {@link Controller}
+	 */
 	public static Controller getController(String id,RoadContext rdCxt){
 		if(rdCxt.getMvCxt().getMovsim().getScenario().isSetTrafficLights()){
 			for(Controller cg:rdCxt.getRn().getOdrNetwork().getController()){
@@ -254,5 +310,10 @@ public class TrafficLightsPanel extends JPanel {
 	}
 	public ControllerPanel getControllerPanel() {
 		return controllerPanel;
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

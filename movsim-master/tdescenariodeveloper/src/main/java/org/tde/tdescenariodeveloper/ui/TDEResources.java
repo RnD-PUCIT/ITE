@@ -6,12 +6,38 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
+import java.util.prefs.Preferences;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-
+/**
+ * This class uses singleton pattern and holds all information/resources to be used in different locations
+ * @author Shmeel
+ */
 public class TDEResources {
+	Preferences pref=Preferences.userRoot().node(this.getClass().getName());
 	private static TDEResources ir=null;
+	private static boolean useTheme;
+	public static void setUseTheme(boolean useTheme) {
+		TDEResources.useTheme = useTheme;
+	}
+	public void setColorDensity(int colorDensity) {
+		if(!useTheme){
+			COLOR1=COLOR2=new Color(240,240,240);
+			return;
+		}
+		pref.putInt("colorDensity", colorDensity);
+		COLOR1=new Color(themeColor.getRGB());
+		if(colorDensity>0){
+			for(int i=0;i<colorDensity;i++)
+				COLOR1=COLOR1.darker();
+		}
+		if(colorDensity<0){
+			for(int i=colorDensity;i<0;i++)
+				COLOR1=COLOR1.brighter();
+		}
+		COLOR2=COLOR1.darker();
+	}
 	private Cursor linkCursor;
 	final public Cursor DEFAULT_CURSOR=new Cursor(Cursor.DEFAULT_CURSOR);
 	final public Cursor DEFAULT_RED_CURSOR;
@@ -20,8 +46,11 @@ public class TDEResources {
 	final public Cursor TRAFFIC_SOURCE_CURSOR;
 	final public Cursor LINK_CURSOR;
 	final public Image JUNCTION_DEMO;
+	final public Image APP_ICON;
 	final public Cursor HAND_CURSOR=new Cursor(Cursor.HAND_CURSOR);
+	public Color COLOR1=new Color(245,245,245),COLOR2=new Color(220,220,220);
 	private TDEResources(){
+		useTheme=pref.getBoolean("useTheme", false);
 		Dimension d=Toolkit.getDefaultToolkit().getBestCursorSize(0, 0);
 		Point p=new Point();
 		p.setLocation(d.width/2.0, d.height/2.0);
@@ -52,7 +81,12 @@ public class TDEResources {
 		junctions=new ImageIcon(getClass().getClassLoader().getResource("Junc_icon.png"));
 		linker=new ImageIcon(getClass().getClassLoader().getResource("linker.png"));
 		controller=new ImageIcon(getClass().getClassLoader().getResource("controller.png"));
+		colorChooser=new ImageIcon(getClass().getClassLoader().getResource("color_chooser.png"));
+		email=new ImageIcon(getClass().getClassLoader().getResource("email.png"));
+		
+		
 		JUNCTION_DEMO=Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("junction_demo.png"));
+		APP_ICON=Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("app_icon.png"));
 		
 		run.setImage(run.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		output.setImage(output.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
@@ -67,27 +101,23 @@ public class TDEResources {
 		junctions.setImage(junctions.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		linker.setImage(linker.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		controller.setImage(controller.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		colorChooser.setImage(colorChooser.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		sim.setImage(sim.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		prt.setImage(prt.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		trf.setImage(trf.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		rts.setImage(rts.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		email.setImage(email.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		
+		themeColor=new Color(pref.getInt("themeColor", new Color(233,233,233).getRGB()));
+		setColorDensity(pref.getInt("colorDensity", 0));
+	}
+	public static ImageIcon getEmail() {
+		return email;
 	}
 	public static TDEResources getResources(){
 		if(ir==null)ir=new TDEResources();
 		return ir;
 	}
-//	public static final Color TRAFFIC_COMP_BORDER_COLOR=new Color(0,204,214);
-//	public static final Color TRAFFIC_COMP_BORDER_FONT_COLOR=new Color(0,204,214);
-//	public static final Color TRAFFIC_SRC_BORDER_COLOR=new Color(242,103,31);
-//	public static final Color TRAFFIC_SRC_BORDER_FONT_COLOR=new Color(242,103,31);
-//	public static final Color INFLOW_BORDER_COLOR=new Color(96,4,122);
-//	public static final Color INFLOW_BORDER_FONT_COLOR=new Color(96,4,122);
-//	public static final Color VEHICLE_TYPE_BORDER_COLOR=new Color(177,135,0);
-//	public static final Color VEHICLE_TYPE_BORDER_FONT_COLOR=new Color(177,135,0);
-//	public static final Color ROAD_BORDER_COLOR=new Color(177,63,107);
-//	public static final Color ROAD_BORDER_FONT_COLOR=new Color(177,63,107);
-//	public static final Color ROUTE_BORDER_COLOR=new Color(96,4,122);
-//	public static final Color ROUTE_BORDER_FONT_COLOR=new Color(96,4,122);
 	public static final Color TRAFFIC_COMP_BORDER_COLOR=new Color(50,50,50);
 	public static final Color TRAFFIC_COMP_BORDER_FONT_COLOR=new Color(50,50,50);
 	public static final Color TRAFFIC_SRC_BORDER_COLOR=new Color(60,60,60);
@@ -119,6 +149,22 @@ public class TDEResources {
 	private static ImageIcon prt;
 	private static ImageIcon trf;
 	private static ImageIcon rts;
+	private static ImageIcon email;
+	private static ImageIcon colorChooser;
+	private Color themeColor;
+	public Color getThemeColor() {
+		return themeColor;
+	}
+	public void setThemeColor(Color themeColor) {
+		this.themeColor = themeColor;
+		pref.putInt("themeColor", themeColor.getRGB());
+	}
+	public void resetThemeColor() {
+		this.themeColor =Color.WHITE;
+	}
+	public static ImageIcon getColorChooser() {
+		return colorChooser;
+	}
 	public ImageIcon getRem() {
 		return rem;
 	}

@@ -10,9 +10,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
-
+/**
+ * Used to show {@link Road} Properties like length, name, id and junction id
+ * @author Shmeel
+ * @see Junction
+ * @see Road
+ * @see RoadContext
+ */
 public class RoadFieldsPanel extends JPanel {
 	/**
 	 * 
@@ -24,13 +32,18 @@ public class RoadFieldsPanel extends JPanel {
 	private JLabel tfLength;
 	private JComboBox<String> cbJunction;
 	RoadContext rdCxt;
+	/**
+	 * 
+	 * @param rpp contains reference to loaded .xodr file and other panels added to it
+	 * @param rfl Listener for this {@link RoadFieldsPanel}
+	 */
 	public RoadFieldsPanel(RoadContext rpp,RoadFieldsPanelListener rfl) {
 		rdCxt=rpp;
 		addRoad=new JButton("New road",TDEResources.getResources().getStraightRoad());
 		removeRoad=new JButton("Remove road",TDEResources.getResources().getRem());
 		addRoad.addActionListener(rfl);
 		removeRoad.addActionListener(rfl);
-		
+		setOpaque(false);
 		setLayout(new GridBagLayout());
 		Insets ins=new Insets(2,2,2,2);
 		JLabel lblId = new JLabel("Id");
@@ -78,6 +91,9 @@ public class RoadFieldsPanel extends JPanel {
 		add(cbJunction, gbc_tf);
 		rfl.setBlocked(false);
 	}
+	/**
+	 * Updates properties panel if selected road is changed and update is requested
+	 */
 	public void updateFields() {
 		if(rdCxt.getSelectedRoad()==null)return;
 		tfId.setText(rdCxt.getSelectedRoad().getOdrRoad().getId());
@@ -106,6 +122,9 @@ public class RoadFieldsPanel extends JPanel {
 	public JComboBox<String> getCbJunction() {
 		return cbJunction;
 	}
+	/**
+	 * Resets this {@link RoadFieldsPanel}
+	 */
 	public void reset() {
 		tfId.setText("");
 		tfName.setText("");
@@ -118,5 +137,4 @@ public class RoadFieldsPanel extends JPanel {
 	public JButton getRemoveRoad() {
 		return removeRoad;
 	}
-	
 }

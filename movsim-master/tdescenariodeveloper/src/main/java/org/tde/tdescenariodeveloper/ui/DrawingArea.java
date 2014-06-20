@@ -21,10 +21,12 @@ import java.util.Set;
 
 import org.movsim.autogen.Road;
 import org.movsim.autogen.TrafficLightStatus;
+import org.movsim.autogen.TrafficSource;
 import org.movsim.input.network.OpenDriveHandlerJaxb;
 import org.movsim.input.network.OpenDriveHandlerUtils;
 import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Lanes.LaneSection;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.LaneSegment;
@@ -38,8 +40,16 @@ import org.movsim.simulator.trafficlights.TrafficLightLocation;
 import org.movsim.viewer.roadmapping.PaintRoadMapping;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaController;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
+import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaPopupListener;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * Class used as canvas and used to show current scenario graphically to the user.
+ * @author Shmeel
+ * @see DrawingAreaController
+ * @see DrawingAreaMouseListener
+ * @see DrawingAreaPopupMenu
+ * @see DrawingAreaPopupListener
+ */
 public class DrawingArea extends Canvas {
 	private static final long serialVersionUID = 1653L;
     private int bufferHeight=700;
@@ -97,7 +107,13 @@ public class DrawingArea extends Canvas {
 	
 	GeneralPath arrow=new GeneralPath();
 	private boolean drawSelectedRoad=true;
-	private void drawArrowHead(Graphics2D g,Line2D line,Color c) {
+	/**
+	 * recieves a line and draws line along with arrow head 
+	 * @param g {@link Graphics2D}
+	 * @param line {@link Line2D}
+	 * @param c {@link Color}
+	 */
+	public void drawArrowHead(Graphics2D g,Line2D line,Color c) {
 		g.setColor(c);
 		double angle=Math.atan2(line.getY2()-line.getY1(), line.getX2()-line.getX1());
 		arrow.reset();
@@ -111,6 +127,10 @@ public class DrawingArea extends Canvas {
 	    
 //	    g.fillOval((int)line.getX2()-3, (int)line.getY2()-3, 6, 6);
 	}
+	/**
+	 * 
+	 * @param rdPrPnl rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public DrawingArea(RoadContext rdPrPnl) {
 		this.roadPrPnl=rdPrPnl;
 		popup=new DrawingAreaPopupMenu(roadPrPnl);
@@ -123,6 +143,10 @@ public class DrawingArea extends Canvas {
 		addMouseWheelListener(mouseListener);
 		setBackground(new Color(74,172,23));
 	}
+	/**
+	 * Draws selected road, geometry and lane
+	 * @param g {@link Graphics2D}
+	 */
     public void drawSelected(Graphics2D g){
     	if(roadPrPnl.getSelectedRoad()==null)return;
 		Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{2+(float)scale}, 0);
@@ -141,9 +165,12 @@ public class DrawingArea extends Canvas {
         	g.setColor(Color.YELLOW);
         	drawSelectedGeometry(g);
     	}
-	    	
     }
-	private void drawSelectedGeometry(Graphics2D g) {
+    /**
+     * Draws selected {@link Geometry}
+     * @param g {@link Graphics2D}
+     */
+	public void drawSelectedGeometry(Graphics2D g) {
 		int ind=roadPrPnl.getGmPnl().getSelectedIndex();
 		if(roadPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			RoadMappingPoly rmp=(RoadMappingPoly)roadPrPnl.getSelectedRoad().roadMapping();
@@ -152,12 +179,19 @@ public class DrawingArea extends Canvas {
 			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
 		}
 	}
+	/**
+	 * resets transform
+	 */
 	public void setTransform() {
         transform.setToIdentity();
         transform.scale(scale, scale);
         transform.translate(xOffset, yOffset);
     }
-	private void drawSelectedRoad(Graphics2D g){
+	/**
+	 * Draws selected road boundary with grey {@link Color}
+	 * @param g {@link Graphics2D}
+	 */
+	public void drawSelectedRoad(Graphics2D g){
 		if(roadPrPnl.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			RoadMappingPoly rmp=(RoadMappingPoly)roadPrPnl.getSelectedRoad().roadMapping();
 			g.draw(rmp.getBounds());
@@ -165,7 +199,11 @@ public class DrawingArea extends Canvas {
 			g.draw(roadPrPnl.getSelectedRoad().roadMapping().getBounds());
 		}
 	}
-	private void drawSelectedJunctionBounds(Graphics2D g){
+	/**
+	 * Draws Selected roads with junctions editor
+	 * @param g {@link Graphics2D}
+	 */
+	public void drawSelectedJunctionBounds(Graphics2D g){
 		Set<RoadSegment>rdShapes =getRoadPrPnl().getAppFrame().getTpnl().getSelectedRoads();
 		if(rdShapes.size()>0){
 			g.setColor(Color.RED);
@@ -179,7 +217,11 @@ public class DrawingArea extends Canvas {
 			}
 		}
 	}
-	private void drawLinks(Graphics2D g){
+	/**
+	 * Draws {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road} links
+	 * @param g {@link Graphics2D}
+	 */
+	public void drawLinks(Graphics2D g){
 		 for (org.movsim.network.autogen.opendrive.OpenDRIVE.Road road : getRoadPrPnl().getRn().getOdrNetwork().getRoad()) {
 	            RoadSegment roadSegment = getRoadPrPnl().getRn().findByUserId(road.getId());
 	            if (roadSegment == null) {
@@ -256,11 +298,22 @@ public class DrawingArea extends Canvas {
 	            }
 	        }
 	}
-    private void drawArrow(Graphics2D g, Point2D p1, Point2D p2,Color c) {
+	/**
+	 * draws line with arrow head starting from p1 to p2 with color c
+	 * @param g {@link Graphics2D}
+	 * @param p1 {@link Point2D}
+	 * @param p2 {@link Point2D}
+	 * @param c {@link Color}
+	 */
+    public void drawArrow(Graphics2D g, Point2D p1, Point2D p2,Color c) {
 		Line2D line=new Line2D.Double(p1,p2);
 		drawArrowHead(g, line,c);
 	}
-	private void drawSelectedLane(Graphics2D g) {
+    /**
+     * Draws selected lane boundary with blue {@link Color}
+     * @param g
+     */
+	public void drawSelectedLane(Graphics2D g) {
     	g.setColor(Color.BLUE);
     	g.draw(roadPrPnl.getSelectedRoad().getLaneSegments()[roadPrPnl.getLanesPnl().getSelectedIndex()].getBounds());
 	}
@@ -290,6 +343,10 @@ public class DrawingArea extends Canvas {
             bufferHeight = height;
         }
     }
+    /**
+     * sets scale
+     * @param scale Scale
+     */
     public void setScale(double scale) {
         final int width = getWidth();
         final int height = getHeight();
@@ -322,10 +379,18 @@ public class DrawingArea extends Canvas {
         g.setColor(backgroundColor);
         g.fillRect(0, 0, getWidth(), getHeight());
     }
+    /**
+     * sets background color of the canvas
+     * @param backgroundColor
+     */
     public void setBackgroundColor(Color backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
-    private void drawRoadSegments(Graphics2D g) {
+    /**
+     * Draws all {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road}s
+     * @param g {@link Graphics2D}
+     */
+    public void drawRoadSegments(Graphics2D g) {
         for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             drawRoadSegment(g, roadMapping);
@@ -339,8 +404,12 @@ public class DrawingArea extends Canvas {
         g.setColor(new Color(roadMapping.roadColor()));
         PaintRoadMapping.paintRoadMapping(g, roadMapping);
     }
-    
-    private void drawRoadSegmentLines(Graphics2D g, RoadMapping roadMapping) {
+    /**
+     * Draws road lines
+     * @param g {@link Graphics2D}
+     * @param roadMapping {@link RoadMapping}
+     */
+    public void drawRoadSegmentLines(Graphics2D g, RoadMapping roadMapping) {
         final float dashPhase = (float) (roadMapping.roadLength() % (lineLength + gapLength));
 
         final Stroke lineStroke = new BasicStroke(lineWidth, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f,
@@ -401,28 +470,42 @@ public class DrawingArea extends Canvas {
         if(drawLaneLinks)drawLinks(g);
         if(mouseListener.getLinkPoints().size()==1)drawLinkerLine(g);
     }
-
-	private void drawLinkerLine(Graphics2D g) {
+    /**
+     * used to draw indicator line when linker has clicked one road and is waiting for other click 
+     * @param g {@link Graphics2D}
+     */
+	public void drawLinkerLine(Graphics2D g) {
 		g.setColor(Color.RED.darker());
 		RoadSegment roadSegment=mouseListener.getLinkPoints().get(0).getRs();
 		int ls=mouseListener.getLinkPoints().get(0).getLaneId();
 		Point2D p=RoadNetworkUtils.getEnd(roadSegment, ls);
 		g.drawLine((int)p.getX(), (int)p.getY(), (int)mouseListener.getMousePoint().getX(),(int) mouseListener.getMousePoint().getY());
 	}
-	private void drawLaneBounds(Graphics2D g) {
+	/**
+	 * used to draw all lanes' bounds
+	 * @param g {@link Graphics2D}
+	 */
+	public void drawLaneBounds(Graphics2D g) {
     	for(RoadSegment rs:roadPrPnl.getRn()){
     		for(LaneSegment ls:rs.getLaneSegments()){
     			g.draw(ls.getBounds());
     		}
     	}
 	}
-	private void drawRoadBounds(Graphics2D g) {
+	/**
+	 * Used to draw all roads' bounds
+	 * @param g {@link Graphics2D}
+	 */
+	public void drawRoadBounds(Graphics2D g) {
     	for(RoadSegment rs:roadPrPnl.getRn()){
     		g.draw(rs.roadMapping().getBounds());
     	}
 	}
-
-	private void drawAxis(Graphics2D g) {
+	/**
+	 * Used to draw axis
+	 * @param g {@link Graphics2D}
+	 */
+	public void drawAxis(Graphics2D g) {
     	int i;
     	for(i=-15;i<15;i++){
     		g.drawLine(i*150, 0, ((i+1)*150), 0);
@@ -433,12 +516,21 @@ public class DrawingArea extends Canvas {
     	g.drawString(i*150+"", i*150, 0);
     	g.drawString(i*150+"", 0, i*150);
 	}
-
-	private void drawTrafficLights(Graphics2D g) {
+	/**
+	 * draws traffic lights
+	 * @param g {@link Graphics2D}
+	 */
+	public void drawTrafficLights(Graphics2D g) {
         for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             drawTrafficLightsOnRoad(g, roadSegment,roadPrPnl);
         }
     }
+	/**
+	 * 
+	 * @param roadMapping {@link RoadMapping}
+	 * @param trafficLightLocation {@link TrafficLightLocation}
+	 * @return {@link Rectangle2D} bounding signal
+	 */
     public static Rectangle2D trafficLightRect(RoadMapping roadMapping, TrafficLightLocation trafficLightLocation) {
         final double offset = (roadMapping.laneCount() / 2.0 + 1.5) * roadMapping.laneWidth();
         final double size = 2 * roadMapping.laneWidth();
@@ -554,8 +646,11 @@ public class DrawingArea extends Canvas {
         y = rect.getCenterY();
         g.fillOval((int) (x - radius), (int) (y - radius), (int) (2 * radius), (int) (2 * radius));
     }
-    
-    private void drawSpeedLimits(Graphics2D g) {
+    /**
+     * draws speed limits
+     * @param g
+     */
+    public void drawSpeedLimits(Graphics2D g) {
         for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             drawSpeedLimitsOnRoad(g, roadSegment);
         }
@@ -642,7 +737,11 @@ public class DrawingArea extends Canvas {
             g.drawString(text, (int) (posTheta.x - textWidth / 2.0), (int) (posTheta.y + offsetY));
         }
     }
-    private void drawRoadSectionIds(Graphics2D g) {
+    /**
+     * draws ids/names of the {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road}s
+     * @param g {@link Graphics2D}
+     */
+    public void drawRoadSectionIds(Graphics2D g) {
         for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             final RoadMapping.PosTheta posTheta = roadMapping.map(0.0);
@@ -654,7 +753,11 @@ public class DrawingArea extends Canvas {
             else g.drawString(roadSegment.userId(), (int) (posTheta.x+20*posTheta.cosTheta), (int) (posTheta.y-20*posTheta.sinTheta)); //$NON-NLS-1$//$NON-NLS-1$
         }
     }
-    private void drawSources(Graphics2D g) {
+    /**
+     * Draws {@link TrafficSource}s
+     * @param g {@link Graphics2D}
+     */
+    public void drawSources(Graphics2D g) {
         for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             assert roadMapping != null;
@@ -671,7 +774,11 @@ public class DrawingArea extends Canvas {
             }
         }
     }
-    private void drawSinks(Graphics2D g) {
+    /**
+     * draws {@link org.movsim.autogen.TrafficSink}s
+     * @param g {@link Graphics2D}
+     */
+    public void drawSinks(Graphics2D g) {
         for (final RoadSegment roadSegment : roadPrPnl.getRn()) {
             final RoadMapping roadMapping = roadSegment.roadMapping();
             assert roadMapping != null;

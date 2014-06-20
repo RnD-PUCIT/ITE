@@ -2,6 +2,7 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -22,10 +23,25 @@ import org.movsim.autogen.Phase;
 import org.movsim.autogen.TrafficLightState;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller.Control;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
+import org.movsim.simulator.trafficlights.TrafficLight;
 import org.tde.tdescenariodeveloper.eventhandling.SignalListener;
 import org.tde.tdescenariodeveloper.eventhandling.SignalsPanelListener;
-
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * Show the signals of selected road found in {@link RoadContext} Tab
+ * @author Shmeel
+ * @see RoadContext
+ * @see Road
+ * @see Signal
+ * @see Signals
+ * @see TrafficLightsPanel
+ * @see TrafficLightState
+ * @see TrafficLight
+ * @see Controller
+ * @see Control
+ */
 public class SignalsPanel extends JPanel {
 	/**
 	 * 
@@ -35,9 +51,14 @@ public class SignalsPanel extends JPanel {
 	JPanel sigPnl;
 	JButton addNew;
 	SignalsPanelListener spl;
+	/**
+	 * 
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public SignalsPanel(RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 		sigPnl=new JPanel(new GridBagLayout());
+		sigPnl.setOpaque(false);
 		addNew=new JButton("New signal",TDEResources.getResources().getAddIcon());
 		setLayout(new GridBagLayout());
 		setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 1, true), "Signals", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -59,6 +80,9 @@ public class SignalsPanel extends JPanel {
 	public JButton getAddNew() {
 		return addNew;
 	}
+	/**
+	 * updates the this {@link SignalsPanel}
+	 */
 	public void updateSignalPanel(){
 		sigPnl.removeAll();
 		if(rdCxt.getSelectedRoad()!=null && rdCxt.getSelectedRoad().getOdrRoad().getSignals()!=null)fillSignalPanel(rdCxt.getSelectedRoad().getOdrRoad().getSignals().getSignal(),sigPnl, rdCxt);
@@ -75,8 +99,16 @@ public class SignalsPanel extends JPanel {
 			sigPnl.add(signalToPanel(s,signals, rdCxt),c);
 		}
 	}
-	private static JPanel signalToPanel(Signal s, List<Signal> signals,RoadContext rdCxt) {
+	/**
+	 * Converts {@link Signal} to {@link JPanel}
+	 * @param s {@link Signal} to be converted
+	 * @param signals {@link List} of {@link Signal}s
+	 * @param rdCxt contains reference to loaded .xprj file and other panels added to it
+	 * @return
+	 */
+	public static JPanel signalToPanel(Signal s, List<Signal> signals,RoadContext rdCxt) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		main.setBorder(new LineBorder(TDEResources.getResources().SIGNALS_BORDER_COLOR, 1, true));
 		GridBagConstraints gbc=new GridBagConstraints();
 		gbc.fill=GridBagConstraints.BOTH;
@@ -121,6 +153,12 @@ public class SignalsPanel extends JPanel {
 	public void reset() {
 		sigPnl.removeAll();
 	}
+/**
+ * used to rename related {@link Control}s found in {@link Controller} after a {@link Signal} is renamed 
+ * @param rdCxt contains reference to loaded .xprj file and other panels added to it
+ * @param old old id of the {@link Signal} which is modified 
+ * @param id new id of the signal which is to be updated
+ */
 	public static void adjustControllers(RoadContext rdCxt, String old,
 			String id) {
 		for(Controller clr:rdCxt.getRn().getOdrNetwork().getController()){
@@ -133,6 +171,11 @@ public class SignalsPanel extends JPanel {
 			}
 		}
 	}
+	/**
+	 * removes related {@link Control} from {@link Controller}s and related {@link ControllerGroup}s
+	 * @param rdCxt contains reference to loaded .xprj file and other panels added to it
+	 * @param old id of the removed {@link Signal}
+	 */
 	public static void adjustControllersAfterSignalRemove(RoadContext rdCxt,
 			String old) {
 		ArrayList<Controller>ctrls=new ArrayList<>();
@@ -169,6 +212,12 @@ public class SignalsPanel extends JPanel {
 		rdCxt.getMvCxt().getMovsim().getScenario().getTrafficLights().getControllerGroup().removeAll(cgs);
 		if(rdCxt.getMvCxt().getMovsim().getScenario().getTrafficLights().getControllerGroup().size()<1)rdCxt.getMvCxt().getMovsim().getScenario().setTrafficLights(null);
 	}
+	/**
+	 * used to rename related {@link ControllerGroup} when an {@link Controller} if renamed
+	 * @param rdCxt contains reference to loaded .xprj file and other panels added to it
+	 * @param old id of the controller to be modified
+	 * @param id new id to be set
+	 */
 	public static void adjustControllersGroups(RoadContext rdCxt, String old,
 			String id) {
 		if(!rdCxt.getMvCxt().getMovsim().getScenario().isSetTrafficLights())return;
@@ -180,5 +229,9 @@ public class SignalsPanel extends JPanel {
 			}
 		}		
 	}
-	
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
+	}
 }

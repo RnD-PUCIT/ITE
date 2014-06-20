@@ -1,6 +1,7 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -10,24 +11,32 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaPopupListener;
-
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * Right click menu for the {@link Road}
+ * @author Shmeel
+ * @see DrawingAreaPopupMenu2
+ * @see DrawingAreaPopupListener
+ */
 public class DrawingAreaPopupMenu extends JPopupMenu {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7710136231966863266L;
 	RoadContext rdCxt;
 	JMenuItem newlane,removeLane,removegeo,newgeo,toggleRotation,delete;
 	JSlider lnWidth,sOffset,hdg,curv;
 	DrawingAreaPopupListener popupListener;
 	JLabel lnWidthLbl,gmsOffsetLbl,hdgLbl,curvLbl;
-	
+	/**
+	 * 
+	 * @param roadPrPnl rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public DrawingAreaPopupMenu(RoadContext roadPrPnl) {
 		rdCxt=roadPrPnl;
 		initialize();
 		addListeners();
+		setDefaultLightWeightPopupEnabled(false);
 		GridBagConstraints fullRow,row1,row3;
 		fullRow=new GridBagConstraints();
 		row3=new GridBagConstraints();
@@ -78,7 +87,11 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 		
 		pack();
 	}
-
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
+	}
 	private void addListeners() {
 		DrawingAreaPopupListener listener=new DrawingAreaPopupListener(rdCxt);
 		this.popupListener=listener;
@@ -100,13 +113,26 @@ public class DrawingAreaPopupMenu extends JPopupMenu {
 		curv=new JSlider();
 		sOffset=new JSlider();
 		
+		lnWidth.setOpaque(false);
+		hdg.setOpaque(false);
+		sOffset.setOpaque(false);
+		curv.setOpaque(false);
+		
 		removegeo=new JMenuItem("Remove road segment");
 		newgeo=new JMenuItem("Append new road segment");
 		toggleRotation=new JMenuItem("Clockwise/Counter-Clockwise");
 		delete=new JMenuItem("Delete road");
 		
+		removegeo.setOpaque(false);
+		newgeo.setOpaque(false);
+		toggleRotation.setOpaque(false);
+		delete.setOpaque(false);
+		
 		newlane=new JMenuItem("Add new lane");
 		removeLane=new JMenuItem("Remove lane");
+		
+		newlane.setOpaque(false);
+		removeLane.setOpaque(false);
 	}
 
 	public JMenuItem getNewlane() {

@@ -1,5 +1,6 @@
 package org.tde.tdescenariodeveloper.ui;
 
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -11,8 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JRadioButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -22,52 +25,35 @@ import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
-
-public class ToolBar extends JToolBar implements ItemListener,ActionListener{
-	/**
-	 * 
-	 */
+/**
+ * Class is used to represent different tools found in {@link ToolBar}
+ * @author Shmeel
+ * @see ToolBar
+ * @see ToolsPanel
+ */
+public class ToolBar extends JToolBar implements ActionListener{
 	private static final long serialVersionUID = -4127064504014635395L;
 
-JCheckBox name,id,axis,dropRoadAtLast,showSelectedGeometry,showSelectedLane,showSpeedLimits,showLinks,showSignals;
 JButton open,run,save;
 private boolean blocked=true;
 private MovsimConfigContext mvCxt;
-
 DrawingArea drawingArea;
+/**
+ * 
+ * @param drawingArea {@link DrawingArea} drawing canvas to show current situation of the scenario 
+ */
 	public ToolBar(DrawingArea drawingArea) {
 		this.drawingArea=drawingArea;
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc=new GridBagConstraints();
-		gbc.fill=GridBagConstraints.BOTH;
 		gbc.anchor=GridBagConstraints.WEST;
-		gbc.insets=new Insets(5, 1, 5, 1);
+//		gbc.insets=new Insets(5, 1, 5, 1);
 		gbc.ipadx=2;
 		gbc.ipady=2;
 		
 		open=new JButton("Open",TDEResources.getResources().getOpen());
 		save=new JButton("Save",TDEResources.getResources().getSave());
 		run=new JButton("Run",TDEResources.getResources().getRun());
-		
-		name=new JCheckBox("Show Rd. names");
-		id=new JCheckBox("Show Rd. id's");
-		axis=new JCheckBox("Show axis");
-		showSelectedGeometry=new JCheckBox("Show selected geom.");
-		showSelectedGeometry.setToolTipText("Yellow boundry line shows currently selected geometry/road segment.");
-		showSelectedLane=new JCheckBox("Show lane boundry");
-		showSpeedLimits=new JCheckBox("Show speed limits");
-		showLinks=new JCheckBox("Show Rd. links");
-		showSignals=new JCheckBox("Show signals");
-		dropRoadAtLast=new JCheckBox("Auto locate new Rd.");
-		dropRoadAtLast.setToolTipText("Drop new road at end of the last road in network");
-		name.addItemListener(this);
-		id.addItemListener(this);
-		showSelectedGeometry.addItemListener(this);
-		showSelectedLane.addItemListener(this);
-		showSpeedLimits.addItemListener(this);
-		showLinks.addItemListener(this);
-		showSignals.addItemListener(this);
-		axis.addItemListener(this);
 		
 		open.setFocusable(false);
 		run.setFocusable(false);
@@ -79,64 +65,21 @@ DrawingArea drawingArea;
 		
 		add(open,gbc);
 		add(save,gbc);
+		gbc.gridwidth=GridBagConstraints.REMAINDER;
+		gbc.weightx=1;
 		add(run,gbc);
 		
-		add(name,gbc);
-		add(id,gbc);
-		add(dropRoadAtLast,gbc);
-		gbc.weightx=1;
-		add(axis,gbc);
-		add(showLinks,gbc);
-//		add(showSignals,gbc);
-		add(showSelectedGeometry,gbc);
-		add(showSelectedLane,gbc);
-		gbc.gridwidth=GridBagConstraints.REMAINDER;
-		add(showSpeedLimits,gbc);
-		id.setSelected(true);
-		axis.setSelected(true);
-		showLinks.setSelected(true);
-		showSignals.setSelected(true);
-		showSelectedLane.setSelected(true);
-		showSpeedLimits.setSelected(true);
-		showSelectedGeometry.setSelected(true);
-		dropRoadAtLast.setSelected(false);
+		setOpaqueness(false,open,run,save);
 	}
-	@Override
-	public void itemStateChanged(ItemEvent e) {
-		if(blocked)return;
-		JRadioButton rdsrc=null;
-		JCheckBox chsrc=null;
-		if(e.getSource() instanceof JRadioButton)rdsrc=(JRadioButton)e.getSource();
-		else if(e.getSource() instanceof JCheckBox)chsrc=(JCheckBox)e.getSource();
-		if(chsrc==name){
-			if(name.isSelected() && id.isSelected())id.setSelected(false);
-			drawingArea.setDrawRoadId(id.isSelected());
-			drawingArea.setDrawRoadNames(name.isSelected());
+	/**
+	 * sets opaqueness of sent buttons
+	 * @param b if false transparent if true opaque
+	 * @param btns {@link JButton}s to be set
+	 */
+	public static void setOpaqueness(boolean b,AbstractButton...btns) {
+		for(AbstractButton bg:btns){
+			bg.setOpaque(b);
 		}
-		else if(chsrc==id){
-			if(id.isSelected() && name.isSelected())name.setSelected(false);
-			drawingArea.setDrawRoadId(id.isSelected());
-			drawingArea.setDrawRoadNames(name.isSelected());
-		}
-		else if(chsrc==axis){
-			drawingArea.setDrawAxis(axis.isSelected());
-		}
-		else if(chsrc==showLinks){
-			drawingArea.setDrawLaneLinks(showLinks.isSelected());
-		}
-		else if(chsrc==showSignals){
-			drawingArea.setDrawSignals(showSignals.isSelected());
-		}
-		else if(chsrc==showSelectedGeometry){
-			drawingArea.setDrawSelectedGeometry(showSelectedGeometry.isSelected());
-		}
-		else if(chsrc==showSelectedLane){
-			drawingArea.setDrawSelectedLane(showSelectedLane.isSelected());
-		}
-		else if(chsrc==showSpeedLimits){
-			drawingArea.setDrawSpeedLimits(showSpeedLimits.isSelected());
-		}
-		drawingArea.getRoadPrPnl().updateGraphics();
 	}
 	public boolean isBlocked() {
 		return blocked;
@@ -191,7 +134,9 @@ DrawingArea drawingArea;
 	public void setMvCxt(MovsimConfigContext mvCxt) {
 		this.mvCxt = mvCxt;
 	}
-	public JCheckBox getDropRoadAtLast() {
-		return dropRoadAtLast;
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

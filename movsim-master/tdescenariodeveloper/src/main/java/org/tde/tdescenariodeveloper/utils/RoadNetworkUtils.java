@@ -3,11 +3,14 @@ package org.tde.tdescenariodeveloper.utils;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Date;
 
+import javax.sound.midi.Sequence;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import org.movsim.autogen.Movsim;
 import org.movsim.input.network.OpenDriveHandlerJaxb;
 import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.Lane.Width;
@@ -28,11 +31,19 @@ import org.movsim.roadmappings.RoadMapping;
 import org.movsim.roadmappings.RoadMapping.PosTheta;
 import org.movsim.roadmappings.RoadMappingPoly;
 import org.movsim.simulator.roadnetwork.LaneSegment;
+import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.movsim.simulator.trafficlights.TrafficLightLocation;
 import org.movsim.simulator.trafficlights.TrafficLights;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
-
+/**
+ * This class helps to achieve small {@link OpenDRIVE} and {@link RoadNetwork} related tasks
+ * @author Shmeel
+ * @see Movsim
+ * @see RoadNetwork
+ * @see OpenDRIVE
+ */
 public class RoadNetworkUtils {
 	public static OpenDRIVE getNewOdr(){
 		OpenDRIVE odr=new OpenDRIVE();
@@ -40,6 +51,11 @@ public class RoadNetworkUtils {
 		odr.getRoad().add(getRoad(odr));
 		return odr;
 	}
+	/**
+	 * used to get id of the first signal
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @return id of first signal if found otherwise null
+	 */
 	public static String getFirstSignal(MovsimConfigContext mvCxt){
 		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
 			if(r.isSetSignals()){
@@ -48,7 +64,12 @@ public class RoadNetworkUtils {
 		}
 		return null;
 	}
-
+	/**
+	 * used to get point on {@link Lane} of {@link RoadSegment} which is 5 units away from start of the road. It is used to show links
+	 * @param rs {@link RoadSegment}
+	 * @param lane {@link Lane}
+	 * @return {@link Point2D}
+	 */
 	public static Point2D getStart(RoadSegment rs,int lane){
 //		LaneSegment ls=rs.getLaneSegments()[lane-1];
 		Point2D.Double p=new Point2D.Double();
@@ -77,6 +98,12 @@ public class RoadNetworkUtils {
 		mvCxt.getTrafficLights().getControllerPanel().updateControllerPanel();
 		mvCxt.getTrafficLights().updateTrafficLightsPanel();;
 	}
+	/**
+	 * used to get point on {@link Lane} of {@link RoadSegment} which is 5 units away from end of the road. It is used to show links
+	 * @param rs {@link RoadSegment}
+	 * @param lane {@link Lane}
+	 * @return {@link Point2D}
+	 */
 	public static Point2D getEnd(RoadSegment rs,int lane){
 		Point2D.Double p=new Point2D.Double();
 		PosTheta pt;
@@ -99,6 +126,11 @@ public class RoadNetworkUtils {
 		p.setLocation(pt.x-rw*pt.sinTheta, pt.y-rw*pt.cosTheta);
 		return p;
 	}
+	/**
+	 * used to get point on road in mid width and at 5 units away from start
+	 * @param rs {@link RoadSegment}
+	 * @return {@link Point2D}
+	 */
 	public static Point2D getStartMidRoad(RoadSegment rs){
 		Point2D.Double p=new Point2D.Double();
 		PosTheta pt;
@@ -116,6 +148,11 @@ public class RoadNetworkUtils {
 		p.setLocation(pt.x,pt.y);
 		return p;
 	}
+	/**
+	 * used to get point on road in mid width and at 5 units away from start
+	 * @param rs {@link RoadSegment}
+	 * @return {@link Point2D}
+	 */
 	public static Point2D getEndMidRoad(RoadSegment rs){
 		Point2D.Double p=new Point2D.Double();
 		PosTheta pt;
@@ -215,6 +252,11 @@ public class RoadNetworkUtils {
 //	public static void refresh(RoadContext rdCxt){
 //		SwingUtilities.invokeLater(new Refresher(rdCxt));
 //	}
+	/**
+	 * checks if {@link Lane} ids are in sequence
+	 * @param rdCxt contains reference to loaded .xodr and other added panels in it
+	 * @return true if ids are in valid sequence or false otherwise
+	 */
 	public static boolean areValidLaneIds(RoadContext rdCxt){
 		if(rdCxt.getLanesPnl().getOdrLanes().get(0).getId()!=-1)return false;
 		for(int i=1;i<rdCxt.getLanesPnl().getOdrLanes().size();i++){
@@ -224,6 +266,7 @@ public class RoadNetworkUtils {
 		}
 		return true;
 	}
+	
 	public static Road getUnderLyingRoad(Point p,MovsimConfigContext mvCxt){
 		Road r=null;
 		for(int i=mvCxt.getRdCxt().getRn().getRoadSegments().size()-1;i>=0;i++){
@@ -244,6 +287,10 @@ public class RoadNetworkUtils {
 		}
 		return r;
 	}
+	/**
+	 * makes lane ids in required sequence
+	 * @param rdCxt contains reference to loaded .xodr and other added panels in it
+	 */
 	public static void updateLaneIds(RoadContext rdCxt){
 		if(!areValidLaneIds(rdCxt)){
 			for(int i=0;i<rdCxt.getLanesPnl().getOdrLanes().size();i++){
@@ -251,6 +298,10 @@ public class RoadNetworkUtils {
 			}
 		}
 	}
+	/**
+	 * updates headings and coordinates of selected road relative to first geometry
+	 * @param rdCxt contains reference to loaded .xodr and other added panels in it
+	 */
 	public static void updateCoordinatesAndHeadings(RoadContext rdCxt) {
 		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			RoadMappingPoly rmp=(RoadMappingPoly)rdCxt.getSelectedRoad().roadMapping();
@@ -266,17 +317,31 @@ public class RoadNetworkUtils {
 			}
 		}
 	}
+	/**
+	 * removes signals which are not controlled by any {@link Controller}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public static void removeUncontrolledSignals(MovsimConfigContext mvCxt){
 		for(Road r:mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad()){
 			if(r.isSetSignals()){
+				ArrayList<Signal>sgnls=new ArrayList<OpenDRIVE.Road.Signals.Signal>();
 				for(Signal s:r.getSignals().getSignal()){
-					if(!isRefferedInController(s.getId(),mvCxt)){
-						r.getSignals().getSignal().remove(s);
-					}
+					if(!isRefferedInController(s.getId(),mvCxt))
+						sgnls.add(s);
+				}
+				r.getSignals().getSignal().removeAll(sgnls);
+				if(r.getSignals().getSignal().size()<1){
+					r.setSignals(null);
 				}
 			}
 		}
 	}
+	/**
+	 * checks if signal is referred in any controller
+	 * @param id id of the {@link Signal}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @return true if there is any {@link Controller} of this signal
+	 */
 	private static boolean isRefferedInController(String id,
 			MovsimConfigContext mvCxt) {
 		if(!mvCxt.getRdCxt().getRn().getOdrNetwork().isSetController())return false;
@@ -287,6 +352,11 @@ public class RoadNetworkUtils {
 		}
 		return false;
 	}
+	/**
+	 * used to get first {@link Controller}
+	 * @param rdCxt contains reference to loaded .xodr and other added panels in it
+	 * @return first {@link Controller} if not found null is returned
+	 */
 	public static Controller getFirstController(RoadContext rdCxt){
 		if(!rdCxt.getRn().getOdrNetwork().isSetController())return null;
 		for(Controller cc:rdCxt.getRn().getOdrNetwork().getController()){
@@ -294,6 +364,12 @@ public class RoadNetworkUtils {
 		}
 		return null;
 	}
+	/**
+	 * used to get underlying {@link RoadSegment} under provided {@link Point2D}
+	 * @param p {@link Point2D}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @return {@link RoadSegment} if found other wise null
+	 */
 	public static RoadSegment getUnderLyingRoadSegment(Point2D p,
 			MovsimConfigContext mvCxt) {
 		RoadSegment r=null;
@@ -315,6 +391,12 @@ public class RoadNetworkUtils {
 		}
 		return r;
 	}
+	/**
+	 * used to get underlying {@link LaneSegment} under provided {@link Point2D}
+	 * @param p {@link Point2D}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @return {@link LaneSegment} if found other wise null
+	 */
 	public static LaneSegment getUnderLyingLaneSegment(Point2D p,
 			MovsimConfigContext mvCxt) {
 		LaneSegment r=null;
@@ -334,17 +416,33 @@ public class RoadNetworkUtils {
 		}
 		return r;
 	}
+	/**
+	 * used to get underlying {@link LaneSegment} under provided {@link Point2D} in given {@link RoadSegment}
+	 * @param p {@link Point2D}
+	 * @param rr {@link RoadSegment} to be searched
+	 * @return {@link LaneSegment} if found other wise null
+	 */
 	public static LaneSegment getUnderLyingLaneSegment(Point2D p,RoadSegment rr){
 		for(LaneSegment ls:rr.getLaneSegments()){
 			if(ls.getBounds().contains(p))return ls;
 		}
 		return null;
 	}
+	/**
+	 * initializes {@link TrafficLightLocation}s and {@link TrafficLights}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public static void SetupLights(MovsimConfigContext mvCxt){
 		if(!mvCxt.getMovsim().getScenario().isSetTrafficLights() || !mvCxt.getRdCxt().getRn().getOdrNetwork().isSetController())return;
 		mvCxt.getMovsim().getScenario().getTrafficLights().setLogging(false);
 		new TrafficLights(mvCxt.getMovsim().getScenario().getTrafficLights(), mvCxt.getRdCxt().getRn());
 	}
+	/**
+	 * used to get bounds of the {@link Road} underlying given {@link Point2D}
+	 * @param p {@link Point2D}
+	 * @param mvCxt contains reference to loaded .xprj and other added panels in it
+	 * @return {@link Shape} bounds
+	 */
 	public static Shape getUnderLyingRoadShape(Point2D p,
 			MovsimConfigContext mvCxt) {
 		Shape r=null;
@@ -366,15 +464,25 @@ public class RoadNetworkUtils {
 		}
 		return r;
 	}
+	/**
+	 * reloads all .xodr data from memory and rebuilds {@link RoadMapping}s and set up lights again and reconstructs whole {@link RoadNetwork} 
+	 * @param rdCxt contains reference to loaded .xprj and other added panels in it
+	 */
 	public static void refresh(RoadContext rdCxt){
 		SwingUtilities.invokeLater(new Refresher(rdCxt));
 	}
 	public static void cleanJunctions(MovsimConfigContext mvCxt) {
-		for(Junction j:mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction()){
-			if(j.getConnection().size()<1)mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().remove(j);
-		}
+		ArrayList<Junction>jns=new ArrayList<>();
+		for(Junction j:mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction())
+			if(j.getConnection().size()<1)jns.add(j);
+		mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().removeAll(jns);
 	}
 }
+/**
+ * used in refresh method all work to refresh is done in separate thread
+ * @author Shmeel
+ *
+ */
 class Refresher extends SwingWorker<Object, String>{
 	RoadContext rdCxt;
 	public Refresher(RoadContext rp) {

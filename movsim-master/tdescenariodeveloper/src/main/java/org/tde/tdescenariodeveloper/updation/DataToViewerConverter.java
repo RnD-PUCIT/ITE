@@ -31,10 +31,15 @@ import org.tde.tdescenariodeveloper.eventhandling.VehicleTypeToPanelListener;
 import org.tde.tdescenariodeveloper.ui.LaneLinkPanel;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.TDEResources;
-
+/**
+ * This class is used to convert different input entities to {@link JPanel}s
+ * @author Shmeel
+ *
+ */
 public class DataToViewerConverter {
 	private static JPanel roadToPanel(MovsimConfigContext mvCxt2, Road r,List<Road>rdList) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		GridBagConstraints gbc=new GridBagConstraints();
 		gbc.fill=GridBagConstraints.BOTH;
 		gbc.insets=new Insets(2, 10, 2, 10);
@@ -67,6 +72,7 @@ public class DataToViewerConverter {
 		main.add(logging,gbc);
 		
 		JPanel trfCompPnl=new JPanel(new GridBagLayout());
+		trfCompPnl.setOpaque(false);
 		if(r.isSetTrafficComposition()){
 			trfCompPnl.setBorder(new TitledBorder(new LineBorder(TDEResources.TRAFFIC_COMP_BORDER_COLOR, 1, true),"Traffic composition for road "+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.TRAFFIC_COMP_BORDER_FONT_COLOR));
 			fillTrafficCompositionPnl(mvCxt2, trfCompPnl, r.getTrafficComposition());
@@ -88,6 +94,7 @@ public class DataToViewerConverter {
 		}
 		main.add(trfCompPnl,gbc);
 		JPanel trfSrc=new JPanel(new GridBagLayout());
+		trfSrc.setOpaque(false);
 		if(r.isSetTrafficSource()){
 			trfSrc.setBorder(new TitledBorder(new LineBorder(TDEResources.TRAFFIC_SRC_BORDER_COLOR, 1, true),"Traffic source for road "+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.TRAFFIC_SRC_BORDER_FONT_COLOR));
 			fillTrafficSourcePanel(mvCxt2, trfSrc, r.getTrafficSource());
@@ -132,6 +139,7 @@ public class DataToViewerConverter {
 		trfSrc.add(logging,gbc);
 		
 		JPanel p=inflowToPnl(mvCxt2,trafficSource.getInflow().get(0),trafficSource,false);
+		p.setOpaque(false);
 		p.setBorder(new TitledBorder(new LineBorder(TDEResources.INFLOW_BORDER_COLOR, 1, true),"Inflow-1" , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.INFLOW_BORDER_FONT_COLOR));
 		trfSrc.add(p,gbc);
 		for(int i=1;i<trafficSource.getInflow().size();i++){
@@ -142,6 +150,7 @@ public class DataToViewerConverter {
 	}
 	private static JPanel inflowToPnl(MovsimConfigContext mvCxt2,Inflow inflow, TrafficSource trafficSource, boolean removable) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		GridBagConstraints gbc=new GridBagConstraints();
 		InflowListener il=new InflowListener(mvCxt2,inflow,trafficSource);
 		gbc.fill=GridBagConstraints.BOTH;
@@ -194,6 +203,7 @@ public class DataToViewerConverter {
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 		
 		JPanel p=VehTypeToPnl(mvCxt,tc.getVehicleType().get(0),tc,false);
+		p.setOpaque(false);
 		p.setBorder(new TitledBorder(new LineBorder(TDEResources.VEHICLE_TYPE_BORDER_COLOR, 1, true),"Type-1" , TitledBorder.LEADING, TitledBorder.TOP, null, TDEResources.VEHICLE_TYPE_BORDER_FONT_COLOR));
 		trafficCompositionPnl.add(p,gbc);
 		for(int i=1;i<tc.getVehicleType().size();i++){
@@ -298,6 +308,7 @@ public class DataToViewerConverter {
 				routeNames.add(v.getLabel());
 		}
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		VehicleTypeToPanelListener vtl=new VehicleTypeToPanelListener(vt, mvCxt,tc);
 		
 		GridBagConstraints gbc=new GridBagConstraints();
@@ -370,6 +381,7 @@ public class DataToViewerConverter {
 		Font f=new Font(Font.SANS_SERIF,Font.ITALIC,11);
 		for(Road r:roads){
 			JPanel p=roadToPanel(mvCxt2,r,roads);
+			p.setOpaque(false);
 			p.setBorder(new TitledBorder(new LineBorder(TDEResources.ROAD_BORDER_COLOR, 1, true),"Road-"+r.getId() , TitledBorder.LEADING, TitledBorder.TOP, f, TDEResources.ROAD_BORDER_FONT_COLOR));
 			roadsPnl2.add(p,gbc);
 		}

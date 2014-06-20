@@ -1,24 +1,36 @@
 package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.EmptyBorder;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-import org.tde.tdescenariodeveloper.eventhandling.Blockable;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.eventhandling.GeometryPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.LanesPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.RoadFieldsPanelListener;
-
+import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
+/**
+ * This class holds input of .xodr file and also panels of selected road with junctions information
+ * @author Shmeel
+ * @see LinkPanel
+ * @see GeometryPanel
+ * @see RoadFieldsPanel
+ * @see SignalsPanel
+ * @see RoadSegment
+ * @see DrawingArea
+ * @see AppFrame
+ * @see RoadNetwork
+ * @see OpenDRIVE
+ */
 public class RoadContext extends JPanel {
 	/**
 	 * 
@@ -41,6 +53,11 @@ public class RoadContext extends JPanel {
 	private LanesPanelListener lpl;
 	private int toastDurationMilis=4000;
 	private MovsimConfigContext mvCxt;
+	/**
+	 * 
+	 * @param rn {@link RoadNetwork}
+	 * @param appfr {@link AppFrame}
+	 */
 	public RoadContext(RoadNetwork rn,AppFrame appfr) {
 		appFrame=appfr;
 		this.rn=rn;
@@ -76,6 +93,10 @@ public class RoadContext extends JPanel {
 		add(lanesPnl,gbc);
 		add(signalsPanel,gbc);
 	}
+	/**
+	 * blocks all listeners
+	 * @param b if true listeners are blocked, false otherwise
+	 */
 	public void blockListeners(boolean b){
 		gpl.setBlocked(b);
 		rfpl.setBlocked(b);
@@ -89,6 +110,9 @@ public class RoadContext extends JPanel {
 	public void updateGraphics(){
 		drawingArea.paint(drawingArea.getGraphics());
 	}
+	/**
+	 * updates the information of all the panels contained in {@link RoadContext} from memory
+	 */
 	public void updatePanel(){
 		if(selectedRoad==null)return;
 		blockListeners(true);
@@ -118,20 +142,35 @@ public class RoadContext extends JPanel {
 			remove(linkPanel);
 		}
 	}
-
-	boolean isAdded(Component c){
+/**
+ * used to check if component exists in this {@link RoadContext}
+ * @param c Components to be checked
+ * @return returns true if this components is added false otherwise 
+ */
+	public boolean isAdded(Component c){
 		if(c.getParent()==this)return true;
 		return false;
 	}
-	
+	/**
+	 * sets selected road
+	 * @param selectedRoad {@link RoadSegment} to be set as selected
+	 */
 	public void setSelectedRoad(RoadSegment selectedRoad) {
 		setSelectedRoad(selectedRoad, true);
 	}
+	/**
+	 * sets selected {@link Road} and updates all the panels contained in this {@link RoadContext}
+	 * @param selectedRoad {@link RoadSegment} to be set as selected
+	 * @param update if true {@link Road} is set and panels are updated and if false road is set but panels are not updated
+	 */
 	public void setSelectedRoad(RoadSegment selectedRoad,boolean update) {
 		if(selectedRoad==null)return;
 		this.selectedRoad = selectedRoad;
 		if(update)updatePanel();
 	}
+	/**
+	 * Sets road as null and resets all fields
+	 */
 	public void setSelectedRoadNull() {
 		DrawingAreaMouseListener dl=(DrawingAreaMouseListener)drawingArea.getMouseListeners()[0];
 		dl.setSelected(false);
@@ -211,5 +250,9 @@ public class RoadContext extends JPanel {
 	public SignalsPanel getSignalsPanel() {
 		return signalsPanel;
 	}
-	
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
+	}
 }

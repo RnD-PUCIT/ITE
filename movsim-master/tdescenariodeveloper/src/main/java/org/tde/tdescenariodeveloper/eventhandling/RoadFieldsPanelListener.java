@@ -77,7 +77,7 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener,
 		}else if(srcBtn==rdCxt.getRdFldPnl().getAddRoad()){
 			Road r=RoadNetworkUtils.getRoad(rdCxt.getRn().getOdrNetwork());
 
-			if(rdCxt.getAppFrame().getToolbar().getDropRoadAtLast().isSelected() && rdCxt.getRn().getOdrNetwork().getRoad().size()>0){
+			if(rdCxt.getAppFrame().getDropRoadAtLast().isSelected() && rdCxt.getRn().getOdrNetwork().getRoad().size()>0){
 				RoadMapping rm=rdCxt.getRn().getRoadSegments().get(rdCxt.getRn().getRoadSegments().size()-1).roadMapping();
 				PosTheta pt=null;
 				if(rm instanceof RoadMappingPoly){

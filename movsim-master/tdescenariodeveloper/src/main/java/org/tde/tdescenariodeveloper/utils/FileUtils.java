@@ -11,8 +11,17 @@ import org.movsim.xml.MovsimInputLoader;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.xml.sax.SAXException;
-
+/**
+ * This class Helps doing {@link File} related tasks
+ * @author Shmeel
+ * @see File
+ */
 public class FileUtils {
+	/**
+	 * provides user a file chooser
+	 * @param type type of the file which user can choose like .xprj
+	 * @return {@link File} selected by user
+	 */
 	public static File chooseFile(final String type){
 		JFileChooser fc=new JFileChooser(".");
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -31,7 +40,11 @@ public class FileUtils {
 			return fc.getSelectedFile();
 		return null;
 	}
-	
+	/**
+	 * Provides user a file chooser to choose location to save file 
+	 * @param type type of the file which will be used as extension of saved file
+	 * @return
+	 */
 	public static File saveFile(final String type){
 		JFileChooser fc=new JFileChooser("..");
 		fc.setFileFilter(new FileFilter() {

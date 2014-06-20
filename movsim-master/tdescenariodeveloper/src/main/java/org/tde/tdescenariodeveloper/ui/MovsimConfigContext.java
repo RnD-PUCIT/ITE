@@ -3,6 +3,7 @@ package org.tde.tdescenariodeveloper.ui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -16,9 +17,22 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentListener;
 
 import org.movsim.autogen.Movsim;
+import org.movsim.autogen.OutputConfiguration;
+import org.movsim.autogen.Routes;
+import org.movsim.autogen.Simulation;
+import org.movsim.autogen.TrafficLights;
+import org.movsim.autogen.VehiclePrototypes;
 import org.tde.tdescenariodeveloper.eventhandling.Blockable;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Class used to hold all the input of {@link Movsim} .xprj file and also other panels related to this input
+ * @author Shmeel
+ * @see Simulation
+ * @see TrafficLights
+ * @see VehiclePrototypes
+ * @see Routes
+ * @see OutputConfiguration
+ */
 public class MovsimConfigContext extends JTabbedPane {
 	/**
 	 * 
@@ -34,6 +48,11 @@ public class MovsimConfigContext extends JTabbedPane {
 	}
 	Movsim movsim;
 	private RoadContext rdCxt;
+	/**
+	 * 
+	 * @param m input .xprj file
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public MovsimConfigContext(Movsim m, RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 		this.movsim=m;
@@ -46,14 +65,23 @@ public class MovsimConfigContext extends JTabbedPane {
 //		MovsimConfigContextMouseListener ml=new MovsimConfigContextMouseListener(this);
 //		addMouseListener(ml);
 //		addMouseMotionListener(ml);
-		
+		JScrollPane sp1,sp2;
+		sp1=new JScrollPane(prototypes);
+		sp2=new JScrollPane(routes);
+		sp1.setOpaque(false);
+		sp2.setOpaque(false);
+		sp1.getViewport().setOpaque(false);
+		sp2.getViewport().setOpaque(false);
 		addTab("Simulation configuration",TDEResources.getResources().getSimulation(),simulation,"Edit parameters for simulation");
-		addTab("Vehicle prototypes",TDEResources.getResources().getPrototypes(),new JScrollPane(prototypes),"Decide which type of traffic to run on roads");
+		addTab("Vehicle prototypes",TDEResources.getResources().getPrototypes(),sp1,"Decide which type of traffic to run on roads");
 		addTab("Traffic signals",TDEResources.getResources().getTraffic(),trafficLights,"Control traffic with signals");
-		addTab("Routes configuration",TDEResources.getResources().getRoutes(),new JScrollPane(routes),"Tell simulator what fraction of vehicles should follow which route");
+		addTab("Routes configuration",TDEResources.getResources().getRoutes(),sp2,"Tell simulator what fraction of vehicles should follow which route");
 		addTab("Output configuration",TDEResources.getResources().getOutput(),output,"Scenario statistics and result output for analysis");
 		updatePanels();
 	}
+	/**
+	 * updates all the panels added to this {@link JTabbedPane}
+	 */
 	public void updatePanels(){
 		blockListeners(true);
 		prototypes.updatePanel();
@@ -65,6 +93,11 @@ public class MovsimConfigContext extends JTabbedPane {
 		revalidate();
 		repaint();
 	}
+	/**
+	 * Used to block/unblock all ({@DocumentListener}, {@link ActionListener}, {@link Blockable}, {@link ItemListener}) listeners of all the components
+	 * Depth first search is used to traverse all the components and then related listeners are blocked or unblocked 
+	 * @param b if true listners are blocked, unblocked otherwise
+	 */
 	private void blockListeners(boolean b) {
 		Stack<Component>stack=new Stack<>();
 		stack.push(this);

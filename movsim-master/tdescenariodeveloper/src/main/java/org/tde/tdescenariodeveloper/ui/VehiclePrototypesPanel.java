@@ -2,29 +2,28 @@ package org.tde.tdescenariodeveloper.ui;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Set;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
 import org.movsim.autogen.AccelerationModelType;
 import org.movsim.autogen.VehiclePrototypeConfiguration;
-import org.movsim.roadmappings.RoadMappingPoly;
+import org.movsim.autogen.VehiclePrototypes;
+import org.movsim.simulator.vehicles.Vehicle;
+import org.movsim.simulator.vehicles.VehicleType;
 import org.tde.tdescenariodeveloper.eventhandling.LaneChangeModelListener;
 import org.tde.tdescenariodeveloper.eventhandling.ModelParamTextFieldListener;
 import org.tde.tdescenariodeveloper.eventhandling.ModelSelectorListener;
@@ -33,6 +32,14 @@ import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 
+/**
+ * This class is used to represent information of tag {@link VehiclePrototypeConfiguration}. It also shows information about driving models and lane change models
+ * @author Shmeel
+ * @see VehiclePrototypeConfiguration
+ * @see Vehicle
+ * @see VehiclePrototypes
+ * @see VehicleType
+ */
 public class VehiclePrototypesPanel extends JPanel {
 	GridBagConstraints gbcV=new GridBagConstraints();
 	private static final long serialVersionUID = 2416945240385622157L;
@@ -40,6 +47,10 @@ public class VehiclePrototypesPanel extends JPanel {
 	MovsimConfigContext mvCxt;
 	JButton addPrototypeConfig;
 	JPanel prPnl;
+	/**
+	 * 
+	 * @param movsimConfigPane contains reference to loaded .xodr file and other panels added to it
+	 */
 	public VehiclePrototypesPanel(MovsimConfigContext movsimConfigPane) {
 		GridBagConstraints gbcH=new GridBagConstraints();
 		gbcV = new GridBagConstraints();
@@ -60,6 +71,7 @@ public class VehiclePrototypesPanel extends JPanel {
 			}
 		});
 		prPnl=new JPanel(new GridBagLayout());
+		prPnl.setOpaque(false);
 		gbcH.gridwidth=GridBagConstraints.REMAINDER;
 		gbcH.weightx=1;
 		gbcH.weighty=1;
@@ -73,6 +85,9 @@ public class VehiclePrototypesPanel extends JPanel {
 		gbcH.fill=GridBagConstraints.HORIZONTAL;
 		add(addPrototypeConfig,gbcH);
 	}
+	/**
+	 * updates this {@link VehiclePrototypesPanel} from memory
+	 */
 	public void updatePanel(){
 		prPnl.removeAll();
 		GridBagConstraints gbc=new GridBagConstraints();
@@ -90,12 +105,22 @@ public class VehiclePrototypesPanel extends JPanel {
 					.get(i), true),gbc);
 		}
 	}
-	private JPanel prototypeConfigToPanel(final VehiclePrototypeConfiguration prCn,boolean removable) {
+	/**
+	 * Converts {@link VehiclePrototypeConfiguration} to {@link JPanel}
+	 * @param prCn {@link VehiclePrototypeConfiguration} to be converted
+	 * @param removable if true this {@link VehiclePrototypeConfiguration} can be removed
+	 * @return {@link JPanel}
+	 */
+	public JPanel prototypeConfigToPanel(final VehiclePrototypeConfiguration prCn,boolean removable) {
 		JPanel main=new JPanel(new GridBagLayout());
+		main.setOpaque(false);
 		main.setBorder(new LineBorder(Color.DARK_GRAY, 2));
 		JPanel fields=new JPanel(new GridBagLayout());
+		fields.setOpaque(false);
 		JPanel longitudenalModel=new JPanel(new GridBagLayout());
+		longitudenalModel.setOpaque(false);
 		JPanel laneChangeModel=new JPanel(new GridBagLayout());
+		laneChangeModel.setOpaque(false);
 		Font f=new Font(null,Font.ITALIC,13);
 		fields.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Properties" , TitledBorder.LEADING, TitledBorder.TOP, f, Color.DARK_GRAY));
 		longitudenalModel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Driving models", TitledBorder.LEADING, TitledBorder.TOP, f, Color.DARK_GRAY));
@@ -280,7 +305,11 @@ public class VehiclePrototypesPanel extends JPanel {
 		
 		return main;
 	}
-	
+	/**
+	 *  used to get parameters of model selected
+	 * @param accT {@link AccelerationModelType}
+	 * @return {@link HashMap} <String,JtextField> key value pairs where String becomes label of related {@link JTextField}
+	 */
 	public HashMap<String, JTextField> getParameters(final AccelerationModelType accT){
 		HashMap<String, JTextField>hm=new HashMap<>();
 		if(accT.isSetModelParameterACC()){
@@ -489,5 +518,10 @@ public class VehiclePrototypesPanel extends JPanel {
 		tf.setName("Delta");
 		tf.getDocument().addDocumentListener(new ModelParamTextFieldListener(tf, accT));
 		hm.put("Delta", tf);
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 }

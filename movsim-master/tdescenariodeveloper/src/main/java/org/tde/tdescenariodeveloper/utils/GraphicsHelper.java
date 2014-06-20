@@ -5,13 +5,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Shape;
 import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -21,11 +22,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
+import org.tde.tdescenariodeveloper.ui.TDEResources;
+
 public class GraphicsHelper {
-	
+	/**
+	 * packs,sets default close operation, sets size and state
+	 * @param f frame to be finalized
+	 * @return {@link JFrame} frame which was received
+	 */
 	public static JFrame finalizeFrame(JFrame f){
 		f.pack();
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -46,6 +52,11 @@ public class GraphicsHelper {
 		f.paint(g);
 		f.setVisible(true);
 	}
+	/**
+	 * tells if an string is valid {@link Double} number
+	 * @param v String to be checked
+	 * @return true if value is parsable to Double false otherwise 
+	 */
 	public static boolean isDouble(String v){
 		try{
 			Double.parseDouble(v);
@@ -54,7 +65,10 @@ public class GraphicsHelper {
 		}
 		return true;
 	}
-	public static void setWindowsUI(){
+	/**
+	 * sets native user interface
+	 */
+	public static void setNativeUI(){
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException
@@ -62,34 +76,77 @@ public class GraphicsHelper {
 			JOptionPane.showMessageDialog(null, "UI not set: "+e.getMessage());
 		}
 	}
+	/**
+	 * takes input from user
+	 * @param msg message to be shown to the user
+	 * @return returns value entered by the user
+	 */
 	public static String valueFromUser(String msg){
 		return JOptionPane.showInputDialog(msg);
 	}
+	/**
+	 * Shows user message in dialog
+	 * @param msg message to be shown
+	 */
 	public static void showMessage(String msg){
 		JOptionPane.showMessageDialog(null, msg);
 	}
+	/**
+	 * shows message to the user in toast
+	 * @param msg message to be shown to the user
+	 * @param time time for which toast will be visible
+	 */
 	public static void showToast(String msg,int time){
 		new ToastMessage(msg, time);
 	}
+	/**
+	 * used to make fonts of {@link JTextField} red
+	 * @param tf {@link JTextField} to be marked
+	 */
 	public static void makeRed(JTextField tf){
 		tf.setForeground(Color.RED);
 	}
+	/**
+	 * used to make fonts of {@link JTextField} black
+	 * @param tf {@link JTextField} to be marked
+	 */
 	public static void makeBlack(JTextField tf){
 		tf.setForeground(Color.BLACK);
 	}
+	/**
+	 * used to make fonts {@link JTextField}s black
+	 * @param tf variable arguments {@link JTextField} to be marked
+	 */
 	public static void makeBlack(JTextField ...tf){
 		for(JTextField t:tf){
 			t.setForeground(Color.BLACK);
 		}
 	}
+	/**
+	 * used to make fonts {@link JTextField}s red
+	 * @param tf variable arguments {@link JTextField} to be marked
+	 */
 	public static void makeRed(JTextField ...tf){
 		for(JTextField t:tf){
 			t.setForeground(Color.RED);
 		}
 	}
+	/**
+	 * used to get multiple values from user
+	 * @param title title of dialog
+	 * @param msgs labels of fields to be shown to user
+	 * @return returns values entered by user
+	 */
 	public static String[] valuesFromUser(String title,String...msgs) {
 		return valuesFromUser(title, new JPanel(), msgs);
 	}
+	/**
+	 * used to get multiple values from user
+	 * @param title title of dialog
+	 * @param msgs labels of fields to be shown to user
+	 * @param p JPanel to be used as container
+	 * @return returns values entered by user
+	 */
 	public static String[] valuesFromUser(String title,JPanel p,String...msgs) {
 		p.setLayout((new GridLayout(msgs.length,2,7,7)));
 		JTextField[]flds=new JTextField[msgs.length];
@@ -111,6 +168,13 @@ public class GraphicsHelper {
 		}
 		return s;
 	}
+	/**
+	 * used to get user selection from given values
+	 * @param title title to be shown to the user
+	 * @param p {@link JPanel} to be used as container
+	 * @param msgs labels to be shown to the user 
+	 * @return selected {@link String}
+	 */
 	public static String selectionFromUser(String title,JPanel p,String...msgs) {
 		JComboBox<String>cb=new JComboBox<String>(msgs);
 		p.add(new JLabel("Select main road"));
@@ -120,7 +184,18 @@ public class GraphicsHelper {
 		}
 		return (String)cb.getSelectedItem();
 	}
+	public static void drawGradientBackground(Graphics g, int width, int height) {
+		Graphics2D g2d=(Graphics2D)g;
+		GradientPaint gp=new GradientPaint(0, 0,TDEResources.getResources().COLOR1, 0, height, TDEResources.getResources().COLOR2);
+		g2d.setPaint(gp);
+		g2d.fillRect(0, 0, width, height);
+	}
 }
+/**
+ * Class used to make and show Toasts
+ * @author Unknown
+ *
+ */
 class ToastMessage extends JDialog {
 
     /**

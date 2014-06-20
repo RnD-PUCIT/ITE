@@ -1,6 +1,5 @@
 package org.tde.tdescenariodeveloper.ui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -14,16 +13,21 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.updation.JunctionsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
-
+/**
+ * Right click menu for {@link Junction}s
+ * @author Shmeel
+ * @see JunctionsPanel
+ * @see Junction
+ */
 public class DrawingAreaPopupMenu2 extends JPopupMenu implements ActionListener{
 
 	/**
@@ -31,11 +35,16 @@ public class DrawingAreaPopupMenu2 extends JPopupMenu implements ActionListener{
 	 */
 	private static final long serialVersionUID = -7710136231966863266L;
 	RoadContext rdCxt;
-	JMenuItem markAsJunction,unmarkAsJunction;//,removegeo,newgeo,toggleRotation;
+	JMenuItem markAsJunction,unmarkAsJunction;
+	/**
+	 * 
+	 * @param roadPrPnl rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public DrawingAreaPopupMenu2(RoadContext roadPrPnl) {
 		rdCxt=roadPrPnl;
 		initialize();
 		addListeners();
+		setDefaultLightWeightPopupEnabled(false);
 		GridBagConstraints fullRow,row1,row3;
 		fullRow=new GridBagConstraints();
 		row3=new GridBagConstraints();
@@ -67,10 +76,17 @@ public class DrawingAreaPopupMenu2 extends JPopupMenu implements ActionListener{
 		markAsJunction=new JMenuItem("Make junction");
 		markAsJunction.setToolTipText("Makes all selected roads part of junction further configuration is done in Junctions editor");
 		unmarkAsJunction=new JMenuItem("Unmark roads as junctions");
+		markAsJunction.setOpaque(false);
+		unmarkAsJunction.setOpaque(false);
 	}
 	@Override
 	public void show(Component c,int a,int b){
 		super.show(c, a, b);
+	}
+	@Override
+	public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		GraphicsHelper.drawGradientBackground(g,getWidth(),getHeight());
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -84,7 +100,12 @@ public class DrawingAreaPopupMenu2 extends JPopupMenu implements ActionListener{
 			rdCxt.getAppFrame().getJp().updateJunction();
 		}
 	}
-	private static void markJunc(RoadContext rdCxt,Set<RoadSegment> set) {
+	/**
+	 * used to mark selected {@link Road}s part of {@link Junction}
+	 * @param rdCxt rdCxt contains reference to loaded .xodr file and other panels added to it
+	 * @param set selected {@link Road}s to be marked
+	 */
+	public static void markJunc(RoadContext rdCxt,Set<RoadSegment> set) {
 		int id=JunctionsUpdater.getNextId(rdCxt);
 		Junction jn=new Junction();
 		jn.setId(id+"");
@@ -132,6 +153,11 @@ public class DrawingAreaPopupMenu2 extends JPopupMenu implements ActionListener{
 		return unmarkAsJunction;
 	}
 }
+/**
+ * Panel used as background while selecting connecting road at time of marking roads as {@link Junction}
+ * @author Shmeel
+ *
+ */
 class JunctionDemoPanel extends JPanel{
 	/**
 	 * 
@@ -139,11 +165,5 @@ class JunctionDemoPanel extends JPanel{
 	private static final long serialVersionUID = -408415062954815657L;
 	public JunctionDemoPanel() {
 		setPreferredSize(new Dimension(400,250));
-	}
-	@Override
-	public void paintComponent(Graphics g){
-		super.paintComponent(g);
-		Graphics2D g2=(Graphics2D)g;
-		g2.drawImage(TDEResources.getResources().JUNCTION_DEMO, 0, 0, null);
 	}
 }
