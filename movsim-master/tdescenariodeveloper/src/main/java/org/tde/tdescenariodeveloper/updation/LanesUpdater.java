@@ -3,15 +3,30 @@ package org.tde.tdescenariodeveloper.updation;
 import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.Lane.Speed;
 import org.movsim.network.autogen.opendrive.Lane.Width;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
+import org.tde.tdescenariodeveloper.ui.LanesPanel;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+import org.tde.tdescenariodeveloper.validation.LanesValidator;
+/**
+ * used to update data of {@link Lane}
+ * @author Shmeel
+ * @see Lane
+ * @see LanesPanel
+ * @see LanesValidator
+ */
 public class LanesUpdater {
 	RoadContext rdCxt;
+	/**
+	 * 
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public LanesUpdater(RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 	}
-	
+	/**
+	 * adds new {@link Lane}
+	 */
 	public void addnewLane() {
 		Lane ln=new Lane();
 		ln.setId(-1*rdCxt.getSelectedRoad().getLaneSegments().length-1);
@@ -29,12 +44,17 @@ public class LanesUpdater {
 		RoadNetworkUtils.updateLaneIds(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
 	}
-	
+	/**
+	 * removes last lane of the selected {@link Road}
+	 */
 	public void removeLastLane() {
 		rdCxt.getLanesPnl().getOdrLanes().remove(rdCxt.getLanesPnl().getOdrLanes().size()-1);
 		RoadNetworkUtils.updateLaneIds(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
 	}
+	/**
+	 * updates width of lanes
+	 */
 	public void updateWidth(){
 		double d=Double.parseDouble(rdCxt.getLanesPnl().getTfWidth().getText());
 		Width w=new Width();
@@ -49,6 +69,9 @@ public class LanesUpdater {
 		}
 		RoadNetworkUtils.refresh(rdCxt);
 	}
+	/**
+	 * updates maxSpeed of the lane
+	 */
 	public void updateMaxSpeed(){
 		double d=Double.parseDouble(rdCxt.getLanesPnl().getMaxSpeed().getText());
 		double pos=0;

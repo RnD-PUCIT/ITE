@@ -82,7 +82,7 @@ public class RoadToPanelListener implements ActionListener, ItemListener,Blockab
 		}else if(srcCb==id){
 			if(!s.equals(road.getId())){
 				if(Conditions.existsIdInRoads(s, mvCxt)){
-					if(!DataToViewerConverter.getUsedRoadIds(rdList).contains(s)){
+					if(!DataToViewerConverter.getusedRoadCustomizations(rdList).contains(s)){
 						road.setId(s);
 						mvCxt.updatePanels();
 					}

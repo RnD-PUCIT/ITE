@@ -1,5 +1,6 @@
 package org.tde.tdescenariodeveloper.updation;
 
+import org.movsim.autogen.Road;
 import org.movsim.input.network.OpenDriveHandlerJaxb;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry.Arc;
@@ -12,13 +13,23 @@ import org.tde.tdescenariodeveloper.exception.InvalidInputException;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * Used to update {@link Road} {@link Geometry}
+ * @author Shmeel
+ *
+ */
 public class GeometryUpdater {
 	RoadContext rdCxt;
+	/**
+	 * 
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public GeometryUpdater(RoadContext rdCxt) {
 		this.rdCxt=rdCxt;
 	}
-
+/**
+ * Used to update sOffset
+ */
 	public void updateSoffset() {
 		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			Geometry g=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex());
@@ -32,6 +43,10 @@ public class GeometryUpdater {
 			RoadNetworkUtils.refresh(rdCxt);
 		}
 	}
+	/** 
+	 * updates {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road} length
+	 * @throws InvalidInputException
+	 */
 	public void updateLength() throws InvalidInputException{
 		double l=Double.parseDouble(rdCxt.getGmPnl().getL().getText());
 		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
@@ -68,6 +83,10 @@ public class GeometryUpdater {
 			}
 		}
 	}
+	/**
+	 * sum lengths of all {@link Geometry} 
+	 * @return
+	 */
 	public double getGmSum(){
 		double sum=0.0;
 		for(Geometry g:rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry()){
@@ -76,20 +95,33 @@ public class GeometryUpdater {
 		return sum;
 	}
 
-
+/**
+ * check if selected geometry is last one
+ * @return true if it is not last geometry false otherwise
+ */
 	public boolean isNextGmExist(){
 		return rdCxt.getGmPnl().getSelectedIndex()+1<rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size();
 	}
+	/**
+	 * used to check if selected {@link Geometry} is first
+	 * @return true if it is not first {@link Geometry} false otherwise
+	 */
 	public boolean isPrevGmExist(){
 		return rdCxt.getGmPnl().getSelectedIndex()>0;
 	}
+	/**
+	 * used to get next {@link Geometry} than selected {@link Geometry}
+	 * @return {@link Geometry}
+	 */
 	public Geometry getNext(){
 		if(isNextGmExist()){
 			return rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()+1);
 		}
 		return null;
 	}
-
+	/**
+	 * adds new {@link Geometry} having length same as last one
+	 */
 	public void addnew() {
 		Geometry g=rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().size()-1);
 		double s=g.getS()+g.getLength();
@@ -116,7 +148,9 @@ public class GeometryUpdater {
 		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
 	}
-
+	/**
+	 * removes selected {@link Geometry}
+	 */
 	public void removeCurrent() {
 		if(rdCxt.getSelectedRoad().roadMapping() instanceof RoadMappingPoly){
 			if(rdCxt.getGmPnl().getSelectedIndex()>0){
@@ -134,7 +168,9 @@ public class GeometryUpdater {
 			rdCxt.getGmPnl().getRemove().setEnabled(false);
 		}
 	}
-
+	/**
+	 * updates x, y coordinates taking values from fields
+	 */
 	public void updateXY() {
 		double x=Double.parseDouble(rdCxt.getGmPnl().getTfX().getText());
 		double y=Double.parseDouble(rdCxt.getGmPnl().getTfY().getText());
@@ -143,18 +179,27 @@ public class GeometryUpdater {
 		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
 	}
+	/**
+	 * updates heading taking values from fields
+	 */
 	public void updateHdg(){
 		double hdg=Double.parseDouble(rdCxt.getGmPnl().getHdg().getText());
 		rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setHdg(hdg);
 		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
 	}
+	/**
+	 * updates curvature taking values from field
+	 */
 	public void updateCurv(){
 		double curv=Double.parseDouble(rdCxt.getGmPnl().getCurvature().getText());
 		rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(rdCxt.getGmPnl().getSelectedIndex()).getArc().setCurvature(curv);
 		RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
 		RoadNetworkUtils.refresh(rdCxt);
 	}
+	/**
+	 * used to update {@link Geometry} type
+	 */
 	public void updateGmType(){
 		if(((String)rdCxt.getGmPnl().getCbGmType().getSelectedItem()).equals("line")){
 			rdCxt.getGmPnl().getarcTypePnl().setVisible(false);

@@ -2,7 +2,12 @@ package org.tde.tdescenariodeveloper.updation;
 
 import org.movsim.simulator.roadnetwork.LaneSegment;
 import org.movsim.simulator.roadnetwork.RoadSegment;
-
+import org.tde.tdescenariodeveloper.ui.ToolsPanel;
+/**
+ * class used to keep record of which lane to connect which lane helping linker in {@link ToolsPanel}
+ * @author Shmeel
+ *
+ */
 public class RoadLaneSegmentPair {
 	private RoadSegment rs;
 	private LaneSegment ls;

@@ -1,20 +1,35 @@
 package org.tde.tdescenariodeveloper.updation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Predecessor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.tde.tdescenariodeveloper.ui.ToolsPanel;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
-
+/**
+ * This class is used to udpate data of link of lanes and helps linker in {@link ToolsPanel} 
+ * @author Shmeel
+ * @see ToolsPanel
+ * @see org.movsim.network.autogen.opendrive.Lane.Link
+ * @see Lane
+ * @see LaneLink
+ */
 public class LinkUpdater {
+	/**
+	 * 
+	 * @param linkPoints {@link List} of {@link RoadLaneSegmentPair}
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	 public static void linkSelectedLanes(ArrayList<RoadLaneSegmentPair> linkPoints,RoadContext rdCxt) {
 		 //TODO auto road if junction conflict
 	    	RoadSegment rdPr=linkPoints.get(0).getRs();
@@ -29,11 +44,22 @@ public class LinkUpdater {
 	    		addLinks4(linkPoints,rdCxt);
 	    	}
 	    	linkPoints.clear();
-		}
+	}
+	 /**
+	  * 
+	  * Called when two jucntions tries to be linked only used to show user a warning
+	  * @param linkPoints list of {@link RoadLaneSegmentPair}
+	  * @param rdCxt RoadLaneSegmentPair
+	  */
 	 public static void addLinks4(ArrayList<RoadLaneSegmentPair> linkPoints,
 			RoadContext rdCxt) {
 		 GraphicsHelper.showToast("Two junctions cannot be linked, use non-junction intermediate road",rdCxt.getToastDurationMilis());
 	 }
+	 /**
+	  * Called when predecessor road is {@link Junction}
+	  * @param linkPoints {@link List} of {@link RoadLaneSegmentPair}
+	  * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	  */
 	public static void addLinks3(ArrayList<RoadLaneSegmentPair> linkPoints,
 			RoadContext rdCxt) {
 			RoadSegment rdPr=linkPoints.get(0).getRs();
@@ -99,6 +125,11 @@ public class LinkUpdater {
 				scJn.getConnection().add(cc);
 	 		}
 	}
+	 /**
+	  * Called when successor road is {@link Junction}
+	  * @param linkPoints {@link List} of {@link RoadLaneSegmentPair}
+	  * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	  */
 	public static void addLinks2(ArrayList<RoadLaneSegmentPair> linkPoints,RoadContext rdCxt) {
 	    RoadSegment rdPr=linkPoints.get(0).getRs();
 	    RoadSegment rdSc=linkPoints.get(1).getRs();
@@ -165,6 +196,12 @@ public class LinkUpdater {
 		}
 	
 	}
+	/**
+	 * clears link between given roads
+	 * @param rdPr {@link Road} predecessor
+	 * @param rdSc {@link Road} Successor
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public static void clearLink(RoadSegment rdPr, RoadSegment rdSc,RoadContext rdCxt) {
 		if(!rdPr.getOdrRoad().getJunction().equals("-1"))
 			JunctionsUpdater.clearJunction(rdPr, rdCxt);
@@ -173,6 +210,10 @@ public class LinkUpdater {
 		clearSuccessor(rdPr);
 		clearPredecessor(rdSc);
 	}
+	/**
+	 * clears predecessor of given road
+	 * @param rdSc {@link Road} under consideration
+	 */
 	public static void clearPredecessor(RoadSegment rdSc) {
 		if(rdSc.getOdrRoad().isSetLink()){
 			if(rdSc.getOdrRoad().getLink().isSetPredecessor()){
@@ -196,6 +237,10 @@ public class LinkUpdater {
 			}
 		}
 	}
+	/**
+	 * used to remove {@link Successor} of given {@link Road}
+	 * @param rdPr {@link Road} of which successor to be cleared
+	 */
 	public static void clearSuccessor(RoadSegment rdPr) {
 		if(rdPr.getOdrRoad().isSetLink()){
 			if(rdPr.getOdrRoad().getLink().isSetSuccessor()){
@@ -219,7 +264,13 @@ public class LinkUpdater {
 			}
 		}
 	}
-	
+	/**
+	 * gets a link if existed having from and to ids same as given
+	 * @param from id of from lane
+	 * @param to id of to lane
+	 * @param cn connection under consideration
+	 * @return {@link LaneLink}
+	 */
 	public static LaneLink getLaneLink(int from,int to,Connection cn){
 		 LaneLink ln=null;
 		 for(LaneLink l:cn.getLaneLink()){
@@ -227,6 +278,10 @@ public class LinkUpdater {
 		 }
 		 return ln;
 	 }
+	/**
+	 * used when link is requested with help of linker
+	 * @param linkPoints {@link List} of {@link RoadLaneSegmentPair}
+	 */
 	public static void addLinks(ArrayList<RoadLaneSegmentPair>linkPoints){
     	RoadSegment rdPr=linkPoints.get(0).getRs();
     	RoadSegment rdSc=linkPoints.get(1).getRs();
@@ -258,7 +313,12 @@ public class LinkUpdater {
 		lanePr.getLink().getSuccessor().setId(laneSc.getId());
 		laneSc.getLink().getPredecessor().setId(lanePr.getId());
 	}
+	/**
+	 * clears whole road's link
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public static void removeRoad(RoadContext rdCxt) {
+		//TODO modify for concurrentModificationExcetion
 		if(rdCxt.getSelectedRoad()!=null){
 			if(!rdCxt.getSelectedRoad().getOdrRoad().getJunction().equals("-1"))
 				JunctionsUpdater.clearJunction(rdCxt.getSelectedRoad(), rdCxt);

@@ -6,21 +6,38 @@ import java.util.Comparator;
 
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
 import org.tde.tdescenariodeveloper.exception.InvalidInputException;
 import org.tde.tdescenariodeveloper.ui.JunctionsPanel;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 import org.tde.tdescenariodeveloper.validation.JunctionsValidator;
-
+/**
+ * This class is used to update data of a junction
+ * @author Shmeel
+ * @see JunctionsPanel
+ * @see JunctionsValidator
+ * @see Junction
+ * @see JunctionsListener
+ */
 public class JunctionsUpdater {
 	RoadContext rdCxt;
 	JunctionsValidator validator;
+	/**
+	 * 
+	 * @param rd contains reference to loaded .xodr file and other panels added to it
+	 */
 	public JunctionsUpdater(RoadContext rd) {
 		this.rdCxt=rd;
 		validator=new JunctionsValidator(rd);
 	}
+	/**
+	 * add new junction with default values
+	 * @return
+	 */
 	public Junction addNewJunc() {
 		int id=getNextId(rdCxt);
 		Junction j=new Junction();
@@ -30,6 +47,9 @@ public class JunctionsUpdater {
 		RoadNetworkUtils.refresh(rdCxt);
 		return j;
 	}
+	/**
+	 * used to remove a junction
+	 */
 	public void removeJunc() {
 		String id=rdCxt.getAppFrame().getJp().getSelectedJn();
 		rdCxt.getAppFrame().getJp();
@@ -43,6 +63,9 @@ public class JunctionsUpdater {
 			rdCxt.getAppFrame().getJp().getCbSelectJunc().removeAllItems();
 		}
 	}
+	/**
+	 * Used to add new {@link Connection} to selected {@link Junction}
+	 */
 	public void addNewConn() {
 		String id=rdCxt.getAppFrame().getJp().getSelectedJn();
 		rdCxt.getAppFrame().getJp();
@@ -69,6 +92,11 @@ public class JunctionsUpdater {
 			GraphicsHelper.showToast(e2.getMessage(), rdCxt.getToastDurationMilis());
 		}
 	}
+	/**
+	 * used to get id of connection 1 greater than id of last {@link Connection}
+	 * @param j  {@link Junction} under consideration
+	 * @return id to be used for next {@link Connection}
+	 */
 	public static int getNextId(Junction j){
 		Connection max=null;
 		int cnid=0;
@@ -83,6 +111,11 @@ public class JunctionsUpdater {
 		}
 		return cnid;
 	}
+	/**
+	 * used to get id of next {@link Junction}
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 * @return id 1 greater than id of last {@link Junction}
+	 */
 	public static int getNextId(RoadContext rdCxt){
 		int id=1001;
 		if(rdCxt.getRn().getOdrNetwork().getJunction().size()>0){
@@ -97,6 +130,11 @@ public class JunctionsUpdater {
 		}
 		return id;
 	}
+	/**
+	 * used to clear {@link Junction} information from a given {@link Road}
+	 * @param rd {@link Road}
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 */
 	public static void clearJunction(RoadSegment rd,RoadContext rdCxt){//rd is connecting road, adjusts related succ,pred
 		if(!rd.getOdrRoad().getJunction().equals("-1")){
 			Junction j=getJunction(rd.getOdrRoad().getJunction(), rdCxt);
@@ -129,6 +167,13 @@ public class JunctionsUpdater {
 			}
 		}
 	}
+	/**
+	 * used to check and get a connection having given connecting {@link Road} and incoming {@link Road}
+	 * @param connecting {@link Road}
+	 * @param incoming {@link Road}
+	 * @param prJn {@link Junction} under consideration
+	 * @return
+	 */
 	public static Connection getConnection(String connecting, String incoming,
 			Junction prJn) {
 		Connection cn=null;
@@ -137,6 +182,12 @@ public class JunctionsUpdater {
 		}
 		return cn;
 	}
+	/**
+	 * used to get junction provided id of junction
+	 * @param id of {@link Junction}
+	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
+	 * @return {@link Junction}
+	 */
 	public static Junction getJunction(String id,RoadContext rdCxt) {
 		try{
 			for(Junction j:rdCxt.getRn().getOdrNetwork().getJunction()){

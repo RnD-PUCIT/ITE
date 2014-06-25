@@ -25,6 +25,8 @@ import org.movsim.autogen.TrafficComposition;
 import org.movsim.autogen.TrafficSource;
 import org.movsim.autogen.VehiclePrototypeConfiguration;
 import org.movsim.autogen.VehicleType;
+import org.movsim.simulator.trafficlights.TrafficLightLocation;
+import org.movsim.simulator.trafficlights.TrafficLights;
 import org.tde.tdescenariodeveloper.eventhandling.InflowListener;
 import org.tde.tdescenariodeveloper.eventhandling.RoadToPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.VehicleTypeToPanelListener;
@@ -34,10 +36,21 @@ import org.tde.tdescenariodeveloper.ui.TDEResources;
 /**
  * This class is used to convert different input entities to {@link JPanel}s
  * @author Shmeel
- *
+ * @see Road
+ * @see org.movsim.network.autogen.opendrive.OpenDRIVE.Road
+ * @see TrafficComposition
+ * @see TrafficLightLocation
+ * @see TrafficLights
  */
 public class DataToViewerConverter {
-	private static JPanel roadToPanel(MovsimConfigContext mvCxt2, Road r,List<Road>rdList) {
+	/**
+	 * Converts {@link Road} to {@link JPanel} representation
+	 * @param mvCxt2 contains reference to loaded .xprj file and other panels added to it
+	 * @param r {@link Road} to be converted
+	 * @param rdList List of roads in which road is contained
+	 * @return {@link JPanel}
+	 */
+	public static JPanel roadToPanel(MovsimConfigContext mvCxt2, Road r,List<Road>rdList) {
 		JPanel main=new JPanel(new GridBagLayout());
 		main.setOpaque(false);
 		GridBagConstraints gbc=new GridBagConstraints();
@@ -119,7 +132,13 @@ public class DataToViewerConverter {
 		rtpl.setBlocked(false);
 		return main;
 	}
-	private static void fillTrafficSourcePanel(MovsimConfigContext mvCxt2,
+	/**
+	 * Converts {@link TrafficSource} to {@link JPanel}
+	 * @param mvCxt2 contains reference to loaded .xprj file and other panels added to it
+	 * @param trfSrc {@link JPanel} to be filled
+	 * @param trafficSource Data to be converted
+	 */
+	public static void fillTrafficSourcePanel(MovsimConfigContext mvCxt2,
 			JPanel trfSrc, final TrafficSource trafficSource) {
 		trfSrc.removeAll();
 		GridBagConstraints gbc=new GridBagConstraints();
@@ -148,7 +167,15 @@ public class DataToViewerConverter {
 			trfSrc.add(p,gbc);
 		}
 	}
-	private static JPanel inflowToPnl(MovsimConfigContext mvCxt2,Inflow inflow, TrafficSource trafficSource, boolean removable) {
+	/**
+	 * Converts {@link Inflow} to {@link JPanel} representation
+	 * @param mvCxt2 contains reference to loaded .xprj file and other panels added to it
+	 * @param inflow {@link Inflow} to be converted
+	 * @param trafficSource {@link TrafficSource} in which inflow is contained
+	 * @param removable tells if it is removable
+	 * @return {@link JPanel}
+	 */
+	public static JPanel inflowToPnl(MovsimConfigContext mvCxt2,Inflow inflow, TrafficSource trafficSource, boolean removable) {
 		JPanel main=new JPanel(new GridBagLayout());
 		main.setOpaque(false);
 		GridBagConstraints gbc=new GridBagConstraints();
@@ -194,6 +221,12 @@ public class DataToViewerConverter {
 		il.setBlocked(false);
 		return main;
 	}
+	/**
+	 * Fills traffic composition panel with data
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @param trafficCompositionPnl {@link JPanel} to be filled
+	 * @param tc data to be filled
+	 */
 	public static void fillTrafficCompositionPnl(MovsimConfigContext mvCxt,JPanel trafficCompositionPnl,TrafficComposition tc){
 		trafficCompositionPnl.removeAll();
 		GridBagConstraints gbc=new GridBagConstraints();
@@ -212,6 +245,10 @@ public class DataToViewerConverter {
 			trafficCompositionPnl.add(p,gbc);
 		}
 	}
+	/**
+	 * used to update all the {@link TrafficComposition}'s types to have sum of fractions of all types of a {@link TrafficComposition} to be 1
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 */
 	public static void updateFractions(MovsimConfigContext mvCxt) {
 		double sum=0.0;
 		for(VehicleType vt:mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType()){
@@ -234,6 +271,12 @@ public class DataToViewerConverter {
 			}
 		}
 	}
+	/**
+	 * Used to get a prototype which is not yet used in {@link VehiclePrototypeConfiguration}
+	 * @param mvCxt2 contains reference to loaded .xprj file and other panels added to it
+	 * @param tc {@link TrafficComposition} under consideration
+	 * @return label of not used prototype
+	 */
 	public static String getNotUsedPrototypeLabel(MovsimConfigContext mvCxt2,TrafficComposition tc){
 		String s=null;
 		List<VehicleType>vtList=tc.getVehicleType();
@@ -249,6 +292,13 @@ public class DataToViewerConverter {
 		}
 		return s;
 	}
+	/**
+	 * Used to get id of a {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road} to customize it which is not already customized.
+	 * @param mvCxt2 contains reference to loaded .xprj file and other panels added to it
+	 * @param rdList {@link List} of {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road}s
+	 * @return
+	 */
+	
 	public static String getNotUsedRoadCustomizationId(MovsimConfigContext mvCxt2,List<Road>rdList){
 		String s=null;
 		List<org.movsim.network.autogen.opendrive.OpenDRIVE.Road>odrRdList=mvCxt2.getRdCxt().getRn().getOdrNetwork().getRoad();
@@ -263,6 +313,12 @@ public class DataToViewerConverter {
 		}
 		return s;
 	}
+	/**
+	 * Used to get id of the {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road} which is not already added to given route
+	 * @param mvCxt2 contains reference to loaded .xprj file and other panels added to it
+	 * @param r {@link Route} under consideration
+	 * @return id of {@link org.movsim.network.autogen.opendrive.OpenDRIVE.Road} not added yet in route/or null if no road found or all roads are already added
+	 */
 	public static String getNotUsedRoadRouteId(MovsimConfigContext mvCxt2,Route r){
 		String s=null;
 		List<org.movsim.network.autogen.opendrive.OpenDRIVE.Road>odrRdList=mvCxt2.getRdCxt().getRn().getOdrNetwork().getRoad();
@@ -277,25 +333,36 @@ public class DataToViewerConverter {
 		}
 		return s;
 	}
+	/**
+	 * Used to get Labels of all {@link VehiclePrototypeConfiguration}s
+	 * @param vtList {@link List} of {@link VehicleType}
+	 * @return {@link ArrayList} of labels
+	 */
 	public static ArrayList<String> getUsedPrototypes(List<VehicleType>vtList) {
 		ArrayList<String>usedPrototypes=new ArrayList<>();
 		for(VehicleType vt:vtList)
 			LaneLinkPanel.putOrReject(usedPrototypes, vt.getLabel());
 		return usedPrototypes;
 	}
-	public static ArrayList<String> getUsedRoadIds(List<Road>rdList) {
-		ArrayList<String>used=new ArrayList<>();
-		for(Road rd:rdList)
-			LaneLinkPanel.putOrReject(used, rd.getId());
-		return used;
-	}
+	/**
+	 * Used to get customized roads' ids
+	 * @param rdList {@link List} of {@link Road}s
+	 * @return {@link ArrayList} of ids
+	 */
 	public static ArrayList<String> getusedRoadCustomizations(List<Road>rdList) {
 		ArrayList<String>used=new ArrayList<>();
 		for(Road r:rdList)
 			LaneLinkPanel.putOrReject(used, r.getId());
 		return used;
 	}
-	
+	/**
+	 * Used to convert {@link VehicleType} to {@link JPanel} representation
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @param vt {@link VehicleType} to be converted
+	 * @param tc {@link TrafficComposition} in which vt is contained
+	 * @param removable if true remove button is added
+	 * @return
+	 */
 	public static JPanel VehTypeToPnl(MovsimConfigContext mvCxt,VehicleType vt,TrafficComposition tc, boolean removable) {
 		ArrayList<String>prototypesNames=new ArrayList<>();
 		ArrayList<String>routeNames=new ArrayList<>();
@@ -370,6 +437,12 @@ public class DataToViewerConverter {
 		vtl.setBlocked(false);
 		return main;
 	}
+	/**
+	 * fills {@link Road}s panel
+	 * @param mvCxt2 contains reference to loaded .xprj file and other panels added to it
+	 * @param roadsPnl2 {@link JPanel} to be filled
+	 * @param roads {@link List} of {@link Road}s
+	 */
 	public static void fillroadsPnl(MovsimConfigContext mvCxt2, JPanel roadsPnl2,
 			List<Road> roads) {
 		roadsPnl2.removeAll();
@@ -386,6 +459,11 @@ public class DataToViewerConverter {
 			roadsPnl2.add(p,gbc);
 		}
 	}
+	/**
+	 * Used to get Prototype label not used yet
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @return Unique label not used yet
+	 */
 	public static String getUniquePrototypeLabel(MovsimConfigContext mvCxt){
 		String s="Label";
 		while(Conditions.existsLabelInVPC(s,mvCxt));
