@@ -83,6 +83,7 @@ public class TDEResources {
 		controller=new ImageIcon(getClass().getClassLoader().getResource("controller.png"));
 		colorChooser=new ImageIcon(getClass().getClassLoader().getResource("color_chooser.png"));
 		email=new ImageIcon(getClass().getClassLoader().getResource("email.png"));
+		defCur=new ImageIcon(getClass().getClassLoader().getResource("defalultCursor.png"));
 		
 		
 		JUNCTION_DEMO=Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("junction_demo.png"));
@@ -107,12 +108,16 @@ public class TDEResources {
 		trf.setImage(trf.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		rts.setImage(rts.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		email.setImage(email.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		defCur.setImage(defCur.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		
 		themeColor=new Color(pref.getInt("themeColor", new Color(233,233,233).getRGB()));
 		setColorDensity(pref.getInt("colorDensity", 0));
 	}
 	public static ImageIcon getEmail() {
 		return email;
+	}
+	public static ImageIcon getDefCur() {
+		return defCur;
 	}
 	public static TDEResources getResources(){
 		if(ir==null)ir=new TDEResources();
@@ -150,6 +155,7 @@ public class TDEResources {
 	private static ImageIcon trf;
 	private static ImageIcon rts;
 	private static ImageIcon email;
+	private static ImageIcon defCur;
 	private static ImageIcon colorChooser;
 	private Color themeColor;
 	public Color getThemeColor() {

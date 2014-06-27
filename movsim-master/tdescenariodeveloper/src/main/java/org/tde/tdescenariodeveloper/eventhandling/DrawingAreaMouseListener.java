@@ -110,6 +110,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         				}
         				linkPoints.add(new RoadLaneSegmentPair(sp, ls, sp.userId(), ls.lane()));
         				LinkUpdater.linkSelectedLanes(linkPoints, trafficCanvas.getRoadPrPnl());
+        				trafficCanvas.getRoadPrPnl().getAppFrame().getJp().updateJunction();
         				trafficCanvas.getRoadPrPnl().updateGraphics();
         				break;
         			default:

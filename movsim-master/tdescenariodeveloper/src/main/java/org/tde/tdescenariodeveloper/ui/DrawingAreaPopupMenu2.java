@@ -124,8 +124,11 @@ public class DrawingAreaPopupMenu2 extends JPopupMenu implements ActionListener{
 					main=r;
 				}else othr.add(r);
 			}
-			if(main==null || othr.size()+1!=set.size()){
+			if(main==null){
 				GraphicsHelper.showToast("Selected road not found", rdCxt.getToastDurationMilis());
+				return;
+			}else if(othr.size()+1!=set.size()){
+				GraphicsHelper.showToast("Something went wrong", rdCxt.getToastDurationMilis());
 				return;
 			}
 			for(RoadSegment r:rdCxt.getAppFrame().getTpnl().getSelectedRoads())

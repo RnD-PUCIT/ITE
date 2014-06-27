@@ -61,7 +61,7 @@ import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 	private Border defaultBorder;
 	private static final long serialVersionUID = -1452084837775482733L;
-	private AbstractButton straightRoad,arcRoad,addTrafficSource,junctionEditor,linker;
+	private AbstractButton straightRoad,arcRoad,addTrafficSource,junctionEditor,linker,defaultCursor;
 	JButton chooseColor;
 	public JButton getChooseColor() {
 		return chooseColor;
@@ -99,10 +99,15 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 		addTrafficSource=new JToggleButton(TDEResources.getResources().getTrafficSource());
 		junctionEditor=new JToggleButton(TDEResources.getResources().getJunctions());
 		linker=new JToggleButton(TDEResources.getResources().getLinker());
+		defaultCursor=new JToggleButton(TDEResources.getResources().getDefCur());
+		defaultCursor.setSelected(true);
+		defaultCursor.setBorder(BorderFactory.createLoweredBevelBorder());
 		chooseColor=new JButton(TDEResources.getResources().getColorChooser());
 		chooseColor.setToolTipText("Choose theme color");
 		chooseColor.setEnabled(Preferences.userRoot().node(TDEResources.class.getName()).getBoolean("useTheme",false));
 		Insets in=new Insets(3, 3, 3, 3);
+		
+		defaultCursor.setMargin(in);
 		straightRoad.setMargin(in);
 		arcRoad.setMargin(in);
 		addTrafficSource.setMargin(in);
@@ -111,6 +116,7 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 		chooseColor.setMargin(in);
 		
 		Dimension btnsize=new Dimension(30,30);
+		defaultCursor.setPreferredSize(btnsize);
 		straightRoad.setPreferredSize(btnsize);
 		arcRoad.setPreferredSize(btnsize);
 		addTrafficSource.setPreferredSize(btnsize);
@@ -118,31 +124,27 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 		linker.setPreferredSize(btnsize);
 		chooseColor.setPreferredSize(btnsize);
 		
-		
-		straightRoad.setMargin(in);
-		arcRoad.setMargin(in);
-		addTrafficSource.setMargin(in);
-		junctionEditor.setMargin(in);
-		linker.setMargin(in);
-		chooseColor.setMargin(in);
-		
+		defaultCursor.setToolTipText("Default road selecter");
 		straightRoad.setToolTipText("Straight road");
 		arcRoad.setToolTipText("Arc raod");
 		addTrafficSource.setToolTipText("Traffic Source");
 		junctionEditor.setToolTipText("Junctions editor");
 		linker.setToolTipText("Road linker");
 		
+		defaultCursor.setFocusable(false);
 		straightRoad.setFocusable(false);
 		arcRoad.setFocusable(false);
 		addTrafficSource.setFocusable(false);
 		junctionEditor.setFocusable(false);
 		linker.setFocusable(false);
 		
+		addListener(defaultCursor);
 		addListener(straightRoad);
 		addListener(arcRoad);
 		addListener(addTrafficSource);
 		addListener(junctionEditor);
 		addListener(linker);
+		p.add(defaultCursor,c);
 		p.add(straightRoad,c);
 		p.add(arcRoad,c);
 		p.add(addTrafficSource,c);
@@ -152,7 +154,7 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 		c.weighty=1;
 		p.add(chooseColor,c);
 		chooseColor.addActionListener(this);
-		ToolBar.setOpaqueness(false, straightRoad,arcRoad,addTrafficSource,junctionEditor,linker);
+		ToolBar.setOpaqueness(false, defaultCursor,straightRoad,arcRoad,addTrafficSource,junctionEditor,linker);
 		colorDensity.setOpaque(false);
 		defaultBorder=arcRoad.getBorder();
 	}
@@ -176,7 +178,7 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 				if(src!=junctionEditor && selectedRoads.size()>0)selectedRoads.clear();
 				if(src==straightRoad){
 					JToggleButton jtb=(JToggleButton)straightRoad;
-					setSelected(linker,arcRoad,addTrafficSource,junctionEditor);
+					setSelected(linker,arcRoad,addTrafficSource,junctionEditor,defaultCursor);
 					if(jtb.isSelected()){
 						jtb.setBorder(BorderFactory.createLoweredBevelBorder());
 						mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().STRAIGHT_ROAD_CURSOR);
@@ -189,7 +191,7 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 					}
 				}else if(src==arcRoad){
 					JToggleButton jtb=(JToggleButton)arcRoad;
-					setSelected(linker,junctionEditor,addTrafficSource,straightRoad);
+					setSelected(linker,junctionEditor,addTrafficSource,straightRoad,defaultCursor);
 					if(jtb.isSelected()){
 						jtb.setBorder(BorderFactory.createLoweredBevelBorder());
 						mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().ARC_ROAD_CURSOR);
@@ -202,7 +204,7 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 					}
 				}else if(src==addTrafficSource){
 					JToggleButton jtb=(JToggleButton)addTrafficSource;
-					setSelected(linker,arcRoad,junctionEditor,straightRoad);
+					setSelected(linker,arcRoad,junctionEditor,straightRoad,defaultCursor);
 					if(jtb.isSelected()){
 						jtb.setBorder(BorderFactory.createLoweredBevelBorder());
 						mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().TRAFFIC_SOURCE_CURSOR);
@@ -216,7 +218,7 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 				}
 				else if(src==junctionEditor){
 					JToggleButton jtb=(JToggleButton)junctionEditor;
-					setSelected(linker,arcRoad,addTrafficSource,straightRoad);
+					setSelected(linker,arcRoad,addTrafficSource,straightRoad,defaultCursor);
 					selectedRoads.clear();
 					if(jtb.isSelected()){
 						jtb.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -228,9 +230,23 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 						mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().DEFAULT_CURSOR);
 						mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getDrawingArea().getGraphics());
 					}
+				}else if(src==defaultCursor){
+					JToggleButton jtb=(JToggleButton)defaultCursor;
+					setSelected(linker,arcRoad,addTrafficSource,straightRoad,junctionEditor);
+					selectedRoads.clear();
+					if(jtb.isSelected()){
+						jtb.setBorder(BorderFactory.createLoweredBevelBorder());
+						mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().DEFAULT_CURSOR);
+						mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getDrawingArea().getGraphics());
+					}
+					else{
+						jtb.setBorder(defaultBorder);
+						mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().DEFAULT_CURSOR);
+						mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getDrawingArea().getGraphics());
+					}
 				}else if(src==linker){
 					JToggleButton jtb=(JToggleButton)linker;
-					setSelected( junctionEditor,straightRoad,arcRoad,addTrafficSource);
+					setSelected( junctionEditor,straightRoad,arcRoad,addTrafficSource,defaultCursor);
 					if(jtb.isSelected()){
 						jtb.setBorder(BorderFactory.createLoweredBevelBorder());
 						mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().LINK_CURSOR);
