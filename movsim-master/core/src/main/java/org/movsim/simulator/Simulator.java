@@ -93,7 +93,7 @@ public class Simulator implements SimulationTimeStep, SimulationRun.CompletionCa
     private SimulationOutput simOutput;
     private final RoadNetwork roadNetwork;
     private Routing routing;
-    private final SimulationRunnable simulationRunnable;
+    public final SimulationRunnable simulationRunnable;
     private int obstacleCount;
     private long timeOffsetMillis;
 

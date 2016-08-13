@@ -43,6 +43,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.ToolTipManager;
 
+import org.movsim.viewer.ui.AppFrame;
+
 public class SwingHelper {
 
     private SwingHelper() {
@@ -96,10 +98,11 @@ public class SwingHelper {
 
     }
 
-    public static void activateWindowClosingAndSystemExitButton(JFrame frame) {
+    public static void activateWindowClosingAndSystemExitButton(final AppFrame frame) {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent evnt) {
+                frame.simulator.simulationRunnable.stop();
                 evnt.getWindow().setVisible(false);
                 evnt.getWindow().dispose();
 //                System.exit(0);

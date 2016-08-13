@@ -52,13 +52,15 @@ public class AppFrame extends JFrame {
     private final CanvasPanel canvasPanel;
     final StatusPanel statusPanel;
     private MovSimToolBar toolBar;
-
+    
+    public final Simulator simulator;
+    
     public AppFrame(ResourceBundle resourceBundle, ProjectMetaData projectMetaData, Properties properties) {
         super(resourceBundle.getString("FrameName"));
 
         SwingHelper.activateWindowClosingAndSystemExitButton(this);
 
-        final Simulator simulator = new Simulator();
+        simulator = new Simulator();
         initLookAndFeel();
 
         final TrafficCanvas trafficCanvas = new TrafficCanvas(simulator, properties);
