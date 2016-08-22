@@ -12,6 +12,7 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Predecessor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.ui.AppFrame;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.ui.ToolsPanel;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
@@ -285,6 +286,15 @@ public class LinkUpdater {
 	public static void addLinks(ArrayList<RoadLaneSegmentPair>linkPoints){
     	RoadSegment rdPr=linkPoints.get(0).getRs();
     	RoadSegment rdSc=linkPoints.get(1).getRs();
+    	
+    	Lane lanePr=linkPoints.get(0).getLs().getOdrLane();
+    	Lane laneSc=linkPoints.get(1).getLs().getOdrLane();
+    	
+    	if(lanePr.isSetLink() && lanePr.getLink().isSetSuccessor()){
+    		GraphicsHelper.showToast("A lane can't be successor of two lanes at a time", AppFrame.getAppFrame().getrdCxt().getToastDurationMilis());
+    		return;
+    	}
+    	
 		if(!rdPr.getOdrRoad().isSetLink())rdPr.getOdrRoad().setLink(new Link());
 		if(!rdSc.getOdrRoad().isSetLink())rdSc.getOdrRoad().setLink(new Link());
 //		if(!rdPr.getOdrRoad().getLink().isSetPredecessor())rdPr.getOdrRoad().getLink().setPredecessor(new Predecessor());
@@ -301,8 +311,6 @@ public class LinkUpdater {
 		rdPr.getOdrRoad().getLink().getSuccessor().setElementType("road");
 		rdSc.getOdrRoad().getLink().getPredecessor().setElementType("road");
 		
-		Lane lanePr=linkPoints.get(0).getLs().getOdrLane();
-		Lane laneSc=linkPoints.get(1).getLs().getOdrLane();
 		
 		if(!lanePr.isSetLink())lanePr.setLink(new org.movsim.network.autogen.opendrive.Lane.Link());
 		if(!lanePr.getLink().isSetSuccessor())lanePr.getLink().setSuccessor(new org.movsim.network.autogen.opendrive.Lane.Link.Successor());

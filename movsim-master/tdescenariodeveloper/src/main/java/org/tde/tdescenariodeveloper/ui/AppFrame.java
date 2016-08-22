@@ -42,6 +42,8 @@ public class AppFrame extends JFrame {
 	private MovsimConfigContext mvCxt;
 	JMenuBar menuBar;
 	org.movsim.viewer.ui.AppFrame movsimFrame;
+	private static AppFrame thisAppFrame;
+	
 	public org.movsim.viewer.ui.AppFrame getMovsimFrame() {
 		return movsimFrame;
 	}
@@ -53,6 +55,11 @@ public class AppFrame extends JFrame {
 	 * 
 	 * @return return {@link RoadContext}
 	 */
+	
+	public static AppFrame getAppFrame(){
+		return thisAppFrame;
+	}
+	
 	public RoadContext getrdCxt(){
 		return rdCxt;
 	}
@@ -120,7 +127,7 @@ public class AppFrame extends JFrame {
 
 		JMenuItem mntmEmail= new JMenuItem("Request tutorials",TDEResources.getResources().getEmail());
 		mnHelp.add(mntmEmail);
-		
+		//TODO: This is the culprit side tabPane which provides functions of Road and Junction
 		JTabbedPane tabPane=new JTabbedPane();
 		ImageIcon icon=new ImageIcon(getClass().getClassLoader().getResource("road_icon.png"));
 		icon.setImage(icon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
@@ -214,6 +221,7 @@ public class AppFrame extends JFrame {
 		getContentPane().add(southPanel,BorderLayout.SOUTH);
 		appListener.setBlocked(false);
 		GraphicsHelper.finalizeFrame(this);
+		thisAppFrame = this;
 	}
 	public JCheckBoxMenuItem getDropRoadAtLast() {
 		return dropRoadAtLast;

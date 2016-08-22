@@ -148,7 +148,7 @@ public class ToolsPanel extends JPanel implements ChangeListener,ActionListener{
 		p.add(straightRoad,c);
 		p.add(arcRoad,c);
 		p.add(addTrafficSource,c);
-		p.add(junctionEditor,c);
+		//p.add(junctionEditor,c);
 		p.add(linker,c);
 		p.add(colorDensity,c);
 		c.weighty=1;
