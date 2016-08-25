@@ -366,6 +366,16 @@ public class LinkUpdater {
 			}
 			if(rdCxt.getRn().getOdrNetwork().getRoad().remove(rdCxt.getSelectedRoad().getOdrRoad())){
 				RoadNetworkUtils.refresh(rdCxt);
+				String id = rdCxt.getSelectedRoad().getOdrRoad().getId();
+				List<org.movsim.autogen.Road> roadList = rdCxt.getMvCxt().getMovsim().getScenario().getSimulation().getRoad();
+				org.movsim.autogen.Road deletedRoad = null;
+				for(org.movsim.autogen.Road road : roadList){
+					if(road.getId().equals(id)){
+						deletedRoad = road;
+						break;
+					}
+				}
+				rdCxt.getMvCxt().getMovsim().getScenario().getSimulation().getRoad().remove(deletedRoad);
 				rdCxt.getMvCxt().updatePanels();
 			}else GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" couldn't be remvoed", rdCxt.getToastDurationMilis());
 		}else GraphicsHelper.showToast("Select road to delete", rdCxt.getToastDurationMilis());
