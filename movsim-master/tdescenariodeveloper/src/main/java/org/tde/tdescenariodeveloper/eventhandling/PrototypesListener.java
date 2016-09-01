@@ -10,7 +10,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import org.movsim.autogen.Road;
 import org.movsim.autogen.VehiclePrototypeConfiguration;
+import org.movsim.autogen.VehicleType;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.Conditions;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
@@ -34,15 +36,42 @@ public class PrototypesListener implements ActionListener, DocumentListener ,Blo
 		this.mvCxt=mvCxt;
 	}
 
-
+	private boolean isPrototypeInUse(){
+		boolean retval = false;
+		String labelRemoved = vpc.getLabel();
+		try{
+			for(VehicleType v : mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType()){
+				if(labelRemoved.equals(v.getLabel())){
+					retval = true;
+					return retval;
+				}
+			}			
+		}catch(Exception e){}
+		try{			
+			for(Road r : mvCxt.getMovsim().getScenario().getSimulation().getRoad()){
+				for(VehicleType v : r.getTrafficComposition().getVehicleType()){
+					if(labelRemoved.equals(v.getLabel())){
+						retval = true;
+						return retval;
+					}
+				}
+			}
+		}catch(Exception e){}
+		return retval;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(blocked)return;
 		JButton srcBtn=null;
 		if(e.getSource() instanceof JButton)srcBtn=(JButton)e.getSource();
 		if(srcBtn==removePrototype){
-			mvCxt.getMovsim().getVehiclePrototypes().getVehiclePrototypeConfiguration().remove(vpc);
-			mvCxt.updatePanels();
+			if (isPrototypeInUse())
+				GraphicsHelper.showToast("The prortype is in use, cannot be deleted", mvCxt.getRdCxt().getToastDurationMilis());
+			else{
+				mvCxt.getMovsim().getVehiclePrototypes().getVehiclePrototypeConfiguration().remove(vpc);
+				mvCxt.updatePanels();				
+			}
 		}
 	}
 
