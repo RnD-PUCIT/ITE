@@ -334,10 +334,12 @@ public class LinkUpdater {
 				RoadSegment rs=rdCxt.getRn().findByUserId(rdCxt.getSelectedRoad().getOdrRoad().getLink().getPredecessor().getElementId());
 				if(rs!=null && !rs.getOdrRoad().getJunction().equals("-1")){
 					Junction j=JunctionsUpdater.getJunction(rs.getOdrRoad().getLink().getSuccessor().getElementId(), rdCxt);
-					for(Connection cn:j.getConnection()){
-						if(cn.getIncomingRoad().equals(rdCxt.getSelectedRoad().userId())){
-							j.getConnection().remove(cn);
-							break;
+					if(j!=null){						
+						for(Connection cn:j.getConnection()){
+							if(cn.getIncomingRoad().equals(rdCxt.getSelectedRoad().userId())){
+								j.getConnection().remove(cn);
+								break;
+							}
 						}
 					}
 				}
@@ -346,10 +348,12 @@ public class LinkUpdater {
 				RoadSegment rs=rdCxt.getRn().findByUserId(rdCxt.getSelectedRoad().getOdrRoad().getLink().getSuccessor().getElementId());
 				if(rs!=null && !rs.getOdrRoad().getJunction().equals("-1")){
 					Junction j=JunctionsUpdater.getJunction(rs.getOdrRoad().getLink().getPredecessor().getElementId(), rdCxt);
-					for(Connection cn:j.getConnection()){
-						if(cn.getIncomingRoad().equals(rdCxt.getSelectedRoad().userId())){
-							j.getConnection().remove(cn);
-							break;
+					if(j!=null){						
+						for(Connection cn:j.getConnection()){
+							if(cn.getIncomingRoad().equals(rdCxt.getSelectedRoad().userId())){
+								j.getConnection().remove(cn);
+								break;
+							}
 						}
 					}
 				}

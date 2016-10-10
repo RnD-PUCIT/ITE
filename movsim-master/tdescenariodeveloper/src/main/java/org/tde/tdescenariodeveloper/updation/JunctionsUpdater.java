@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import org.movsim.network.autogen.opendrive.OpenDRIVE;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Predecessor;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
@@ -57,6 +61,14 @@ public class JunctionsUpdater {
 		Junction j=getJunction(id, rdCxt);
 		if(rdCxt.getRn().getOdrNetwork().getJunction().remove(j)){
 			rdCxt.getAppFrame().getJp().getCbSelectJunc().removeItem(id+"");
+			for(OpenDRIVE.Junction.Connection c:j.getConnection()){
+				Road incomingRoad = rdCxt.getRn().findByUserId(c.getIncomingRoad()).getOdrRoad();
+				Road connectingRoad = rdCxt.getRn().findByUserId(c.getConnectingRoad()).getOdrRoad();
+				connectingRoad.setJunction("-1");
+				incomingRoad.setJunction("-1");
+				incomingRoad.getLink().setSuccessor(null);
+				connectingRoad.getLink().setPredecessor(null);
+			}
 			RoadNetworkUtils.refresh(rdCxt);
 		}
 		if(rdCxt.getRn().getOdrNetwork().getJunction()==null || rdCxt.getRn().getOdrNetwork().getJunction().size()<1){
@@ -86,6 +98,18 @@ public class JunctionsUpdater {
 			j.getConnection().add(cn);
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.getAppFrame().getJp().setSelectedJn(id+"");
+			Road connectingRoad = rdCxt.getRn().findByUserId(vls[0]).getOdrRoad();
+			Road incomingRoad = rdCxt.getRn().findByUserId(vls[1]).getOdrRoad();
+			connectingRoad.setJunction(id);
+			if(!connectingRoad.isSetLink())connectingRoad.setLink(new Link());
+			if(!incomingRoad.isSetLink())incomingRoad.setLink(new Link());
+			connectingRoad.getLink().setSuccessor(new Successor());
+			connectingRoad.getLink().getSuccessor().setElementType("junction");
+			connectingRoad.getLink().getSuccessor().setElementId(id);
+			incomingRoad.getLink().setPredecessor(new Predecessor());
+			incomingRoad.getLink().getPredecessor().setElementType("road");
+			incomingRoad.getLink().getPredecessor().setContactPoint("end");
+			incomingRoad.getLink().getPredecessor().setElementId(connectingRoad.getId());
 		}catch(NumberFormatException e){
 			GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
 		}catch(IllegalArgumentException e2){

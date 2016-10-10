@@ -6,8 +6,13 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 
+import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.Lane.Link;
+import org.movsim.network.autogen.opendrive.Lane.Link.Predecessor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Lanes.LaneSection;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.updation.JunctionsUpdater;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
@@ -70,6 +75,16 @@ public class ConnectionListener implements ActionListener,Blockable {
 			rdCxt.getAppFrame().getJp();
 			rdCxt.getAppFrame().getJp();
 			JunctionsUpdater.getJunction(rdCxt.getAppFrame().getJp().getSelectedJn(), rdCxt).getConnection().remove(cn);
+			cn.getConnectingRoad();
+			cn.getIncomingRoad();
+			Road incomingRoad = rdCxt.getRn().findByUserId(cn.getIncomingRoad()).getOdrRoad();
+			Road connectingRoad = rdCxt.getRn().findByUserId(cn.getConnectingRoad()).getOdrRoad();
+			connectingRoad.setJunction("-1");
+			incomingRoad.setJunction("-1");
+			incomingRoad.getLink().setSuccessor(null);
+			connectingRoad.getLink().setPredecessor(null);
+			
+			
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.getAppFrame().getJl().actionPerformed(new ActionEvent(rdCxt.getAppFrame().getJp().getCbSelectJunc(), 234, ""));
 		}else if(srcBtn==addLn){
@@ -83,6 +98,31 @@ public class ConnectionListener implements ActionListener,Blockable {
 				ll.setFrom(from);
 				ll.setTo(to);
 				cn.getLaneLink().add(ll);
+				Road incomingRoad = rdCxt.getRn().findByUserId(cn.getIncomingRoad()).getOdrRoad();
+				for(LaneSection ls : incomingRoad.getLanes().getLaneSection()){
+					LaneSection.Left lsl = ls.getLeft();
+					LaneSection.Right lsr = ls.getRight();
+					if(lsl != null){
+						for (Lane l : lsl.getLane()){
+							if(l.getId()==to){
+								if(!l.isSetLink())l.setLink(new Link());
+								if(!l.getLink().isSetPredecessor())l.getLink().setPredecessor(new Predecessor());
+								l.getLink().getPredecessor().setId(from);
+								break;
+							}
+						}						
+					}
+					if(lsr != null){
+						for (Lane l : lsr.getLane()){
+							if(l.getId()==to){
+								if(!l.isSetLink())l.setLink(new Link());
+								if(!l.getLink().isSetPredecessor())l.getLink().setPredecessor(new Predecessor());
+								l.getLink().getPredecessor().setId(from);
+								break;
+							}
+						}
+					}
+				}
 				RoadNetworkUtils.refresh(rdCxt);
 				rdCxt.getAppFrame().getJl().actionPerformed(new ActionEvent(rdCxt.getAppFrame().getJp().getCbSelectJunc(), 234, ""));
 			}catch(NumberFormatException ee){

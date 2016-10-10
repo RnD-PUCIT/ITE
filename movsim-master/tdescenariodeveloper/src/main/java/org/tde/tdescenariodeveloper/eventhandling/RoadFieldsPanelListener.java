@@ -69,7 +69,6 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener,
 					if(jnc.equals("-1"))jnc="None";
 					rdCxt.getRdFldPnl().getCbJunction().setSelectedItem(jnc);
 				}
-				
 			}
 			else{
 				GraphicsHelper.showMessage("Junction doesn't exist");
