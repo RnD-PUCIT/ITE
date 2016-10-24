@@ -62,12 +62,7 @@ public class JunctionsUpdater {
 		if(rdCxt.getRn().getOdrNetwork().getJunction().remove(j)){
 			rdCxt.getAppFrame().getJp().getCbSelectJunc().removeItem(id+"");
 			for(OpenDRIVE.Junction.Connection c:j.getConnection()){
-				Road incomingRoad = rdCxt.getRn().findByUserId(c.getIncomingRoad()).getOdrRoad();
-				Road connectingRoad = rdCxt.getRn().findByUserId(c.getConnectingRoad()).getOdrRoad();
-				connectingRoad.setJunction("-1");
-				incomingRoad.setJunction("-1");
-				incomingRoad.getLink().setSuccessor(null);
-				connectingRoad.getLink().setPredecessor(null);
+				JunctionsUpdater.removeConnectionFromJunction(rdCxt, j, c);
 			}
 			RoadNetworkUtils.refresh(rdCxt);
 		}
@@ -222,4 +217,31 @@ public class JunctionsUpdater {
 		}
 		return null;
 	}
+	
+	public static void removeConnectionFromJunction(
+			org.tde.tdescenariodeveloper.ui.RoadContext rdCxt,
+			org.movsim.network.autogen.opendrive.OpenDRIVE.Junction junction, 
+			org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection connection
+			){
+		Road connectingRoad = rdCxt.getRn().findByUserId(connection.getConnectingRoad()).getOdrRoad();
+		Road incomingRoad = rdCxt.getRn().findByUserId(connection.getIncomingRoad()).getOdrRoad();
+		connectingRoad.setJunction("-1");
+		connectingRoad.getLink().setSuccessor(null);
+		if (!connectingRoad.getLink().isSetInclude() &&
+			!connectingRoad.getLink().isSetNeighbor() &&
+			!connectingRoad.getLink().isSetPredecessor() &&
+			!connectingRoad.getLink().isSetSuccessor() &&
+			!connectingRoad.getLink().isSetUserData()	
+			)connectingRoad.setLink(null);
+		incomingRoad.getLink().setPredecessor(null);
+		if (!incomingRoad.getLink().isSetInclude() &&
+			!incomingRoad.getLink().isSetNeighbor() &&
+			!incomingRoad.getLink().isSetPredecessor() &&
+			!incomingRoad.getLink().isSetSuccessor() &&
+			!incomingRoad.getLink().isSetUserData()	
+			)incomingRoad.setLink(null);
+		for(OpenDRIVE.Junction.Connection.LaneLink laneLink: connection.getLaneLink()){
+			LinkUpdater.removeLaneLinkFromJunction(rdCxt, connection, laneLink);
+		}
+	}	
 }

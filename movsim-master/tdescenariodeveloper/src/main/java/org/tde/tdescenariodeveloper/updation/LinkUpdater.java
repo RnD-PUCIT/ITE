@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.OpenDRIVE;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
@@ -384,5 +385,51 @@ public class LinkUpdater {
 			}else GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" couldn't be remvoed", rdCxt.getToastDurationMilis());
 		}else GraphicsHelper.showToast("Select road to delete", rdCxt.getToastDurationMilis());
 	
+	}
+	
+	public static void removeLaneLinkFromJunction(
+			RoadContext rdCxt,
+			OpenDRIVE.Junction.Connection connection,
+			OpenDRIVE.Junction.Connection.LaneLink laneLink){
+		Road incomingRoad = rdCxt.getRn().findByUserId(connection.getIncomingRoad()).getOdrRoad();
+		for(OpenDRIVE.Road.Lanes.LaneSection laneSection : 
+			incomingRoad.getLanes().getLaneSection()){
+			if(laneSection.getLeft()!=null){						
+				for(org.movsim.network.autogen.opendrive.Lane lane : laneSection.getLeft().getLane()){
+					if(lane.isSetLink()){						
+						if(lane.getLink().getPredecessor().getId()==laneLink.getFrom()){
+							lane.getLink().setPredecessor(null);
+							if(
+									!lane.getLink().isSetInclude() &&
+									!lane.getLink().isSetPredecessor() &&
+									!lane.getLink().isSetSuccessor() &&
+									!lane.getLink().isSetUserData()
+									){
+								lane.setLink(null);
+							}
+							break;
+						}
+					}
+				}
+			}
+			if(laneSection.getRight()!=null){						
+				for(org.movsim.network.autogen.opendrive.Lane lane : laneSection.getRight().getLane()){
+					if(lane.isSetLink()){						
+						if(lane.getLink().getPredecessor().getId()==laneLink.getFrom()){
+							lane.getLink().setPredecessor(null);
+							if(
+									!lane.getLink().isSetInclude() &&
+									!lane.getLink().isSetPredecessor() &&
+									!lane.getLink().isSetSuccessor() &&
+									!lane.getLink().isSetUserData()
+									){
+								lane.setLink(null);
+							}
+							break;
+						}				
+					}
+				}
+			}
+		}
 	}
 }

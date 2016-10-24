@@ -10,6 +10,7 @@ import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
+import org.tde.tdescenariodeveloper.updation.LinkUpdater;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 /**
  * Class used to Listen for changes made to related {@link LaneLink}
@@ -60,6 +61,7 @@ public class LaneLinkListener implements ActionListener,Blockable {
 			rdCxt.updateGraphics();
 		}else if(srcBtn==removeLn){
 			cn.getLaneLink().remove(lnLnk);
+			LinkUpdater.removeLaneLinkFromJunction(rdCxt, cn, lnLnk);
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.getAppFrame().getJl().actionPerformed(new ActionEvent(rdCxt.getAppFrame().getJp().getCbSelectJunc(), 234, ""));
 		}

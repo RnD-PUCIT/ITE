@@ -5,14 +5,15 @@ traffic composition doesnot work correctly when it is atched to a road (I did no
 remove traffic source of a road and add it again it will not be added the second time - not sure (the issue was not reproducing probably it was a comprehension issue)
 removing road does not remove the traffic source and road custimization related to simulation which causes exception
 add a prototype, use it in a traffic composition, then remove the prototype, composition remains the same and upon reading the tag it throws an obvisois error that such prototype doesnot exist, it happen with both generic and road level composition
+
 upon deleting a road, relivent signal is not removed from controler tag (.xodr) and its phase is not removed from TrafficLights (.xprj) - unable to reproduce the issue
 junction information is not correctly written in files neither it is loaded from files correctly
-
 if road is deleted coresponding routes still carries that road id
-
-route up stream issue
+try to add traffic source to a road will not work correcty
+route up stream issue  i.e tool allows invalid routes having gaps (broken)
 if there is no link between two roads and a route is defnied, simulation crashes with an exception
 if a route is removed Output configuration remain there in .xprj file
 lane cardinility infact all sorts of cardinalities are not being inforced and taken care by the tool
 route validity could be checked by folloing the succseer trail
 It is unknown why it shows white lines! does not make any sense how it is working
+multiple predecessor for a road should be allowed, but API doesnot support it, so for now we are skipping it

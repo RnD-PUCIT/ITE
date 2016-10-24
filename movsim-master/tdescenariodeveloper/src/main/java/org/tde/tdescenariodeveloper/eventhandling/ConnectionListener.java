@@ -75,16 +75,7 @@ public class ConnectionListener implements ActionListener,Blockable {
 			rdCxt.getAppFrame().getJp();
 			rdCxt.getAppFrame().getJp();
 			JunctionsUpdater.getJunction(rdCxt.getAppFrame().getJp().getSelectedJn(), rdCxt).getConnection().remove(cn);
-			cn.getConnectingRoad();
-			cn.getIncomingRoad();
-			Road incomingRoad = rdCxt.getRn().findByUserId(cn.getIncomingRoad()).getOdrRoad();
-			Road connectingRoad = rdCxt.getRn().findByUserId(cn.getConnectingRoad()).getOdrRoad();
-			connectingRoad.setJunction("-1");
-			incomingRoad.setJunction("-1");
-			incomingRoad.getLink().setSuccessor(null);
-			connectingRoad.getLink().setPredecessor(null);
-			
-			
+			JunctionsUpdater.removeConnectionFromJunction(rdCxt, JunctionsUpdater.getJunction(rdCxt.getAppFrame().getJp().getSelectedJn(), rdCxt), this.cn);
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.getAppFrame().getJl().actionPerformed(new ActionEvent(rdCxt.getAppFrame().getJp().getCbSelectJunc(), 234, ""));
 		}else if(srcBtn==addLn){
@@ -134,5 +125,4 @@ public class ConnectionListener implements ActionListener,Blockable {
 	public void setBlocked(boolean blocked) {
 		this.blocked = blocked;
 	}
-
 }
