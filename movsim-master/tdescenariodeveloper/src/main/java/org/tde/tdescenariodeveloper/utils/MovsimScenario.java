@@ -41,7 +41,7 @@ public class MovsimScenario {
 			mvCxt.setMovsim(MovsimInputLoader.getInputData(f));
 			mvCxt.getRdCxt().setSelectedRoadNull();
 			mvCxt.getRdCxt().getRn().reset();
-			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath().replace(".xprj", ".xodr"));
+			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath().replace( f.getName() , mvCxt.getMovsim().getScenario().getNetworkFilename()));
 			RoadNetworkUtils.SetupLights(mvCxt);
 			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(true);
 			if(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().size()>0)mvCxt.getRdCxt().getAppFrame().getJp().setSelectedJn(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().get(0).getId());

@@ -45,6 +45,7 @@ public class TDEResources {
 	final public Cursor ARC_ROAD_CURSOR;
 	final public Cursor TRAFFIC_SOURCE_CURSOR;
 	final public Cursor LINK_CURSOR;
+	final public Cursor LINK_REMOVER_CURSOR;
 	final public Image JUNCTION_DEMO;
 	final public Image APP_ICON;
 	final public Cursor HAND_CURSOR=new Cursor(Cursor.HAND_CURSOR);
@@ -57,6 +58,7 @@ public class TDEResources {
 		Point p2=new Point();
 		p2.setLocation(d.width/2.0, d.height-1);
 		LINK_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("linker_icon2.png")), p2, "linkCursor");
+		LINK_REMOVER_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("linkRemoveri1.png")) , p2 , "linkRemoverCursor");
 		DEFAULT_RED_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("defaultred_cursor.png")), p, "defaultRedCusor");
 		STRAIGHT_ROAD_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("straight_road2.png")), p, "straightRoadCursor");
 		ARC_ROAD_CURSOR=Toolkit.getDefaultToolkit().createCustomCursor(Toolkit.getDefaultToolkit().createImage(getClass().getClassLoader().getResource("arc_road2.png")), p, "arcRoadCursor");
@@ -80,6 +82,7 @@ public class TDEResources {
 		trafficSource=new ImageIcon(getClass().getClassLoader().getResource("traffic_source.png"));
 		junctions=new ImageIcon(getClass().getClassLoader().getResource("Junc_icon.png"));
 		linker=new ImageIcon(getClass().getClassLoader().getResource("linker.png"));
+		linkRemover = new ImageIcon(getClass().getClassLoader().getResource("linkRemover.png"));
 		controller=new ImageIcon(getClass().getClassLoader().getResource("controller.png"));
 		colorChooser=new ImageIcon(getClass().getClassLoader().getResource("color_chooser.png"));
 		email=new ImageIcon(getClass().getClassLoader().getResource("email.png"));
@@ -101,6 +104,7 @@ public class TDEResources {
 		trafficSource.setImage(trafficSource.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		junctions.setImage(junctions.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		linker.setImage(linker.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+		linkRemover.setImage(linkRemover.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		controller.setImage(controller.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		colorChooser.setImage(colorChooser.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
 		sim.setImage(sim.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH));
@@ -149,6 +153,7 @@ public class TDEResources {
 	private static ImageIcon trafficSource;
 	private static ImageIcon junctions;
 	private static ImageIcon linker;
+	private static ImageIcon linkRemover;
 	private static ImageIcon controller;
 	private static ImageIcon sim;
 	private static ImageIcon prt;
@@ -207,11 +212,17 @@ public class TDEResources {
 	public Icon getLinker() {
 		return linker;
 	}
+	public Icon getLinkRemover(){
+		return linkRemover;
+	}
 	public Icon getController() {
 		return controller;
 	}
 	public Cursor getLinkCursor() {
 		return linkCursor;
+	}
+	public Cursor getLinkRemovalCursor(){
+		return LINK_REMOVER_CURSOR;
 	}
 	public ImageIcon getSimulation() {
 		return sim;

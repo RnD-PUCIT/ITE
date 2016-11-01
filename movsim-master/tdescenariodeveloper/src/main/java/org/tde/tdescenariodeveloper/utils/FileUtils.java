@@ -4,13 +4,7 @@ import java.io.File;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBException;
 
-import org.movsim.input.network.OpenDriveReader;
-import org.movsim.xml.MovsimInputLoader;
-import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
-import org.tde.tdescenariodeveloper.ui.RoadContext;
-import org.xml.sax.SAXException;
 /**
  * This class Helps doing {@link File} related tasks
  * @author Shmeel

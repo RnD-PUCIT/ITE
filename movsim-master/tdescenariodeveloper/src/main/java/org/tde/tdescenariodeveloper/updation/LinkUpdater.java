@@ -2,9 +2,11 @@ package org.tde.tdescenariodeveloper.updation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle.Control;
 
-import org.movsim.network.autogen.opendrive.Lane;
 import org.movsim.network.autogen.opendrive.OpenDRIVE;
+import org.movsim.network.autogen.opendrive.Lane;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Controller;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction.Connection.LaneLink;
@@ -12,6 +14,7 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Predecessor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.ui.AppFrame;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
@@ -246,7 +249,8 @@ public class LinkUpdater {
 	public static void clearSuccessor(RoadSegment rdPr) {
 		if(rdPr.getOdrRoad().isSetLink()){
 			if(rdPr.getOdrRoad().getLink().isSetSuccessor()){
-				if(rdPr.getOdrRoad().getLink().isSetPredecessor())rdPr.getOdrRoad().getLink().setSuccessor(null);
+				if(rdPr.getOdrRoad().getLink().isSetPredecessor())
+					rdPr.getOdrRoad().getLink().setSuccessor(null);
 				else{
 					rdPr.getOdrRoad().setLink(null);
 				}
@@ -259,7 +263,8 @@ public class LinkUpdater {
 		for(int i=0;i<rdPr.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size();i++){
 			Lane l=rdPr.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(i);
 			if(l.isSetLink() && l.getLink().isSetSuccessor()){
-				if(l.getLink().isSetPredecessor())l.getLink().setSuccessor(null);
+				if(l.getLink().isSetPredecessor())
+					l.getLink().setSuccessor(null);
 				else l.setLink(null);
 			}else if(l.isSetLink() && !l.getLink().isSetPredecessor()){
 				l.setLink(null);
@@ -296,7 +301,7 @@ public class LinkUpdater {
     		return;
     	}
     	
-		if(!rdPr.getOdrRoad().isSetLink())rdPr.getOdrRoad().setLink(new Link());
+    	if(!rdPr.getOdrRoad().isSetLink())rdPr.getOdrRoad().setLink(new Link());
 		if(!rdSc.getOdrRoad().isSetLink())rdSc.getOdrRoad().setLink(new Link());
 //		if(!rdPr.getOdrRoad().getLink().isSetPredecessor())rdPr.getOdrRoad().getLink().setPredecessor(new Predecessor());
 		if(!rdSc.getOdrRoad().getLink().isSetPredecessor())rdSc.getOdrRoad().getLink().setPredecessor(new Predecessor());
@@ -322,6 +327,98 @@ public class LinkUpdater {
 		lanePr.getLink().getSuccessor().setId(laneSc.getId());
 		laneSc.getLink().getPredecessor().setId(lanePr.getId());
 	}
+	
+	/*
+	 * checks if any successor link of predecessor road Segment is present
+	 */
+	
+	
+	private static boolean isAnySucccessorPresent (RoadSegment rdPr )
+	{
+		for(int i=0;i<rdPr.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size();i++)
+		{
+			Lane l=rdPr.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(i);
+			if(l.isSetLink() &&  l.getLink().isSetSuccessor())
+			{
+				return true;
+			}
+					
+		}
+		
+		return false;
+	}
+	
+	
+	/*
+	 * checks if any Predecessor link of Successor road Segment is present
+	 */
+	
+	
+	private static boolean isAnyPredecessorPresent (RoadSegment rdSc )
+	{
+		for(int i=0;i<rdSc.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().size();i++)
+		{
+			Lane l=rdSc.getOdrRoad().getLanes().getLaneSection().get(0).getRight().getLane().get(i);
+			if(l.isSetLink() &&  l.getLink().isSetPredecessor())
+			{
+				return true;
+			}
+					
+		}
+		
+		return false;
+	}
+	
+	
+	
+	/*
+	 * removes the link between two selected lanes
+	 *  
+	 */
+	
+	public static void removeLink(ArrayList<RoadLaneSegmentPair> linkPoints)
+	{
+		
+		
+		RoadSegment rdPr=linkPoints.get(0).getRs();
+    	RoadSegment rdSc=linkPoints.get(1).getRs();
+    	if(!rdPr.getOdrRoad().getJunction().equals("-1"))
+    	{
+    		GraphicsHelper.showToast("This Road is attached to junction, Remove it from junction Panel", 1000);
+    		return ;
+    	}
+    	Lane lanePr = linkPoints.get(0).getLs().getOdrLane();
+    	Lane laneSc = linkPoints.get(1).getLs().getOdrLane();
+    	if (lanePr.isSetLink() && laneSc.isSetLink())
+		{
+			if (lanePr.getLink().getSuccessor().getId() == laneSc.getLink().getPredecessor().getId())
+			{
+				lanePr.getLink().setSuccessor(null);
+				if (!lanePr.getLink().isSetPredecessor())
+					lanePr.setLink(null);
+				laneSc.getLink().setPredecessor(null);
+				if (!laneSc.getLink().isSetSuccessor())
+					laneSc.setLink(null);
+				
+				if (!isAnySucccessorPresent(rdPr))
+				{
+					rdPr.getOdrRoad().getLink().setSuccessor(null);
+					if (!rdPr.getOdrRoad().getLink().isSetPredecessor())
+						rdPr.getOdrRoad().setLink(null);
+				}
+				if (!isAnyPredecessorPresent(rdSc))
+				{
+					rdSc.getOdrRoad().getLink().setPredecessor(null);
+					if (!rdSc.getOdrRoad().getLink().isSetSuccessor())
+						rdSc.getOdrRoad().setLink(null);
+				}
+			
+			}
+		}
+		
+	}
+	
+	
 	/**
 	 * clears whole road's link
 	 * @param rdCxt contains reference to loaded .xodr file and other panels added to it
@@ -380,13 +477,77 @@ public class LinkUpdater {
 						break;
 					}
 				}
+				// if road has signal then it is necessary to remove its contoller from xml file
+				if ( rdCxt.getSelectedRoad().getOdrRoad().isSetSignals() )
+				{
+					boolean flag = false;
+					int index = -1;
+					List<Controller> controller = null;
+					if (rdCxt.getRn().getOdrNetwork().isSetController())
+					{
+						controller = rdCxt.getRn().getOdrNetwork().getController();
+						for (int j = 0 ; j < controller.size() ; j++)
+						{
+							String id_2 = controller.get(j).getId();
+							if (id_2.contains("Plan"))
+							{
+								index = j;
+								flag = true;
+							}
+						}
+						
+						
+					}
+					
+					for (Signal s :  rdCxt.getSelectedRoad().getOdrRoad().getSignals().getSignal()) {
+						String s_id = s.getId() ;
+						
+						if (flag)
+						{
+						
+								if (controller.get(index).isSetControl())
+								{
+									for (int k = 0 ; k < controller.get(index).getControl().size() ; k++ )
+									{
+										if ( controller.get(index).getControl().get(k).getSignalId().equals(s_id))
+										{
+											if (!controller.get(index).getControl().get(k).isSetInclude() && !controller.get(index).getControl().get(k).isSetType() && !controller.get(index).getControl().get(k).isSetUserData())
+											{
+												controller.get(index).getControl().remove(k);
+											}
+											else
+											{
+												controller.get(index).getControl().get(k).setSignalId(null);
+											}
+											if (controller.get(index).getControl().size() == 0)
+											{
+												controller.get(index).unsetControl();	
+												if (!controller.get(index).isSetSequence() && !controller.get(index).isSetInclude() && !controller.get(index).isSetUserData() )
+												{
+													controller.remove(index);
+													
+												}
+											}
+										}
+									}
+									
+								}
+							
+						}
+						
+					} 
+					if (controller.size() == 0)
+					{
+						rdCxt.getRn().getOdrNetwork().unsetController();
+					}
+					
+				}
 				rdCxt.getMvCxt().getMovsim().getScenario().getSimulation().getRoad().remove(deletedRoad);
 				rdCxt.getMvCxt().updatePanels();
 			}else GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" couldn't be remvoed", rdCxt.getToastDurationMilis());
 		}else GraphicsHelper.showToast("Select road to delete", rdCxt.getToastDurationMilis());
 	
 	}
-	
 	public static void removeLaneLinkFromJunction(
 			RoadContext rdCxt,
 			OpenDRIVE.Junction.Connection connection,
@@ -431,5 +592,8 @@ public class LinkUpdater {
 				}
 			}
 		}
+
 	}
+	
+	
 }

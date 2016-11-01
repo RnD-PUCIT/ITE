@@ -94,7 +94,8 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
     		if(e.getButton()==MouseEvent.BUTTON3){
     			trafficCanvas.getPopup2().show(trafficCanvas, e.getX(), e.getY());
     		}
-    	}else if(trafficCanvas.getCursor()==TDEResources.getResources().LINK_CURSOR){
+    	}
+    	else if(trafficCanvas.getCursor()==TDEResources.getResources().LINK_CURSOR){
     		if(e.getButton()==MouseEvent.BUTTON1){
     			RoadSegment sp=RoadNetworkUtils.getUnderLyingRoadSegment(transformedPoint,trafficCanvas.getRoadPrPnl().getMvCxt());
         		if(sp!=null){
@@ -121,7 +122,36 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         			if(linkPoints.size()>0)linkPoints.clear();
         		}
     		}
-    	}else if(trafficCanvas.getCursor()==TDEResources.getResources().TRAFFIC_SOURCE_CURSOR){
+    	}
+    	else if(trafficCanvas.getCursor()==TDEResources.getResources().LINK_REMOVER_CURSOR){
+    		if(e.getButton()==MouseEvent.BUTTON1){
+    			RoadSegment sp=RoadNetworkUtils.getUnderLyingRoadSegment(transformedPoint,trafficCanvas.getRoadPrPnl().getMvCxt());
+    			if(sp!=null){
+        			LaneSegment ls=RoadNetworkUtils.getUnderLyingLaneSegment(transformedPoint, sp);
+        			switch(linkPoints.size()){
+        			case 0:
+            			linkPoints.add(new RoadLaneSegmentPair(sp, ls, sp.userId(), ls.lane()));
+        				break;
+        			case 1:
+        				if(linkPoints.get(0).getRoadId().equals(sp.userId())){
+        					linkPoints.clear();
+        					return;
+        				}
+        				linkPoints.add(new RoadLaneSegmentPair(sp, ls, sp.userId(), ls.lane()));
+        				LinkUpdater.removeLink(linkPoints);
+        				trafficCanvas.getRoadPrPnl().getAppFrame().getJp().updateJunction();
+        				trafficCanvas.getRoadPrPnl().updateGraphics();
+        				break;
+        			default:
+        				linkPoints.clear();
+        			}
+        		}
+        		else{
+        			if(linkPoints.size()>0)linkPoints.clear();
+        		}
+    		}
+    	}
+    	else if(trafficCanvas.getCursor()==TDEResources.getResources().TRAFFIC_SOURCE_CURSOR){
     		if(e.getButton()==MouseEvent.BUTTON1)trafficCanvas.getRoadPrPnl().getAppFrame().getTpnl().trafficSourceClicked(e);
     	}else if(trafficCanvas.getCursor()==TDEResources.getResources().STRAIGHT_ROAD_CURSOR){
     		if(e.getButton()==MouseEvent.BUTTON1)trafficCanvas.getRoadPrPnl().getAppFrame().getTpnl().straightRoadClicked(e);

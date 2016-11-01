@@ -76,6 +76,10 @@ public class GeometryUpdater {
 			try{
 				rdCxt.getSelectedRoad().getOdrRoad().getPlanView().getGeometry().get(0).setLength(l);
 				rdCxt.getSelectedRoad().getOdrRoad().setLength(l);
+				if (rdCxt.getSelectedRoad().getOdrRoad().isSetSignals())
+				{
+					rdCxt.getSelectedRoad().getOdrRoad().getSignals().getSignal().get(0).setS(0);
+				}
 				RoadNetworkUtils.updateCoordinatesAndHeadings(rdCxt);
 				RoadNetworkUtils.refresh(rdCxt);
 			}catch(NumberFormatException e){

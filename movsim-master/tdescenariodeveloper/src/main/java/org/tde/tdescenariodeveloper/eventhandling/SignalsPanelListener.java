@@ -57,7 +57,8 @@ public class SignalsPanelListener implements ActionListener,Blockable {
 			return;
 		}
 		JButton src=null;
-		if(e.getSource() instanceof JButton)src=(JButton)e.getSource();
+		if(e.getSource() instanceof JButton)
+			src=(JButton)e.getSource();
 		if(src==rdCxt.getSignalsPanel().getAddNew()){
 			if(!rdCxt.getSelectedRoad().getOdrRoad().isSetSignals()){
 				rdCxt.getSelectedRoad().getOdrRoad().setSignals(new Signals());
