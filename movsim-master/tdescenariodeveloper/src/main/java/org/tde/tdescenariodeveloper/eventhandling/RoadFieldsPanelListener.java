@@ -95,8 +95,13 @@ public class RoadFieldsPanelListener implements DocumentListener,ActionListener,
 				RoadNetworkUtils.refresh(rdCxt);
 			}else GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" couldn't be remvoed", rdCxt.getToastDurationMilis());
 		}else if(srcBtn==rdCxt.getRdFldPnl().getRemoveRoad())
+		{
 			LinkUpdater.removeRoad(rdCxt);
+			
+			
+		}
 	}
+	
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {

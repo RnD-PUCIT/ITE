@@ -2,6 +2,7 @@ package org.tde.tdescenariodeveloper.eventhandling;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
@@ -47,21 +48,65 @@ public class RouteListener implements DocumentListener, ActionListener ,Blockabl
 		if(e.getSource() instanceof JButton)b=(JButton)e.getSource();
 		if(b==removeRoute){
 			if(mvCxt.getMovsim().getScenario().getRoutes().getRoute().remove(rt)){
+				
 				mvCxt.updatePanels();
+				updateTrafficComposition(rt.getLabel());
 			}else GraphicsHelper.showToast("Couldn't be removed", mvCxt.getRdCxt().getToastDurationMilis());
 		}else if(b==addRoad){
-			String id=DataToViewerConverter.getNotUsedRoadRouteId(mvCxt, rt);
-			if(id!=null){
-				Road r=new Road();
-				r.setId(id);
-				if(rt.getRoad().add(r)){
-					mvCxt.updatePanels();
-				}else GraphicsHelper.showToast("Couldn't be added", mvCxt.getRdCxt().getToastDurationMilis());
-			}else{
-				GraphicsHelper.showToast("All roads are already added", mvCxt.getRdCxt().getToastDurationMilis());
+			if (rt.getRoad().isEmpty() )
+			{
+				String id=DataToViewerConverter.getNotUsedRoadRouteId(mvCxt, rt);
+				if(id!=null){
+					Road r=new Road();
+					r.setId(id);
+					if(rt.getRoad().add(r)){
+						mvCxt.updatePanels();
+					}else GraphicsHelper.showToast("Couldn't be added", mvCxt.getRdCxt().getToastDurationMilis());
+				}else{
+					GraphicsHelper.showToast("All roads are already added", mvCxt.getRdCxt().getToastDurationMilis());
+				}
+			}
+			else
+			{
+				List<String> s = DataToViewerConverter.getSuccessorRoadId(mvCxt, rt.getRoad().get(rt.getRoad().size()-1)) ;
+				if (s.size() > 0 )
+				{
+					Road r=new Road();
+					r.setId(s.get(0));
+					if(rt.getRoad().add(r)){
+						mvCxt.updatePanels();
+					}else GraphicsHelper.showToast("Couldn't be added", mvCxt.getRdCxt().getToastDurationMilis());
+				}
+				else
+				{
+					String msg = "Road " + rt.getRoad().get(rt.getRoad().size()-1).getId() + " don't have any successor Road ";
+					GraphicsHelper.showToast(msg, mvCxt.getRdCxt().getToastDurationMilis());
+				}
 			}
 		}
 	}
+	
+	/*
+	 remove route tag from Traffic Protoype tag in .xprj file after  we delete route
+	 
+	 * */
+	 
+	
+	public void updateTrafficComposition(String route)
+	{
+		
+		int prototypeCount = mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType().size();
+		for (int i = 0 ; i < prototypeCount ; i++)
+		{
+			if (  mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType().get(i).getRouteLabel().equals(route) )
+			{
+				
+				 mvCxt.getMovsim().getScenario().getSimulation().getTrafficComposition().getVehicleType().get(i).setRouteLabel(null);
+			}
+		}
+		
+	}
+	
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 		textChanged(e);

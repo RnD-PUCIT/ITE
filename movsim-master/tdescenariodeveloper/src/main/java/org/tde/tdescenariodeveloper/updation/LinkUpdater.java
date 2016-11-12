@@ -17,10 +17,13 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.tde.tdescenariodeveloper.ui.AppFrame;
+import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 import org.tde.tdescenariodeveloper.ui.ToolsPanel;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
+import org.movsim.autogen.Routes;
+import org.movsim.autogen.Route;
 /**
  * This class is used to udpate data of link of lanes and helps linker in {@link ToolsPanel} 
  * @author Shmeel
@@ -469,11 +472,17 @@ public class LinkUpdater {
 			if(rdCxt.getRn().getOdrNetwork().getRoad().remove(rdCxt.getSelectedRoad().getOdrRoad())){
 				RoadNetworkUtils.refresh(rdCxt);
 				String id = rdCxt.getSelectedRoad().getOdrRoad().getId();
+				
+				
+				removeRoadFromRoute(id , rdCxt.getMvCxt());
+			
 				List<org.movsim.autogen.Road> roadList = rdCxt.getMvCxt().getMovsim().getScenario().getSimulation().getRoad();
 				org.movsim.autogen.Road deletedRoad = null;
 				for(org.movsim.autogen.Road road : roadList){
 					if(road.getId().equals(id)){
+					
 						deletedRoad = road;
+						
 						break;
 					}
 				}
@@ -547,6 +556,51 @@ public class LinkUpdater {
 			}else GraphicsHelper.showToast("Road "+rdCxt.getSelectedRoad().userId()+" couldn't be remvoed", rdCxt.getToastDurationMilis());
 		}else GraphicsHelper.showToast("Select road to delete", rdCxt.getToastDurationMilis());
 	
+	}
+	
+	/**
+	 * used to remove road from route if a deleted road is in any route
+	 * @param id contains the id of road
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 */
+	public static void removeRoadFromRoute(String id , MovsimConfigContext mvCxt)
+	{
+		Routes routes = mvCxt.getMovsim().getScenario().getRoutes();
+		if (routes==null || !routes.isSetRoute())
+			return;
+		
+		List<Route> route = routes.getRoute();
+		int routesCount = route.size();
+		for ( int i = routesCount-1; i >=0  ; i--)
+		{
+			int roadCount = route.get(i).getRoad().size();
+			
+			for (int j = 0 ; j < roadCount ; j++)
+			{
+				if ( route.get(i).getRoad().get(j).getId().equals(id) )
+				{
+					for ( int k = roadCount-1 ; k >= j ; k-- )
+					{
+						route.get(i).getRoad().remove(k);
+					}
+					if ( route.get(i).getRoad().isEmpty() )
+					{
+						route.remove(i);
+						
+					}
+					break;
+				}
+			}
+			
+		}
+		if (mvCxt.getMovsim().getScenario().getRoutes().getRoute().isEmpty())
+		{
+			mvCxt.getMovsim().getScenario().getRoutes().unsetRoute();
+			mvCxt.getMovsim().getScenario().setRoutes(null);
+		}
+		
+		
+		
 	}
 	public static void removeLaneLinkFromJunction(
 			RoadContext rdCxt,

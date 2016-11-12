@@ -25,14 +25,17 @@ import org.movsim.autogen.TrafficComposition;
 import org.movsim.autogen.TrafficSource;
 import org.movsim.autogen.VehiclePrototypeConfiguration;
 import org.movsim.autogen.VehicleType;
+import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.movsim.simulator.trafficlights.TrafficLightLocation;
 import org.movsim.simulator.trafficlights.TrafficLights;
 import org.tde.tdescenariodeveloper.eventhandling.InflowListener;
 import org.tde.tdescenariodeveloper.eventhandling.RoadToPanelListener;
 import org.tde.tdescenariodeveloper.eventhandling.VehicleTypeToPanelListener;
+import org.tde.tdescenariodeveloper.ui.JunctionsPanel;
 import org.tde.tdescenariodeveloper.ui.LaneLinkPanel;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.TDEResources;
+import org.movsim.network.autogen.opendrive.OpenDRIVE.Junction;
 /**
  * This class is used to convert different input entities to {@link JPanel}s
  * @author Shmeel
@@ -332,6 +335,97 @@ public class DataToViewerConverter {
 			}
 		}
 		return s;
+	}
+	
+	/*
+	 * gets the successor Roads Ids (if any) for checking if road should be added in this route of not
+	 */
+	/**
+	 * used to get the successor roads Ids(if any) for checking if road should be added in this route or not
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @param road is the new road added
+	 * @return list of strings having successor roads IDs;
+	 */
+	
+	public static List<String> getSuccessorRoadId( MovsimConfigContext mvCxt , Road road )
+	{
+		List<String> s = new ArrayList<String>() ;
+		
+		List<org.movsim.network.autogen.opendrive.OpenDRIVE.Road>odrRdList=mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad();
+		
+		for(org.movsim.network.autogen.opendrive.OpenDRIVE.Road odrRd:odrRdList){
+				
+			if (odrRd.getId().equals(road.getId()))
+			{
+				if ( !odrRd.getJunction().equals("-1") )
+				{
+					String JId = odrRd.getJunction();
+					Junction j = JunctionsUpdater.getJunction(JId, mvCxt.getRdCxt());
+					if(j!=null){
+						if(j.getConnection()!=null || j.getConnection().size()>0){
+							ArrayList<RoadSegment>incomingRds=JunctionsPanel.getJunctionRoadSegments("incoming", mvCxt.getRdCxt(), j);
+							
+							for(RoadSegment rs:incomingRds)
+							{
+								s.add(rs.getOdrRoad().getId()) ;
+								
+							}
+							return s;
+						}
+					}
+				}
+				else if (odrRd.isSetLink())
+				{
+					if (odrRd.getLink().isSetSuccessor())
+					{
+						s.add(odrRd.getLink().getSuccessor().getElementId());
+						break;
+					}
+				
+				}
+				else
+					break;
+			}				
+			
+		}
+		
+		return s;
+	}
+	
+	
+	/**
+	 * used to check whether next road (if any) to  new updated road in route has its predecessor link with updated road
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 * @param road is next road to new updated road
+	 * @param newRaodId contains the id of new updated road.
+	 * @return true or false;
+	 */
+	public static boolean getPredecessorRoadId(MovsimConfigContext mvCxt ,Road road , String newRoadId)
+	{
+		List<org.movsim.network.autogen.opendrive.OpenDRIVE.Road>odrRdList=mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad();
+		for(org.movsim.network.autogen.opendrive.OpenDRIVE.Road odrRd:odrRdList){
+			
+			if (odrRd.getId().equals(road.getId()))
+			{
+				if (odrRd.isSetLink())
+				{
+					if (odrRd.getLink().isSetPredecessor())
+					{
+						if (odrRd.getLink().getPredecessor().getElementId().equals(newRoadId))
+						{
+							return true;
+						}
+						else
+							return false;
+					}
+				
+				}
+				else
+					return false;
+			}
+		}
+		return false;
+			
 	}
 	/**
 	 * Used to get Labels of all {@link VehiclePrototypeConfiguration}s
