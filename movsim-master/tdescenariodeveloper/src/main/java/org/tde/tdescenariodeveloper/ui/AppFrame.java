@@ -3,7 +3,7 @@ package org.tde.tdescenariodeveloper.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.util.prefs.Preferences;
+//import java.util.prefs.Preferences;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
@@ -12,7 +12,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+//import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -31,7 +31,7 @@ import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
  *
  */
 public class AppFrame extends JFrame {
-	JCheckBoxMenuItem name,id,axis,dropRoadAtLast,showSelectedGeometry,showSelectedLane,showSpeedLimits,showLinks,showSignals,useTheme;
+	JCheckBoxMenuItem name,id,axis,dropRoadAtLast,showSelectedGeometry,showSelectedLane,showSpeedLimits,showLinks,showSignals; //,useTheme;
 	private static final long serialVersionUID = 14320973455L;
 	private RoadContext rdCxt;
 	private StatusPanel statusPnl;
@@ -79,7 +79,7 @@ public class AppFrame extends JFrame {
 		showSpeedLimits=new JCheckBoxMenuItem("Show speed limits");
 		showLinks=new JCheckBoxMenuItem("Show road links");
 		showSignals=new JCheckBoxMenuItem("Show signals");
-		useTheme=new JCheckBoxMenuItem("Use color theme");
+		//useTheme=new JCheckBoxMenuItem("Use color theme");
 		dropRoadAtLast=new JCheckBoxMenuItem("Auto locate new road");
 		dropRoadAtLast.setToolTipText("Drop new road at end of the last road in network");
 		
@@ -87,7 +87,7 @@ public class AppFrame extends JFrame {
 		axis.setSelected(true);
 		showLinks.setSelected(true);
 		showSignals.setSelected(true);
-		useTheme.setSelected(Preferences.userRoot().node(TDEResources.class.getName()).getBoolean("useTheme",false));
+		//useTheme.setSelected(Preferences.userRoot().node(TDEResources.class.getName()).getBoolean("useTheme",false));
 		showSelectedLane.setSelected(true);
 		showSpeedLimits.setSelected(true);
 		showSelectedGeometry.setSelected(true);
@@ -158,7 +158,7 @@ public class AppFrame extends JFrame {
 		mnEdit.add(showSignals);
 		mnEdit.add(axis);
 		mnEdit.add(dropRoadAtLast);
-		mnEdit.add(useTheme);
+		//mnEdit.add(useTheme);
 		
 		
 		
@@ -183,7 +183,7 @@ public class AppFrame extends JFrame {
 		showSpeedLimits.addActionListener(appListener);
 		showLinks.addActionListener(appListener);
 		showSignals.addActionListener(appListener);
-		useTheme.addActionListener(appListener);
+		//useTheme.addActionListener(appListener);
 		axis.addActionListener(appListener);
 		dropRoadAtLast.addActionListener(appListener);
 
@@ -194,7 +194,7 @@ public class AppFrame extends JFrame {
 		appListener.setShowSpeedLimits(showSpeedLimits);
 		appListener.setShowLinks(showLinks);
 		appListener.setShowSignals(showSignals);
-		appListener.setUseTheme(useTheme);
+		//appListener.setUseTheme(useTheme);
 		appListener.setAxis(axis);
 		appListener.setDropRoadAtLast(dropRoadAtLast);
 		

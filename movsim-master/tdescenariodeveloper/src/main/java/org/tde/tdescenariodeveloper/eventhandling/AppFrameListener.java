@@ -1,6 +1,6 @@
 package org.tde.tdescenariodeveloper.eventhandling;
 
-import java.awt.Color;
+//import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
+//import java.util.prefs.Preferences;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
@@ -27,7 +27,7 @@ import org.movsim.viewer.ui.LogWindow;
 import org.movsim.viewer.ui.ViewProperties;
 import org.movsim.viewer.util.LocalizationStrings;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
-import org.tde.tdescenariodeveloper.ui.TDEResources;
+//import org.tde.tdescenariodeveloper.ui.TDEResources;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
@@ -106,8 +106,18 @@ public class AppFrameListener implements ActionListener,Blockable {
 		}
 		else if(mi==toastDelay){
 			try{
-				mvCxt.getRdCxt().setToastDurationMilis((int)(1000*Double.parseDouble(GraphicsHelper.valueFromUser("Enter delay in seconds"))));
+				int duration = (int)(1000 * Double.parseDouble(GraphicsHelper.valueFromUser("Enter delay in seconds"))) ;
+				while (duration < 0)
+				{
+					GraphicsHelper.showToast("Enter a Valid Duration", mvCxt.getRdCxt().getToastDurationMilis());
+					duration = (int)(1000 * Double.parseDouble(GraphicsHelper.valueFromUser("Enter delay in seconds"))) ;
+				}
+				
+				mvCxt.getRdCxt().setToastDurationMilis(duration);
 				GraphicsHelper.showToast("Delay time changed", mvCxt.getRdCxt().getToastDurationMilis());
+				
+				
+			
 			}catch(NumberFormatException ee){
 				GraphicsHelper.showToast("Enter valid number", mvCxt.getRdCxt().getToastDurationMilis());
 			}
@@ -182,28 +192,28 @@ public class AppFrameListener implements ActionListener,Blockable {
 		else if(chsrc==showSpeedLimits){
 			mvCxt.getRdCxt().getDrawingArea().setDrawSpeedLimits(showSpeedLimits.isSelected());
 		}
-		else if(chsrc==useTheme){
+		/*else if(chsrc==useTheme){
 			TDEResources.setUseTheme(useTheme.isSelected());
 			Preferences.userRoot().node(TDEResources.class.getName()).putBoolean("useTheme", useTheme.isSelected());
 			if(useTheme.isSelected()){
-				mvCxt.getRdCxt().getAppFrame().getTpnl().getColorDensity().setEnabled(true);
-				mvCxt.getRdCxt().getAppFrame().getTpnl().getChooseColor().setEnabled(true);
+				//mvCxt.getRdCxt().getAppFrame().getTpnl().getColorDensity().setEnabled(true);
+				//mvCxt.getRdCxt().getAppFrame().getTpnl().getChooseColor().setEnabled(true);
 				TDEResources.getResources().setThemeColor(new Color(Preferences.userRoot().node(TDEResources.class.getName()).getInt("themeColor", new Color(250,250,250).getRed())));
 				TDEResources.getResources().setColorDensity(Preferences.userRoot().node(TDEResources.class.getName()).getInt("colorDensity", 0));
-				mvCxt.getRdCxt().getAppFrame().getTpnl().getColorDensity().setValue(Preferences.userRoot().node(TDEResources.class.getName()).getInt("colorDensity", 0));
+				//mvCxt.getRdCxt().getAppFrame().getTpnl().getColorDensity().setValue(Preferences.userRoot().node(TDEResources.class.getName()).getInt("colorDensity", 0));
 				mvCxt.updatePanels();
 				mvCxt.getRdCxt().updatePanel();
 				mvCxt.getRdCxt().getAppFrame().getStatusPnl().repaint();
 			}else{
-				mvCxt.getRdCxt().getAppFrame().getTpnl().getColorDensity().setEnabled(false);
-				mvCxt.getRdCxt().getAppFrame().getTpnl().getChooseColor().setEnabled(false);
+				//mvCxt.getRdCxt().getAppFrame().getTpnl().getColorDensity().setEnabled(false);
+				//mvCxt.getRdCxt().getAppFrame().getTpnl().getChooseColor().setEnabled(false);
 				TDEResources.getResources().resetThemeColor();
 				TDEResources.getResources().setColorDensity(0);
 				mvCxt.updatePanels();
 				mvCxt.getRdCxt().updatePanel();
 				mvCxt.getRdCxt().getAppFrame().getStatusPnl().repaint();
 			}
-		}
+		}*/
 		mvCxt.getRdCxt().getDrawingArea().getRoadPrPnl().updateGraphics();
 	
 	}
