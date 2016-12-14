@@ -138,7 +138,7 @@ public class DrawingAreaMouseListener implements MouseListener, MouseMotionListe
         					return;
         				}
         				linkPoints.add(new RoadLaneSegmentPair(sp, ls, sp.userId(), ls.lane()));
-        				LinkUpdater.removeLink(linkPoints);
+        				LinkUpdater.removeLink(linkPoints , trafficCanvas.getRoadPrPnl());
         				trafficCanvas.getRoadPrPnl().getAppFrame().getJp().updateJunction();
         				trafficCanvas.getRoadPrPnl().updateGraphics();
         				break;

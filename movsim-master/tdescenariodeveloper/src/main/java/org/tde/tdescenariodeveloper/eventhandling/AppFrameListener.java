@@ -4,18 +4,19 @@ package org.tde.tdescenariodeveloper.eventhandling;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
-//import java.util.prefs.Preferences;
-
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+
 import javax.swing.SwingUtilities;
 
 import org.movsim.input.MovsimCommandLine;
@@ -27,7 +28,6 @@ import org.movsim.viewer.ui.LogWindow;
 import org.movsim.viewer.ui.ViewProperties;
 import org.movsim.viewer.util.LocalizationStrings;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
-//import org.tde.tdescenariodeveloper.ui.TDEResources;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
@@ -79,7 +79,25 @@ public class AppFrameListener implements ActionListener,Blockable {
 			});
 		}
 		else if(mi==about){
-			GraphicsHelper.showMessage("Vehiculat Traffic Flow Scenario Development Environment"
+			
+			ClassLoader classLoader = getClass().getClassLoader();
+			//final File file = new File(classLoader.getResource("About.txt").getFile());
+			StringBuilder result = new StringBuilder("");
+			
+			try {
+			    BufferedReader in = new BufferedReader(new FileReader(classLoader.getResource("About.txt").getFile()));
+			    String str;
+			    while ((str = in.readLine()) != null)
+			    	result.append(str).append("\n");
+			    in.close();
+			} catch (IOException e2) {
+				
+			}
+			
+			
+			String message = result.toString();
+
+			/*GraphicsHelper.showMessage("Vehiculat Traffic Flow Scenario Development Environment"
 					+ "\nVersion 1.0"
 					+ "\nThis project is submitted in Partial fulfilment of the requirements for the degree of"
 					+ "\nMasters of Science "
@@ -93,7 +111,8 @@ public class AppFrameListener implements ActionListener,Blockable {
 					+ "\nArtificial Intelligence and Multi-disciplinary Research Laboratory (AIM-RL)"
 					+ "\nDate: 20 June, 2014"
 					+ "\nPunjab University College of Information Technology"
-					+ "\n\nshmeelahmad@gmail/hotmail/yahoo.com");
+					+ "\n\nshmeelahmad@gmail/hotmail/yahoo.com");*/
+			GraphicsHelper.showMessage(message);
 		}
 		else if(mi==email){
 			try {

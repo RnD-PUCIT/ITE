@@ -57,6 +57,34 @@ public class MovsimScenario {
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * loads and sets scenario from History file
+	 * @param f .xprj {@link File} to be loaded
+	 * @param mvCxt contains reference to loaded .xprj file and other panels added to it
+	 */
+	public static void setScenario2(File f,MovsimConfigContext mvCxt){
+		try {
+			mvCxt.setMovsim(MovsimInputLoader.getInputData(f));
+			mvCxt.getRdCxt().setSelectedRoadNull();
+			mvCxt.getRdCxt().getRn().reset();
+			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath().replace( f.getName() , mvCxt.getMovsim().getScenario().getNetworkFilename()));
+			RoadNetworkUtils.SetupLights(mvCxt);
+			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(true);
+			if(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().size()>0)mvCxt.getRdCxt().getAppFrame().getJp().setSelectedJn(mvCxt.getRdCxt().getRn().getOdrNetwork().getJunction().get(0).getId());
+			mvCxt.getRdCxt().getAppFrame().getJp().updateJunction();
+			mvCxt.getRdCxt().getAppFrame().getJl().setBlocked(false);
+			mvCxt.updatePanels2();
+			mvCxt.getRdCxt().updateGraphics();
+			mvCxt.getRdCxt().getAppFrame().revalidate();
+			mvCxt.getRdCxt().getAppFrame().repaint();
+		} catch (JAXBException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * reloads default scenario
 	 * @param mvCxt

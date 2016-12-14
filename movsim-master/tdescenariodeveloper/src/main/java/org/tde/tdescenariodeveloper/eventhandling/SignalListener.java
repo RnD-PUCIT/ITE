@@ -62,7 +62,7 @@ public class SignalListener implements DocumentListener, ActionListener,
 			if(src==slider){
 				signal.setS(src.getValue());
 				RoadNetworkUtils.refresh(rdCxt);
-				rdCxt.getMvCxt().updatePanels();
+				rdCxt.getMvCxt().updatePanels2();
 			}
 		}
 	}
@@ -76,7 +76,7 @@ public class SignalListener implements DocumentListener, ActionListener,
 			SignalsPanel.adjustControllersAfterSignalRemove(rdCxt,old);
 			if(signals.size()<1)rdCxt.getSelectedRoad().getOdrRoad().setSignals(null);
 			RoadNetworkUtils.refresh(rdCxt);
-			rdCxt.getMvCxt().updatePanels();
+			rdCxt.getMvCxt().updatePanels2();
 		}
 	}
 
@@ -111,7 +111,7 @@ public class SignalListener implements DocumentListener, ActionListener,
 			SignalsPanel.adjustControllersGroups(rdCxt,old,signal.getId());
 			RoadNetworkUtils.refresh(rdCxt);
 			rdCxt.updatePanel();
-			rdCxt.getMvCxt().updatePanels();
+			rdCxt.getMvCxt().updatePanels2();
 		}
 	}
 

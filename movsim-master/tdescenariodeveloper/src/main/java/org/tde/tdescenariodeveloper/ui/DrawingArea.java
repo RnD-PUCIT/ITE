@@ -41,6 +41,7 @@ import org.movsim.viewer.roadmapping.PaintRoadMapping;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaController;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaPopupListener;
+import org.tde.tdescenariodeveloper.eventhandling.Shortcuts;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
 /**
  * Class used as canvas and used to show current scenario graphically to the user.
@@ -79,6 +80,7 @@ public class DrawingArea extends Canvas {
     protected boolean drawSlopes=true;
     
     final DrawingAreaMouseListener mouseListener;
+    final Shortcuts keyListner;
 	private boolean drawAxis=true;
 	private boolean drawRoadBounds=false;
 	private boolean drawRoadNames=false;
@@ -138,9 +140,11 @@ public class DrawingArea extends Canvas {
 		setSize(new Dimension(bufferWidth,bufferHeight));
 		DrawingAreaController controller=new DrawingAreaController(this);
 		mouseListener=new DrawingAreaMouseListener(this, controller);
+		keyListner = new Shortcuts();
 		addMouseListener(mouseListener);
 		addMouseMotionListener(mouseListener);
 		addMouseWheelListener(mouseListener);
+		addKeyListener(keyListner);
 		setBackground(new Color(74,172,23));
 	}
 	/**

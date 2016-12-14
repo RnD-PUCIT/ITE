@@ -35,6 +35,7 @@ import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.movsim.simulator.roadnetwork.RoadSegment;
 import org.movsim.simulator.trafficlights.TrafficLightLocation;
 import org.movsim.simulator.trafficlights.TrafficLights;
+import org.tde.tdescenariodeveloper.eventhandling.Shortcuts;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
 /**
@@ -470,6 +471,9 @@ public class RoadNetworkUtils {
 	 */
 	public static void refresh(RoadContext rdCxt){
 		SwingUtilities.invokeLater(new Refresher(rdCxt));
+		// save the History
+		Shortcuts.setMvCxt(rdCxt.getMvCxt());
+		Shortcuts.saveAction();
 	}
 	public static void cleanJunctions(MovsimConfigContext mvCxt) {
 		ArrayList<Junction>jns=new ArrayList<>();

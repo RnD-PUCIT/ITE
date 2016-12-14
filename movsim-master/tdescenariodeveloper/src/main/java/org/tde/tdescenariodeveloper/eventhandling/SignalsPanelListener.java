@@ -93,7 +93,7 @@ public class SignalsPanelListener implements ActionListener,Blockable {
 			cn.setSignalId(s.getId());
 			c.getControl().add(cn);
 			RoadNetworkUtils.refresh(rdCxt);
-			rdCxt.getMvCxt().updatePanels();
+			rdCxt.getMvCxt().updatePanels2();
 		}
 	}
 	@Override

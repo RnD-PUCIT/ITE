@@ -1,5 +1,7 @@
 package org.tde.tdescenariodeveloper.validation;
 
+import java.io.Serializable;
+
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.PlanView.Geometry;
 import org.tde.tdescenariodeveloper.exception.InvalidInputException;
 import org.tde.tdescenariodeveloper.ui.RoadContext;

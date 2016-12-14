@@ -16,6 +16,7 @@ import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Predecessor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Link.Successor;
 import org.movsim.network.autogen.opendrive.OpenDRIVE.Road.Signals.Signal;
 import org.movsim.simulator.roadnetwork.RoadSegment;
+import org.tde.tdescenariodeveloper.eventhandling.Shortcuts;
 import org.tde.tdescenariodeveloper.ui.AppFrame;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.ui.RoadContext;
@@ -52,6 +53,11 @@ public class LinkUpdater {
 	    		addLinks4(linkPoints,rdCxt);
 	    	}
 	    	linkPoints.clear();
+	    	
+	    	// saving history
+	   
+	    	Shortcuts.setMvCxt(rdCxt.getMvCxt());
+	    	Shortcuts.saveAction();
 	}
 	 /**
 	  * 
@@ -379,7 +385,7 @@ public class LinkUpdater {
 	 *  
 	 */
 	
-	public static void removeLink(ArrayList<RoadLaneSegmentPair> linkPoints)
+	public static void removeLink(ArrayList<RoadLaneSegmentPair> linkPoints , RoadContext rdCxt)
 	{
 		
 		
@@ -417,6 +423,11 @@ public class LinkUpdater {
 				}
 			
 			}
+			
+			//Save history
+			
+			Shortcuts.setMvCxt(rdCxt.getMvCxt());
+			Shortcuts.saveAction();
 		}
 		
 	}

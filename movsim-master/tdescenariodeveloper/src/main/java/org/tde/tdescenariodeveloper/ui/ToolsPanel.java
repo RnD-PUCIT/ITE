@@ -284,6 +284,26 @@ public class ToolsPanel extends JPanel {
 			}
 		});
 	}
+	
+	
+	
+	public void setDefaultCursor()
+	{
+		JToggleButton jtb=(JToggleButton)defaultCursor;
+		setSelected(linker,linkRemover,arcRoad,addTrafficSource,straightRoad,junctionEditor);
+		selectedRoads.clear();
+		if(jtb.isSelected()){
+			jtb.setBorder(BorderFactory.createLoweredBevelBorder());
+			mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().DEFAULT_CURSOR);
+			mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getDrawingArea().getGraphics());
+		}
+		else{
+			jtb.setBorder(defaultBorder);
+			mvCxt.getRdCxt().getDrawingArea().setCursor(TDEResources.getResources().DEFAULT_CURSOR);
+			mvCxt.getRdCxt().getDrawingArea().paint(mvCxt.getRdCxt().getDrawingArea().getGraphics());
+		}
+	}
+	
 	/**
 	 * Creates and adds new {@link Road} to the {@link OpenDRIVE}
 	 * Called when user has selected straight {@link Line} road and clicks on canvas or on road
@@ -294,8 +314,8 @@ public class ToolsPanel extends JPanel {
 		try {
 			mvCxt.getRdCxt().getDrawingArea().transform.inverseTransform(new Point(e.getX(),e.getY()), p);
 			Road r=RoadNetworkUtils.getRoad(mvCxt.getRdCxt().getRn().getOdrNetwork());
-			RoadSegment undr=RoadNetworkUtils.getUnderLyingRoadSegment(p, mvCxt);
-			if(undr!=null){
+			//RoadSegment undr=RoadNetworkUtils.getUnderLyingRoadSegment(p, mvCxt);
+			/*if(undr!=null){
 				RoadMapping rm=undr.roadMapping();
 				if(!(rm instanceof RoadMappingPoly)){
 					PosTheta p1=rm.endPos();
@@ -363,7 +383,8 @@ public class ToolsPanel extends JPanel {
 				sr.setElementType("road");
 				undr.getOdrRoad().getLink().setSuccessor(sr);
 			}else{
-				if(mvCxt.getRdCxt().getAppFrame().getDropRoadAtLast().isSelected() && mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().size()>0){
+			
+			*/	if(mvCxt.getRdCxt().getAppFrame().getDropRoadAtLast().isSelected() && mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().size()>0){
 					RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(mvCxt.getRdCxt().getRn().getRoadSegments().size()-1).roadMapping();
 					PosTheta pt=null;
 					if(rm instanceof RoadMappingPoly){
@@ -379,10 +400,10 @@ public class ToolsPanel extends JPanel {
 					r.getPlanView().getGeometry().get(0).setY(p.getY());
 					r.getPlanView().getGeometry().get(0).setHdg(0);
 				}
-			}
+			//}
 			mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().add(r);
 			RoadNetworkUtils.refresh(mvCxt.getRdCxt());
-			mvCxt.updatePanels();
+			mvCxt.updatePanels2();
 		} catch (NoninvertibleTransformException e1) {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 		}
@@ -402,7 +423,7 @@ public class ToolsPanel extends JPanel {
 			Arc a=new Arc();
 			a.setCurvature(0.0045);
 			g.setArc(a);
-			RoadSegment undr=RoadNetworkUtils.getUnderLyingRoadSegment(p, mvCxt);
+			/*RoadSegment undr=RoadNetworkUtils.getUnderLyingRoadSegment(p, mvCxt);
 			if(undr!=null){
 				RoadMapping rm=undr.roadMapping();
 				if(!(rm instanceof RoadMappingPoly)){
@@ -470,7 +491,8 @@ public class ToolsPanel extends JPanel {
 				sr.setElementId(r.getId());
 				sr.setElementType("road");
 				undr.getOdrRoad().getLink().setSuccessor(sr);
-			}else{
+			}
+			else{*/
 				if(mvCxt.getRdCxt().getAppFrame().getDropRoadAtLast().isSelected() && mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().size()>0){
 					RoadMapping rm=mvCxt.getRdCxt().getRn().getRoadSegments().get(mvCxt.getRdCxt().getRn().getRoadSegments().size()-1).roadMapping();
 					PosTheta pt=null;
@@ -487,10 +509,10 @@ public class ToolsPanel extends JPanel {
 					r.getPlanView().getGeometry().get(0).setY(p.getY());
 					r.getPlanView().getGeometry().get(0).setHdg(0);
 				}
-			}
+			//}
 			mvCxt.getRdCxt().getRn().getOdrNetwork().getRoad().add(r);
 			RoadNetworkUtils.refresh(mvCxt.getRdCxt());
-			mvCxt.updatePanels();
+			mvCxt.updatePanels2();
 		} catch (NoninvertibleTransformException e1) {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
 		}
@@ -529,7 +551,7 @@ public class ToolsPanel extends JPanel {
 					}
 				}
 				RoadNetworkUtils.refresh(mvCxt.getRdCxt());
-				mvCxt.updatePanels();
+				mvCxt.updatePanels2();
 			}
 		} catch (NoninvertibleTransformException e1) {
 			GraphicsHelper.showToast(e1.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());

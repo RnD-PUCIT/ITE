@@ -23,6 +23,7 @@ import org.movsim.autogen.Simulation;
 import org.movsim.autogen.TrafficLights;
 import org.movsim.autogen.VehiclePrototypes;
 import org.tde.tdescenariodeveloper.eventhandling.Blockable;
+import org.tde.tdescenariodeveloper.eventhandling.Shortcuts;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 /**
  * Class used to hold all the input of {@link Movsim} .xprj file and also other panels related to this input
@@ -92,6 +93,26 @@ public class MovsimConfigContext extends JTabbedPane {
 		blockListeners(false);
 		revalidate();
 		repaint();
+		Shortcuts.setMvCxt(this);
+		Shortcuts.saveAction();
+	}
+	
+	/**
+	 * updates all the panels added to this {@link JTabbedPane}  called only in Set Scenario and don't save the history
+	 */
+	public void updatePanels2()
+	{
+		blockListeners(true);
+		prototypes.updatePanel();
+		simulation.updateSimPanel();
+		routes.updateRoutesPanel();
+		trafficLights.updateTrafficLightsPanel();
+		output.updateOutputPanels();
+		blockListeners(false);
+		revalidate();
+		repaint();
+		//Shortcuts.setMvCxt(this);
+		//Shortcuts.saveAction();
 	}
 	/**
 	 * Used to block/unblock all ({@DocumentListener}, {@link ActionListener}, {@link Blockable}, {@link ItemListener}) listeners of all the components

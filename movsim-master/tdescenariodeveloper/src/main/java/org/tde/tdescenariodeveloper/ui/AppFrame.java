@@ -3,8 +3,6 @@ package org.tde.tdescenariodeveloper.ui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
-//import java.util.prefs.Preferences;
-
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -12,7 +10,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-//import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -22,6 +19,7 @@ import org.movsim.simulator.roadnetwork.RoadNetwork;
 import org.tde.tdescenariodeveloper.eventhandling.AppFrameListener;
 import org.tde.tdescenariodeveloper.eventhandling.DrawingAreaMouseListener;
 import org.tde.tdescenariodeveloper.eventhandling.JunctionsListener;
+import org.tde.tdescenariodeveloper.eventhandling.Shortcuts;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
 import org.tde.tdescenariodeveloper.utils.MovsimScenario;
 import org.tde.tdescenariodeveloper.utils.RoadNetworkUtils;
@@ -69,7 +67,6 @@ public class AppFrame extends JFrame {
 		setMinimumSize(new Dimension(700, 500));
 		setTitle("Vehicular Traffic  Flow Scenario Development Environment");
 		setIconImage(TDEResources.getResources().APP_ICON);
-		
 		name=new JCheckBoxMenuItem("Show road names");
 		id=new JCheckBoxMenuItem("Show road id's");
 		axis=new JCheckBoxMenuItem("Show axis");
@@ -175,6 +172,7 @@ public class AppFrame extends JFrame {
 		mvCxt=new MovsimConfigContext(MovsimScenario.getMovsim(),rdCxt);
 		rdCxt.setMvCxt(mvCxt);
 		toolbar.setMvCxt(mvCxt);
+		Shortcuts.setMvCxt(mvCxt);
 		AppFrameListener appListener=new  AppFrameListener(mvCxt);
 		name.addActionListener(appListener);
 		id.addActionListener(appListener);
