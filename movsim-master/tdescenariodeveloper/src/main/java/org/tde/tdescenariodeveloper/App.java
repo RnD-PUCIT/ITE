@@ -1,5 +1,7 @@
 package org.tde.tdescenariodeveloper;
 
+import javax.swing.JOptionPane;
+
 import org.tde.tdescenariodeveloper.ui.AppFrame;
 
 
@@ -16,6 +18,7 @@ public class App
 	 */
     public static void main( String[] args )
     {
+    	//JOptionPane.showMessageDialog(null, "I am too happy.");
     	AppFrame fr=new AppFrame();
     	fr.setVisible(true);
     }

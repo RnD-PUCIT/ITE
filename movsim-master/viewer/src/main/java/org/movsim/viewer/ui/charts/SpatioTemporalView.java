@@ -62,6 +62,7 @@ package org.movsim.viewer.ui.charts;
 // * @author ralph
 // * 
 // */
+public class SpatioTemporalView{}
 //public class SpatioTemporalView extends JFrame implements ObserverInTime {
 //
 //    private final Simulator simulator;

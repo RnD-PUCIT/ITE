@@ -26,6 +26,7 @@ import org.movsim.autogen.VehicleType;
 import org.movsim.input.network.OpenDriveReader;
 import org.movsim.simulator.trafficlights.TrafficLights;
 import org.movsim.xml.MovsimInputLoader;
+import org.tde.tdescenariodeveloper.eventhandling.Shortcuts;
 import org.tde.tdescenariodeveloper.jaxbhandler.Marshalling;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.xml.sax.SAXException;
@@ -94,7 +95,10 @@ public class MovsimScenario {
 			mvCxt.setMovsim(getMovsim());
 			mvCxt.getRdCxt().setSelectedRoadNull();
 			mvCxt.getRdCxt().getRn().reset();
-			File f=new File("\\tmp.xodr");
+			
+			String path = "History//"  + "tmp.xodr" ;
+		    ClassLoader classLoader = Shortcuts.class.getClassLoader();
+		    File f = new File(path);
 			Marshalling.writeToXml(RoadNetworkUtils.getNewOdr(), f);
 			OpenDriveReader.loadRoadNetwork(mvCxt.getRdCxt().getRn(),f.getAbsolutePath());
 			RoadNetworkUtils.SetupLights(mvCxt);
@@ -119,7 +123,7 @@ public class MovsimScenario {
 	 */
 	public static void saveScenario(File f, MovsimConfigContext mvCxt) {
 		RoadNetworkUtils.removeUncontrolledSignals(mvCxt);
-		RoadNetworkUtils.cleanJunctions(mvCxt);
+		//RoadNetworkUtils.cleanJunctions(mvCxt);
 		Marshalling.writeToXml(mvCxt.getMovsim(),f);
 		Marshalling.writeToXml(mvCxt.getRdCxt().getRn().getOdrNetwork(), new File(f.getAbsolutePath().replace(".xprj", ".xodr")));
 	}

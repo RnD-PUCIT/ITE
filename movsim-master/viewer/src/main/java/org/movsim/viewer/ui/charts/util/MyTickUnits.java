@@ -37,3 +37,4 @@ package org.movsim.viewer.ui.charts.util;
 //public class MyTickUnits extends TickUnits {
 //
 //}
+public class MyTickUnits{}

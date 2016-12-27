@@ -35,6 +35,7 @@ package org.movsim.viewer.ui.charts.util;
 // * @author ralph
 // * 
 // */
+public class MyYNumberTickUnit{}
 //public class MyYNumberTickUnit extends NumberTickUnit {
 //
 //    /**

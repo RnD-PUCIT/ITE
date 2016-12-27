@@ -68,6 +68,7 @@ package org.movsim.viewer.ui.charts;
 // * @author ralph
 // * 
 // */
+public class FloatingCarsTrajectoriesView{}
 //public class FloatingCarsTrajectoriesView extends JFrame implements ActionListener, ObserverInTime {
 //
 //    private final FloatingCars floatingCars;

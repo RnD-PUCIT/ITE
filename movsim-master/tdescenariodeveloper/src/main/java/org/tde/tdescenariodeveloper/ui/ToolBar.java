@@ -21,6 +21,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import org.movsim.viewer.App;
+import org.tde.tdescenariodeveloper.eventhandling.Shortcuts;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
 import org.tde.tdescenariodeveloper.utils.FileUtils;
 import org.tde.tdescenariodeveloper.utils.GraphicsHelper;
@@ -118,7 +119,9 @@ DrawingArea drawingArea;
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					File f=new File(new File("").getAbsoluteFile()+"\\tmp.xprj");
+					String path = "History//"  + "tmp.xprj" ;
+				    ClassLoader classLoader = Shortcuts.class.getClassLoader();
+				    File f = new File(path);
 					DataToViewerConverter.updateFractions(mvCxt);
 					MovsimScenario.saveScenario(f, mvCxt);
 					String[]s={"-f",f.getAbsolutePath()};

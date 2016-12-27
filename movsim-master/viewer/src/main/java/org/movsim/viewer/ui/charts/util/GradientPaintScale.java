@@ -32,6 +32,7 @@ package org.movsim.viewer.ui.charts.util;
 //
 //import org.jfree.chart.renderer.GrayPaintScale;
 //
+public class GradientPaintScale {}
 //public class GradientPaintScale extends GrayPaintScale {
 //
 //    public GradientPaintScale(double lowerBound, double upperBound) {

@@ -70,6 +70,7 @@ package org.movsim.viewer.ui.charts;
 // * @author ralph
 // * 
 // */
+public class DetectorsView{}
 //public class DetectorsView extends JFrame implements ObserverInTime, ActionListener {
 //
 //    private List<LoopDetector> loopDetectors = new ArrayList<LoopDetector>();

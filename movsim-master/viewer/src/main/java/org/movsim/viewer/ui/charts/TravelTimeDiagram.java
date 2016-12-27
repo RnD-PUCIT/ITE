@@ -56,6 +56,7 @@ package org.movsim.viewer.ui.charts;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //
+public class TravelTimeDiagram{}
 //public class TravelTimeDiagram extends JFrame implements ObserverInTime {
 //
 //    final static Logger LOG = LoggerFactory.getLogger(TravelTimeDiagram.class);

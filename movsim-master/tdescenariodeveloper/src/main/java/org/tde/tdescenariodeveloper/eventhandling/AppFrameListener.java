@@ -167,7 +167,10 @@ public class AppFrameListener implements ActionListener,Blockable {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					File f=new File(new File("").getAbsoluteFile()+"\\tmp.xprj");
+					String path = "History//"  + "tmp.xprj" ;
+				    ClassLoader classLoader = Shortcuts.class.getClassLoader();
+				    File f = new File(path);
+					//File f=new File(new File("").getAbsoluteFile()+"\\tmp.xprj");
 					DataToViewerConverter.updateFractions(mvCxt);
 					MovsimScenario.saveScenario(f, mvCxt);
 					String[]args={"-f",f.getAbsolutePath()};

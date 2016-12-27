@@ -39,6 +39,7 @@ package org.movsim.viewer.ui.charts.util;
 // * 
 // * @see ValueAxis
 // */
+public class MyTickUnit{}
 //public class MyTickUnit extends TickUnit {
 //
 //    /**

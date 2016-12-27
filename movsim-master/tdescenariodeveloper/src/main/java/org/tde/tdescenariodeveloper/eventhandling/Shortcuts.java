@@ -53,7 +53,9 @@ public class Shortcuts implements KeyListener {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					File f=new File(new File("").getAbsoluteFile()+"\\tmp.xprj");
+					String path = "History//"  + "tmp.xprj" ;
+				    ClassLoader classLoader = Shortcuts.class.getClassLoader();
+				    File f = new File(path);
 					DataToViewerConverter.updateFractions(mvCxt);
 					MovsimScenario.saveScenario(f, mvCxt);
 					String[]s={"-f",f.getAbsolutePath()};
@@ -73,7 +75,8 @@ public class Shortcuts implements KeyListener {
 			if ((fileCount-1) >= HistoryReverseLimit)
 			{
 				fileCount -= 1;
-				final File f=new File(new File("").getAbsoluteFile()+"\\History\\"+ Integer.toString(fileCount % 20) + ".xprj");
+				String path = "History//" +Integer.toString(fileCount % 20) + ".xprj" ;
+			    final File f = new File(path);
 				if(f==null)return;
 				MovsimScenario.setScenario2(f, mvCxt);
 			}
@@ -108,6 +111,8 @@ public class Shortcuts implements KeyListener {
 	
 	public static void saveAction()
 	{
+		
+		
 		fileCount++;
 		if ( fileCount >= 40 )
 			fileCount -= 20 ;
@@ -116,8 +121,39 @@ public class Shortcuts implements KeyListener {
 			HistoryReverseLimit = (fileCount % 20) +1 ;
 			HistoryReverseLimit = HistoryReverseLimit % 20 ;
 		}
+		
+		if (firstTime)
+		{
+			// making hidden history folder 
+			try
+	        {         
+				File dir = new File("History") ;
+				dir.mkdir();
+	            Runtime rt = Runtime.getRuntime();
+	            Process proc = rt.exec("attrib -s +h -r "+ dir.getPath()); 
+	            int exitVal = proc.waitFor();
+	        } catch (Throwable t)
+	          {
+	            t.printStackTrace();
+	          }
+			
+			
+			// saving tmp file for reseting.. 
+			String path = "History//"  + "tmp.xprj" ;
+		    ClassLoader classLoader = Shortcuts.class.getClassLoader();
+		    File f = new File(path);
+		    if (mvCxt != null)
+			{	
+				DataToViewerConverter.updateFractions(mvCxt);
+				MovsimScenario.saveScenario(f, mvCxt);
+			}
+			
+		}
+		
 		firstTime = false ;
-		File f=new File(new File("").getAbsoluteFile()+"\\History\\"+ Integer.toString(fileCount % 20) + ".xprj");
+		String path = "History//" +Integer.toString(fileCount % 20) + ".xprj" ;
+	    ClassLoader classLoader = Shortcuts.class.getClassLoader();
+	    File f = new File(path);
 		if (mvCxt != null)
 		{	
 			DataToViewerConverter.updateFractions(mvCxt);
