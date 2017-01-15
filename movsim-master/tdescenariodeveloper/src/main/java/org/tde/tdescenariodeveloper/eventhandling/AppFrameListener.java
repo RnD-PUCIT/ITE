@@ -167,7 +167,7 @@ public class AppFrameListener implements ActionListener,Blockable {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					String path = "History//"  + "tmp.xprj" ;
+					String path = System.getProperty("java.io.tmpdir") + "TDE_History.tmp//"  + "tmp.xprj" ;
 				    ClassLoader classLoader = Shortcuts.class.getClassLoader();
 				    File f = new File(path);
 					//File f=new File(new File("").getAbsoluteFile()+"\\tmp.xprj");

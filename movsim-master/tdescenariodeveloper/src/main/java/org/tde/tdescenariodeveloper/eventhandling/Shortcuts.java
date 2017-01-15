@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import javax.swing.SwingUtilities;
+import javax.xml.bind.JAXBException;
+
 import org.movsim.viewer.App;
 import org.tde.tdescenariodeveloper.ui.MovsimConfigContext;
 import org.tde.tdescenariodeveloper.updation.DataToViewerConverter;
@@ -53,17 +55,22 @@ public class Shortcuts implements KeyListener {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					String path = "History//"  + "tmp.xprj" ;
+					String path = System.getProperty("java.io.tmpdir") +"TDE_History.tmp//"  + "tmp" ;
 				    ClassLoader classLoader = Shortcuts.class.getClassLoader();
 				    File f = new File(path);
 					DataToViewerConverter.updateFractions(mvCxt);
 					MovsimScenario.saveScenario(f, mvCxt);
 					String[]s={"-f",f.getAbsolutePath()};
-					try {
-						App.main(s);
-					} catch (URISyntaxException | IOException e) {
-						GraphicsHelper.showToast(e.getMessage(), mvCxt.getRdCxt().getToastDurationMilis());
-					}
+					
+						try {
+							App.main(s);
+						} catch (URISyntaxException | IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						//catch (URISyntaxException | IOException e)
+					
 				}
 			}).start();
 		}
@@ -75,7 +82,7 @@ public class Shortcuts implements KeyListener {
 			if ((fileCount-1) >= HistoryReverseLimit)
 			{
 				fileCount -= 1;
-				String path = "History//" +Integer.toString(fileCount % 20) + ".xprj" ;
+				String path = System.getProperty("java.io.tmpdir")+ "TDE_History.tmp//" +Integer.toString(fileCount % 20) + ".xprj" ;
 			    final File f = new File(path);
 				if(f==null)return;
 				MovsimScenario.setScenario2(f, mvCxt);
@@ -126,8 +133,8 @@ public class Shortcuts implements KeyListener {
 		{
 			// making hidden history folder 
 			try
-	        {         
-				File dir = new File("History") ;
+	        {      
+				File dir = new File(System.getProperty("java.io.tmpdir") + "TDE_History.tmp") ;
 				dir.mkdir();
 	            Runtime rt = Runtime.getRuntime();
 	            Process proc = rt.exec("attrib -s +h -r "+ dir.getPath()); 
@@ -138,8 +145,8 @@ public class Shortcuts implements KeyListener {
 	          }
 			
 			
-			// saving tmp file for reseting.. 
-			String path = "History//"  + "tmp.xprj" ;
+			// saving tmp.xprj file for reseting.. 
+			String path = System.getProperty("java.io.tmpdir") + "TDE_History.tmp//"  + "tmp.xprj" ;
 		    ClassLoader classLoader = Shortcuts.class.getClassLoader();
 		    File f = new File(path);
 		    if (mvCxt != null)
@@ -151,7 +158,7 @@ public class Shortcuts implements KeyListener {
 		}
 		
 		firstTime = false ;
-		String path = "History//" +Integer.toString(fileCount % 20) + ".xprj" ;
+		String path = System.getProperty("java.io.tmpdir") + "TDE_History.tmp//" +Integer.toString(fileCount % 20) + ".xprj" ;
 	    ClassLoader classLoader = Shortcuts.class.getClassLoader();
 	    File f = new File(path);
 		if (mvCxt != null)

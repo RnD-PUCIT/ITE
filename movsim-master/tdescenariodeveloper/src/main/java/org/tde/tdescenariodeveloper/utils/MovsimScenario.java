@@ -96,7 +96,7 @@ public class MovsimScenario {
 			mvCxt.getRdCxt().setSelectedRoadNull();
 			mvCxt.getRdCxt().getRn().reset();
 			
-			String path = "History//"  + "tmp.xodr" ;
+			String path = System.getProperty("java.io.tmpdir") + "TDE_History.tmp//"  + "tmp.xodr" ;
 		    ClassLoader classLoader = Shortcuts.class.getClassLoader();
 		    File f = new File(path);
 			Marshalling.writeToXml(RoadNetworkUtils.getNewOdr(), f);

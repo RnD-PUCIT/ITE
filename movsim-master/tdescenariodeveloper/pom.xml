@@ -123,6 +123,17 @@
                         <mainClass>org.tde.tdescenariodeveloper.App</mainClass>
                     </transformer>
                 </transformers>
+        <filters>
+            <filter>
+                <artifact>*</artifact>
+                <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/*.INF</exclude>
+                </excludes>
+            </filter>
+        </filters>
+                
             </configuration>
         
   	</plugin>
@@ -140,7 +151,7 @@
                     </goals>
                     <configuration>
                         <headerType>gui</headerType>
-                        <jar>target/Test Build.jar</jar>
+                        <jar>target/tdescenariodeveloper-1.0-shaded.jar</jar>
                         <outfile>target/TDE.exe</outfile>
                         <downloadUrl>http://java.com/download</downloadUrl>
                         <classPath>
