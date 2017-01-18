@@ -95,16 +95,17 @@ public class JunctionsUpdater {
 			rdCxt.getAppFrame().getJp().setSelectedJn(id+"");
 			Road connectingRoad = rdCxt.getRn().findByUserId(vls[0]).getOdrRoad();
 			Road incomingRoad = rdCxt.getRn().findByUserId(vls[1]).getOdrRoad();
-			connectingRoad.setJunction(id);
+			incomingRoad.setJunction(id);
 			if(!connectingRoad.isSetLink())connectingRoad.setLink(new Link());
 			if(!incomingRoad.isSetLink())incomingRoad.setLink(new Link());
-			connectingRoad.getLink().setSuccessor(new Successor());
-			connectingRoad.getLink().getSuccessor().setElementType("junction");
-			connectingRoad.getLink().getSuccessor().setElementId(id);
-			incomingRoad.getLink().setPredecessor(new Predecessor());
-			incomingRoad.getLink().getPredecessor().setElementType("road");
-			incomingRoad.getLink().getPredecessor().setContactPoint("end");
-			incomingRoad.getLink().getPredecessor().setElementId(connectingRoad.getId());
+			incomingRoad.getLink().setSuccessor(new Successor());
+			incomingRoad.getLink().getSuccessor().setElementType("junction");
+			incomingRoad.getLink().getSuccessor().setElementId(id);
+			incomingRoad.getLink().getSuccessor().setContactPoint("start");
+		    connectingRoad.getLink().setPredecessor(new Predecessor());
+		    connectingRoad.getLink().getPredecessor().setElementType("junction");
+		    connectingRoad.getLink().getPredecessor().setContactPoint("end");
+		    connectingRoad.getLink().getPredecessor().setElementId(id);
 		}catch(NumberFormatException e){
 			GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
 		}catch(IllegalArgumentException e2){
