@@ -76,9 +76,9 @@ public class SimulationPanel extends JPanel {
 		rds.getViewport().setOpaque(false);
 		trfc.setOpaque(false);
 		trfc.getViewport().setOpaque(false);
-		pr.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Simulation properties" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
-		rds.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Road customizations" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
-		trfc.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Generic Traffic composition" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
+		pr.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Simulation Properties" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
+		rds.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Road Customizations" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
+		trfc.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Generic Traffic Composition" , TitledBorder.LEADING, TitledBorder.ABOVE_TOP, null, Color.DARK_GRAY));
 		
 		GridBagConstraints gbc=new GridBagConstraints();
 		gbc.fill=GridBagConstraints.BOTH;
@@ -94,7 +94,7 @@ public class SimulationPanel extends JPanel {
 		
 		gbc.weightx=1;
 		gbc.gridwidth=1;
-		prop.add(new JLabel("Duration"),gbc);
+		prop.add(new JLabel("Duration (sec)"),gbc);
 		gbc.weightx=4;
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
 		prop.add(duration,gbc);

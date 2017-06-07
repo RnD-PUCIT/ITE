@@ -63,8 +63,8 @@ public class OutputPanel extends JPanel {
 		sp4.getViewport().setOpaque(false);
 		sp1.setOpaque(false);
 		sp4.setOpaque(false);
-		sp1.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Floating cars", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		sp4.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Traval times", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		sp1.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Floating Cars", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		sp4.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Travel Times", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(sp1,c);
 		add(sp4,c);
 		

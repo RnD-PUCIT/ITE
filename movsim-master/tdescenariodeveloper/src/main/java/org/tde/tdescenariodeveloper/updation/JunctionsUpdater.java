@@ -80,12 +80,15 @@ public class JunctionsUpdater {
 		
 		Connection cn=new Connection();
 		cn.setId(getNextId(j)+"");
-		String[]vls=GraphicsHelper.valuesFromUser("Enter values for new connection","Connecting road id","Incoming road id");
-		if(vls[0].equals("") && vls[1].equals(""))return;
+		String[]vls=GraphicsHelper.valuesFromUser("Enter values for new connection","Connecting road id","Incoming road id" , "Sink road id");
+		if(vls[0].equals("") || vls[1].equals("") || vls[2].equals("") )return;
+		
 		try{
 			Integer.parseInt(vls[0]);
 			Integer.parseInt(vls[1]);
 			if(!validator.existsRoad(vls[0]) || !validator.existsRoad(vls[1]))throw new InvalidInputException("Roads reffered don't exist");
+			if(vls[1].equals(vls[0]) )throw new InvalidInputException("Connecting and incoming road should be different");
+			if(!vls[2].equals(vls[1]) && !vls[2].equals(vls[0]) )throw new InvalidInputException("Sink road should be from connecting or incoming road");
 			JunctionsPanel.isPredecessorJunction(rdCxt.getRn().findByUserId(vls[0]).getOdrRoad());
 			cn.setConnectingRoad(vls[0]);
 			cn.setIncomingRoad(vls[1]);
@@ -98,14 +101,27 @@ public class JunctionsUpdater {
 			incomingRoad.setJunction(id);
 			if(!connectingRoad.isSetLink())connectingRoad.setLink(new Link());
 			if(!incomingRoad.isSetLink())incomingRoad.setLink(new Link());
-			incomingRoad.getLink().setSuccessor(new Successor());
-			incomingRoad.getLink().getSuccessor().setElementType("junction");
-			incomingRoad.getLink().getSuccessor().setElementId(id);
-			incomingRoad.getLink().getSuccessor().setContactPoint("start");
-		    connectingRoad.getLink().setPredecessor(new Predecessor());
-		    connectingRoad.getLink().getPredecessor().setElementType("junction");
-		    connectingRoad.getLink().getPredecessor().setContactPoint("end");
-		    connectingRoad.getLink().getPredecessor().setElementId(id);
+			if ( vls[2].equals(vls[0]))
+			{
+				incomingRoad.getLink().setSuccessor(new Successor());
+				incomingRoad.getLink().getSuccessor().setElementType("junction");
+				incomingRoad.getLink().getSuccessor().setElementId(id);
+				incomingRoad.getLink().getSuccessor().setContactPoint("start");
+			    connectingRoad.getLink().setPredecessor(new Predecessor());
+			    connectingRoad.getLink().getPredecessor().setElementType("junction");
+			    connectingRoad.getLink().getPredecessor().setContactPoint("end");
+			    connectingRoad.getLink().getPredecessor().setElementId(id);
+			}else
+			{
+				connectingRoad.getLink().setSuccessor(new Successor());
+				connectingRoad.getLink().getSuccessor().setElementType("junction");
+				connectingRoad.getLink().getSuccessor().setElementId(id);
+				connectingRoad.getLink().getSuccessor().setContactPoint("start");
+				incomingRoad.getLink().setPredecessor(new Predecessor());
+				incomingRoad.getLink().getPredecessor().setElementType("junction");
+				incomingRoad.getLink().getPredecessor().setContactPoint("end");
+				incomingRoad.getLink().getPredecessor().setElementId(id);
+			}
 		}catch(NumberFormatException e){
 			GraphicsHelper.showToast(e.getMessage(), rdCxt.getToastDurationMilis());
 		}catch(IllegalArgumentException e2){

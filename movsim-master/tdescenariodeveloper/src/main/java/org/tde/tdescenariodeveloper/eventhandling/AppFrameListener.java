@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -22,6 +24,10 @@ import javax.swing.SwingUtilities;
 import org.movsim.input.MovsimCommandLine;
 import org.movsim.input.ProjectMetaData;
 import org.movsim.logging.Logger;
+import org.movsim.roadmappings.RoadMapping;
+import org.movsim.roadmappings.RoadMapping.PosTheta;
+import org.movsim.roadmappings.RoadMappingArc;
+import org.movsim.roadmappings.RoadMappingLine;
 import org.movsim.viewer.App;
 import org.movsim.viewer.ui.AppFrame;
 import org.movsim.viewer.ui.LogWindow;
@@ -148,6 +154,12 @@ public class AppFrameListener implements ActionListener,Blockable {
 					File f=null;
 					f=FileUtils.saveFile("xprj");
 					if(f!=null){
+						try {
+							saveForUnity();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						DataToViewerConverter.updateFractions(mvCxt);
 						MovsimScenario.saveScenario(f,mvCxt);
 					}
@@ -239,6 +251,190 @@ public class AppFrameListener implements ActionListener,Blockable {
 		mvCxt.getRdCxt().getDrawingArea().getRoadPrPnl().updateGraphics();
 	
 	}
+	
+	public void saveForUnity() throws IOException
+	{
+		
+		
+		
+		FileWriter fw1 = new FileWriter("C:/cleaf/StraightRoads.txt");
+        PrintWriter pw1 = new PrintWriter(fw1);
+       // BufferedWriter bw = new BufferedWriter(fw1);
+        
+        FileWriter fw2 = new FileWriter("C:/cleaf/Arcs_LeftEdge.txt", false);
+        PrintWriter pw2 = new PrintWriter(fw2);
+        FileWriter fw3 = new FileWriter("C:/cleaf/Arcs_RightEdge.txt", false);
+        PrintWriter pw3 = new PrintWriter(fw3);
+        FileWriter fw4 = new FileWriter("C:/cleaf/Gradient.txt", false);
+        PrintWriter pw4 = new PrintWriter(fw4);
+        
+        
+        int size = mvCxt.getRdCxt().getRn().getRoadSegments().size();
+        for (int i=0; i < size; i++)
+        {
+        		double offset=0.0;
+        		
+		        PosTheta posTheta, trackPosTheta;
+		        double x1,y1,x2,y2, tx, ty, gx, gy, rise, run;
+		        
+		        RoadMapping mp = mvCxt.getRdCxt().getRn().getRoadSegments().get(i).roadMapping();
+		       
+		        final Class<? extends RoadMapping> roadMappingClass =mp.getClass();
+		        final double roadLength = mp.roadLength();
+		        
+		        // forget about offset, it always gives zero
+		       // offset = mp.getLaneGeometries().getLeft().getLaneCount()
+		         //       * mp.getLaneGeometries().getLaneWidth();
+		        
+		      //Below if else condition helps me to find the left edge (x and y coordinates)
+		        if (roadMappingClass == RoadMappingLine.class  )
+		        {
+			        posTheta = mp.startPos(offset);			        
+			        x1=posTheta.x ;
+			        y1=-posTheta.y;
+			        
+			        posTheta = mp.endPos(offset);
+			        x2=posTheta.x ;
+			        y2=-posTheta.y ;
+			        
+			        pw1.println(mvCxt.getRdCxt().getRn().getRoadSegments().get(i).userId());
+			        pw1.println(mp.laneCount() );
+				    pw1.println(x1);
+				    pw1.println(y1);
+				    pw1.println(x2);
+				    pw1.println(y2);
+				    //bw.write("hello");
+		        }
+		        
+		        else if(roadMappingClass == RoadMappingArc.class)
+	            {
+		            final double sectionLength = 5.0;
+		            double roadPos = 0.0;
+		           
+		            posTheta = mp.startPos(offset);
+		            x1=posTheta.x;
+		            y1=-posTheta.y;
+		            while (roadPos < roadLength) 
+		            {
+		                roadPos += sectionLength;
+		                posTheta = mp.map(Math.min(roadPos, roadLength), offset);
+		                x2=posTheta.x ;
+		                y2=-posTheta.y;
+		               
+		                pw2.println(x1);
+			            pw2.println(y1);
+			            pw2.println(x2);
+			            pw2.println(y2); 
+		               
+			            x1=x2;
+		                y1=y2;
+		            }
+		        }
+		      
+		       
+		        //code to find x y coord of lanes
+		        //this is where I find the no of lanes, left road edge is found from code above
+		        
+		        
+		        //int maxRightLane = -mp.getLaneGeometries().getRight().getLaneCount();
+		        //int maxLeftLane = mp.getLaneGeometries().getLeft().getLaneCount();
+		        
+		        int LaneCount = -mp.laneCount();
+		        //int maxLeftLane = mp.laneCount();
+		        
+		        
+		        
+		        
+		        // For the middle lanes/edges
+		        //for (int lane = maxRightLane + 1; lane < maxLeftLane; lane++) 
+		        for (int lane = 0 - 1; lane > LaneCount; lane--)
+		        {
+		            offset = lane * mp.laneWidth();
+		        
+		        	posTheta = mp.startPos(offset);
+				        
+			        x1=posTheta.x;
+			        y1=-posTheta.y;
+			        
+			        posTheta = mp.endPos(offset);
+			        
+			        x2=posTheta.x;
+			        y2=-posTheta.y;
+			    
+			        pw1.println(x1);
+		            pw1.println(y1);
+		            pw1.println(x2);
+		            pw1.println(y2);
+		       }
+		       
+	            // edge of most outer edge
+		        // this code helps me find the x y coordinates of right most edge of the road
+		        
+		        
+		        //offset = mp.getMaxOffsetRight();
+		        
+		        
+		        
+		        offset = -mp.laneCount() * mp.laneWidth();
+//		                * mp.getLaneGeometries().getLaneWidth();
+		        if (roadMappingClass == RoadMappingLine.class  )
+		        {
+			        posTheta = mp.startPos(offset);
+			        
+			        x1=posTheta.x;
+			        y1=-posTheta.y;
+			        
+			        posTheta = mp.endPos(offset);
+			        
+			        x2=posTheta.x;
+			        y2=-posTheta.y;
+			        
+			        pw1.println("Right edge");
+			        pw1.println(x1);
+		            pw1.println(y1);
+		            pw1.println(x2);
+		            pw1.println(y2);
+		        }
+		       
+	            else if(roadMappingClass == RoadMappingArc.class)
+	            {
+		            final double sectionLength = 5.0;
+		            double roadPos = 0.0;
+		            
+		            posTheta = mp.startPos(offset);
+		            x1=posTheta.x;
+		            y1=-posTheta.y;
+		            while (roadPos < roadLength) 
+		            {
+		                roadPos += sectionLength;
+		                posTheta = mp.map(Math.min(roadPos, roadLength), offset);
+		                x2=posTheta.x;
+		                y2=-posTheta.y;
+		               
+		                pw3.println(x1);
+			            pw3.println(y1);
+			            pw3.println(x2);
+			            pw3.println(y2);
+			            x1=x2;
+		                y1=y2;
+		            }
+		            pw3.println("end of arc");
+	            }
+		        
+		        //setVisible(true);
+        }
+        pw1.close();
+        fw1.close();
+        pw2.close();
+        fw2.close();
+        pw3.close();
+        fw3.close();
+        pw4.close();
+        fw4.close();
+        
+        
+	}
+	
 	public void setEmail(JMenuItem email) {
 		this.email = email;
 	}

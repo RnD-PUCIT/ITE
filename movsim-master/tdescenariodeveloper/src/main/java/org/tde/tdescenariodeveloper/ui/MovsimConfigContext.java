@@ -73,11 +73,11 @@ public class MovsimConfigContext extends JTabbedPane {
 		sp2.setOpaque(false);
 		sp1.getViewport().setOpaque(false);
 		sp2.getViewport().setOpaque(false);
-		addTab("Simulation configuration",TDEResources.getResources().getSimulation(),simulation,"Edit parameters for simulation");
-		addTab("Vehicle prototypes",TDEResources.getResources().getPrototypes(),sp1,"Decide which type of traffic to run on roads");
-		addTab("Traffic signals",TDEResources.getResources().getTraffic(),trafficLights,"Control traffic with signals");
-		addTab("Routes configuration",TDEResources.getResources().getRoutes(),sp2,"Tell simulator what fraction of vehicles should follow which route");
-		addTab("Output configuration",TDEResources.getResources().getOutput(),output,"Scenario statistics and result output for analysis");
+		addTab("Simulation Configuration",TDEResources.getResources().getSimulation(),simulation,"Edit parameters for simulation");
+		addTab("Vehicle Prototypes",TDEResources.getResources().getPrototypes(),sp1,"Decide which type of traffic to run on roads");
+		addTab("Traffic Signals",TDEResources.getResources().getTraffic(),trafficLights,"Control traffic with signals");
+		addTab("Routes Configuration",TDEResources.getResources().getRoutes(),sp2,"Tell simulator what fraction of vehicles should follow which route");
+		addTab("Output Configuration",TDEResources.getResources().getOutput(),output,"Scenario statistics and result output for analysis");
 		updatePanels();
 	}
 	/**

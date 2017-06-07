@@ -92,7 +92,7 @@ public class VehiclePrototypesPanel extends JPanel {
 		prPnl.removeAll();
 		GridBagConstraints gbc=new GridBagConstraints();
 		gbc.gridwidth=GridBagConstraints.REMAINDER;
-		mvCxt.setTitleAt(1, "Vehicle prototypes ("+mvCxt.getMovsim().getVehiclePrototypes().getVehiclePrototypeConfiguration().size()+")");
+		mvCxt.setTitleAt(1, "Vehicle Prototypes ("+mvCxt.getMovsim().getVehiclePrototypes().getVehiclePrototypeConfiguration().size()+")");
 		gbc.weightx=1;
 		gbc.weighty=1;
 		gbc.insets=new Insets(10, 10,10, 10);
@@ -123,8 +123,8 @@ public class VehiclePrototypesPanel extends JPanel {
 		laneChangeModel.setOpaque(false);
 		Font f=new Font(null,Font.ITALIC,13);
 		fields.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Properties" , TitledBorder.LEADING, TitledBorder.TOP, f, Color.DARK_GRAY));
-		longitudenalModel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Driving models", TitledBorder.LEADING, TitledBorder.TOP, f, Color.DARK_GRAY));
-		laneChangeModel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Lane change model", TitledBorder.LEADING, TitledBorder.TOP, f, Color.DARK_GRAY));
+		longitudenalModel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Driving Models", TitledBorder.LEADING, TitledBorder.TOP, f, Color.DARK_GRAY));
+		laneChangeModel.setBorder(new TitledBorder(new LineBorder(Color.GRAY, 1, true),"Lane Change Model", TitledBorder.LEADING, TitledBorder.TOP, f, Color.DARK_GRAY));
 		PrototypesListener ptl=new PrototypesListener(mvCxt);
 		ptl.setVpc(prCn);
 		if(removable){

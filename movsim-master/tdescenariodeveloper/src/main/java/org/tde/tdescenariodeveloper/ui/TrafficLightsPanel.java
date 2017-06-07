@@ -56,8 +56,8 @@ public class TrafficLightsPanel extends JPanel {
 		sp1.getViewport().setOpaque(false);
 		sp2.setOpaque(false);
 		sp2.getViewport().setOpaque(false);
-		sp1.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal controllers", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		sp2.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal controllers configurations", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		sp1.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal Controllers", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		sp2.setBorder(new TitledBorder(new LineBorder(new Color(150, 150, 150), 1, false), "Signal Controllers Configurations", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		add(sp1,c);
 		c.weightx=3;
 //		c.gridwidth=GridBagConstraints.REMAINDER;
