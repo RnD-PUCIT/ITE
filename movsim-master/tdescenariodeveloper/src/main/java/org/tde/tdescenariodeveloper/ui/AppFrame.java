@@ -65,7 +65,7 @@ public class AppFrame extends JFrame {
 		GraphicsHelper.setNativeUI();
 		setPreferredSize(new Dimension(1024, 768));
 		setMinimumSize(new Dimension(700, 500));
-		setTitle("Vehicular Traffic  Flow Scenario Development Environment");
+		setTitle("Vehicular Traffic Scenario Development Environment");
 		setIconImage(TDEResources.getResources().APP_ICON);
 		name=new JCheckBoxMenuItem("Show road names");
 		id=new JCheckBoxMenuItem("Show road id's");
