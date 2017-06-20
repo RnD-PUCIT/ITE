@@ -1,7 +1,6 @@
 /.settings
 **/.settings/
 /.classpath
-target/
 bin/
 figs/
 csv/
