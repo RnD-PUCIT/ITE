@@ -98,11 +98,12 @@ public class JunctionsUpdater {
 			rdCxt.getAppFrame().getJp().setSelectedJn(id+"");
 			Road connectingRoad = rdCxt.getRn().findByUserId(vls[0]).getOdrRoad();
 			Road incomingRoad = rdCxt.getRn().findByUserId(vls[1]).getOdrRoad();
-			incomingRoad.setJunction(id);
+			connectingRoad.setJunction(id);
 			if(!connectingRoad.isSetLink())connectingRoad.setLink(new Link());
 			if(!incomingRoad.isSetLink())incomingRoad.setLink(new Link());
 			if ( vls[2].equals(vls[0]))
 			{
+		
 				incomingRoad.getLink().setSuccessor(new Successor());
 				incomingRoad.getLink().getSuccessor().setElementType("junction");
 				incomingRoad.getLink().getSuccessor().setElementId(id);
@@ -113,6 +114,7 @@ public class JunctionsUpdater {
 			    connectingRoad.getLink().getPredecessor().setElementId(id);
 			}else
 			{
+				
 				connectingRoad.getLink().setSuccessor(new Successor());
 				connectingRoad.getLink().getSuccessor().setElementType("junction");
 				connectingRoad.getLink().getSuccessor().setElementId(id);
